@@ -1,0 +1,19 @@
+#deck:Linux Mastery::Module 1 - Filesystem::Demo 02 - Navigation & Files
+#separator:Comma
+#columns:Front,Back,Tags
+
+"ls -l shows link count 3 for a directory. What does 3 mean?","Every directory has minimum 2 hard links: the entry in its parent, and its own . (dot) entry. Each subdirectory adds 1 more via its .. (dotdot) entry. Link count 3 means exactly one subdirectory exists. Use ls -lai to see inode numbers.","demo02,inodes,links"
+
+"You delete a 5GB file but df -h shows no change. What command diagnoses this and what is the fix?","lsof | grep deleted — shows files with directory entry removed but still held open by a process. The kernel keeps inode and data blocks allocated until the process closes the file. Fix: restart the process holding it. The kernel then frees the blocks.","demo02,inodes,disk,lsof"
+
+"What is the difference between mtime and ctime? Why does writing content update both?","mtime updates when file contents change. ctime updates when any inode metadata changes. Writing content changes mtime — but the new mtime value must be stored in the inode — so the inode is modified — so ctime also updates. ctime always updates when mtime updates, but ctime can update without mtime (chmod, chown).","demo02,timestamps"
+
+"ls -lai shows two files with the same inode number. What are they? What happens if you delete one?","Hard links — two directory entries pointing to the same inode and data blocks. Created with: ln original.txt hardlink.txt. Deleting one reduces link count by 1. Data survives until link count = 0 AND no process has file open.","demo02,hardlinks,inodes"
+
+"ls -la shows: lrwxrwxrwx 1 root root 26 May 29 nginx.conf -> /etc/nginx/nginx.conf. What is the 26?","26 is the number of characters in the target path string /etc/nginx/nginx.conf. For symlinks, the size column shows the byte length of the stored path string — not data size. lrwxrwxrwx: l = symbolic link type.","demo02,softlinks,ls"
+
+"chmod on a file updates ctime but not mtime. mv updates ctime but not mtime. Why?","chmod changes permissions — inode metadata. Any inode change updates ctime. mv renames the directory entry — the inode is touched during the rename operation. ctime records any inode change. mtime only changes when file contents change. Neither chmod nor mv touches file data.","demo02,timestamps,ctime"
+
+"Explain the nginx sites-available/sites-enabled symlink pattern. Why symlinks instead of copies?","sites-available/ holds all config files. sites-enabled/ holds symlinks pointing to active configs in sites-available/. Enable: ln -s ../sites-available/app.conf sites-enabled/. Disable: rm sites-enabled/app.conf (symlink only, config preserved). One file exists — edits are immediately seen. Copies would go out of sync.","demo02,softlinks,nginx"
+
+"What is a directory entry? What information does it contain?","A directory in Linux is a special file whose contents are a table mapping filenames to inode numbers. Each row is a directory entry: filename → inode number. The filename lives here, not in the inode. Create a file: new inode + new entry. Delete: entry removed (inode freed when count=0 and no open fd). Rename: entry's filename changed, same inode.","demo02,inodes,directory-entry"
