@@ -74,6 +74,28 @@ all three timestamps at once plus complete inode metadata.]
 
 ---
 
+Q5b. A developer runs stat /etc/nginx/sites-enabled/app.conf and
+     sees mtime from last week. They edited the config three days
+     ago through this symlink. What went wrong and what should
+     they have run?
+
+A) stat follows symlinks — if mtime is last week the edit was lost
+B) stat shows the symlink's OWN metadata by default. The symlink's
+   mtime records when the symlink itself was created, not when
+   content was edited through it. Run stat -L or stat the target
+   directly: stat /etc/nginx/sites-available/app.conf
+C) The editor did not save the file correctly
+D) mtime on a symlink always shows the creation date
+
+[Answer: B — stat on a symlink shows the symlink's own inode and
+timestamps. The symlink's mtime = when the symlink file was created
+or re-pointed. It does not change when you write through it to the
+target. To check whether the edit was saved, always stat the target
+directly or use stat -L to dereference. The nginx sites-enabled/
+sites-available pattern makes this confusion very common in practice.]
+
+---
+
 Q6. Make python3.12 available as python in /usr/local/bin/.
     Which command is correct and why?
 
@@ -108,9 +130,26 @@ that path no longer resolves. Dangling — exists but unreadable.]
 
 ---
 
+Q8. You run cp source-link.txt copy.txt where source-link.txt is
+    a symlink pointing to source.txt. What does copy.txt contain?
+
+A) copy.txt is a symlink pointing to source.txt
+B) copy.txt is a regular file containing the content of source.txt
+   — cp follows the symlink by default
+C) cp fails — you cannot copy a symlink
+D) copy.txt is a symlink pointing to source-link.txt
+
+[Answer: B — cp follows symlinks by default and copies the target
+content as a new regular file. The symlink is not preserved.
+To preserve the symlink: cp -a source-link.txt copy.txt
+copy.txt then becomes a symlink pointing to source.txt.
+cp -a = archive mode = -r + -p + -d (preserve symlinks as symlinks).]
+
+---
+
 Score guide:
 Score   Action
-7/7     Import Anki cards, move to Demo 03
-6/7     Review wrong answer, proceed
-5/7     Re-read relevant section, retry
-4/7 -   Re-read full demo before proceeding
+9/9     Import Anki cards, move to Demo 03
+8/9     Review wrong answer, proceed
+7/9     Re-read relevant section, retry those questions
+6/9 -   Re-read full demo before proceeding

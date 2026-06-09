@@ -1203,6 +1203,14 @@ are removed AND no process has it open.
 "Explain the nginx sites-available/sites-enabled symlink pattern. Why symlinks instead of copies?","sites-available/ holds all config files. sites-enabled/ holds symlinks pointing to active configs in sites-available/. Enable: ln -s ../sites-available/app.conf sites-enabled/. Disable: rm sites-enabled/app.conf (symlink only, config preserved). One file exists — edits are immediately seen. Copies would go out of sync.","demo02,softlinks,nginx"
 
 "What is a directory entry? What information does it contain?","A directory in Linux is a special file whose contents are a table mapping filenames to inode numbers. Each row is a directory entry: filename → inode number. The filename lives here, not in the inode. Create a file: new inode + new entry. Delete: entry removed (inode freed when count=0 and no open fd). Rename: entry's filename changed, same inode.","demo02,inodes,directory-entry"
+
+"You run stat on a symlink. Does it show the symlink's own metadata or the target's? How do you make stat follow the symlink?","stat on a symlink shows the symlink's OWN metadata — its own inode, its own timestamps, its own size (= path string length). It does NOT follow the symlink by default. To follow the symlink and show the target's metadata: stat -L symlink.txt. The -L flag means dereference (follow the link). This distinction matters when checking whether an edit through a symlink was saved — always stat the target directly, not the symlink.","demo02,symlink,stat"
+
+"What is the difference between cp, cp -p, and cp -a when copying a file that is a symlink?","cp (plain): follows the symlink and copies the target content as a regular file. New timestamps from now, your umask permissions. cp -p (preserve): follows the symlink, copies target content, but preserves original timestamps, permissions and ownership. Still a regular file. cp -a (archive): preserves the symlink AS a symlink — does not follow it. Also preserves timestamps and permissions. Use cp -a for complete faithful directory copies — backups, migrations, staging. cp -a = -r + -p + -d (preserve symlinks).","demo02,cp,symlink,flags"
+
+"touch file{1..5}.txt creates 5 files. Is this a touch feature or something else? What other commands can use the same syntax?","This is bash brace expansion — a shell feature, not specific to touch. The shell expands {1..5} before touch even runs, converting it to: touch file1.txt file2.txt file3.txt file4.txt file5.txt. Works with any command: mkdir dir{a,b,c}, cp config{,.bak}, rm log{1..10}.txt. Covered fully in Demo 12 (Bash Scripting).","demo02,touch,bash,brace-expansion"
+
+"You try to create a hard link to a directory: ln /etc/nginx/ /tmp/nginx-link. It fails. Why? What should you use instead?","Hard links to directories are not allowed — the kernel explicitly prevents it to avoid circular directory loops which would break filesystem traversal. Error: hard link not allowed for directory. Use a soft link instead: ln -s /etc/nginx/ /tmp/nginx-link. Soft links can point to directories and are the correct tool for directory aliasing.","demo02,hardlinks,directories"
 ```
 
 ---
@@ -1288,6 +1296,28 @@ all three timestamps at once plus complete inode metadata.]
 
 ---
 
+Q5b. A developer runs stat /etc/nginx/sites-enabled/app.conf and
+     sees mtime from last week. They edited the config three days
+     ago through this symlink. What went wrong and what should
+     they have run?
+
+A) stat follows symlinks — if mtime is last week the edit was lost
+B) stat shows the symlink's OWN metadata by default. The symlink's
+   mtime records when the symlink itself was created, not when
+   content was edited through it. Run stat -L or stat the target
+   directly: stat /etc/nginx/sites-available/app.conf
+C) The editor did not save the file correctly
+D) mtime on a symlink always shows the creation date
+
+[Answer: B — stat on a symlink shows the symlink's own inode and
+timestamps. The symlink's mtime = when the symlink file was created
+or re-pointed. It does not change when you write through it to the
+target. To check whether the edit was saved, always stat the target
+directly or use stat -L to dereference. The nginx sites-enabled/
+sites-available pattern makes this confusion very common in practice.]
+
+---
+
 Q6. Make python3.12 available as python in /usr/local/bin/.
     Which command is correct and why?
 
@@ -1322,10 +1352,27 @@ that path no longer resolves. Dangling — exists but unreadable.]
 
 ---
 
+Q8. You run cp source-link.txt copy.txt where source-link.txt is
+    a symlink pointing to source.txt. What does copy.txt contain?
+
+A) copy.txt is a symlink pointing to source.txt
+B) copy.txt is a regular file containing the content of source.txt
+   — cp follows the symlink by default
+C) cp fails — you cannot copy a symlink
+D) copy.txt is a symlink pointing to source-link.txt
+
+[Answer: B — cp follows symlinks by default and copies the target
+content as a new regular file. The symlink is not preserved.
+To preserve the symlink: cp -a source-link.txt copy.txt
+copy.txt then becomes a symlink pointing to source.txt.
+cp -a = archive mode = -r + -p + -d (preserve symlinks as symlinks).]
+
+---
+
 Score guide:
 Score   Action
-7/7     Import Anki cards, move to Demo 03
-6/7     Review wrong answer, proceed
-5/7     Re-read relevant section, retry
-4/7 -   Re-read full demo before proceeding
+9/9     Import Anki cards, move to Demo 03
+8/9     Review wrong answer, proceed
+7/9     Re-read relevant section, retry those questions
+6/9 -   Re-read full demo before proceeding
 ```
