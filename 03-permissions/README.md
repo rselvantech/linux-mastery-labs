@@ -139,6 +139,37 @@ Run `id` before debugging any "Permission denied" error — it
 tells you immediately which category (owner/group/other) applies
 to you for the file in question.
 
+**How groups are assigned when a user is created:**
+
+When `useradd` creates a user, two things happen by default on
+most Linux systems:
+
+**Primary group** — a new group with the same name and GID as
+the user is created automatically. This is called the
+**User Private Group (UPG)** scheme. The new user's primary GID
+is set to this private group.
+
+```bash
+useradd wadmin
+# Creates: user wadmin (UID=1000)
+# Also creates: group wadmin (GID=1000)  ← UPG
+# /etc/passwd: wadmin:x:1000:1000:...
+#                               ↑ primary GID = 1000 (wadmin group)
+```
+
+**Supplementary groups** — none are assigned by default. The
+user only belongs to their primary group until an administrator
+explicitly adds them to other groups.
+
+```bash
+usermod -aG wheel wadmin    # add to wheel (sudo access)
+usermod -aG docker wadmin   # add to docker
+```
+
+The full details of `useradd`, `usermod`, group management,
+and the `/etc/passwd` / `/etc/group` / `/etc/shadow` files are
+covered in **Demo 05 — Users, Groups & Authentication**.
+
 ---
 
 ### 1.2 The permission model — three levels, three types
@@ -827,13 +858,45 @@ ls -l /var/www/project/style.css
 # nginx can now access it correctly
 ```
 
+**same rule applies to directories as to files:**
+
+```bash
+# Regular directory — mkdir assigns your primary group
+mkdir /srv/project/mysubdir
+ls -ld /srv/project/mysubdir
+# drwxr-xr-x  wadmin  wadmin  mysubdir
+#                      ↑
+#                      primary group (wadmin)
+
+# Inside a setgid directory — mkdir inherits directory's group
+ls -ld /srv/project/
+# drwxrwsr-x  root  developers  /srv/project/  ← setgid set
+
+mkdir /srv/project/assets/
+ls -ld /srv/project/assets/
+# drwxr-sr-x  wadmin  developers  assets/
+#                       ↑           ↑
+#                       inherited   notice: setgid bit is also
+#                       from parent inherited by the new subdir
+```
+
+The setgid bit propagates — new subdirectories created inside a
+setgid directory also get the setgid bit set automatically. This
+means the entire tree maintains the same group assignment behaviour
+without manual intervention. Files do NOT inherit the setgid bit —
+only subdirectories do.
+
 **Summary:**
 
 ```
-Location of new file          → group assigned
-─────────────────────────────────────────────────────
-Regular directory (no setgid) → your primary group (from id output)
-Directory with setgid bit set → the directory's group (inherited)
+When creating inside a directory:
+
+                         Without setgid      With setgid (g+s)
+                         ──────────────────────────────────────
+New file — group         your primary group  directory's group
+New file — setgid bit    not set             not set
+New subdir — group       your primary group  directory's group
+New subdir — setgid bit  not set             inherited (set automatically)
 ```
 
 This is why the break-fix scenario in Part 3 uses `chmod g+s` —
@@ -902,8 +965,13 @@ ls -la ~/demo03/
 
 **What to look for in the output:**
 
-New files will show your username as both owner and group. The
-default permissions come from your current umask — typically
+> New files will show your username as owner and your **primary
+> group** as group. On a standard install using the User Private
+> Group scheme, the primary group name matches your username —
+> which is why both columns show the same name. This is not always
+> the case when users are created with a shared primary group.
+
+The default permissions come from your current umask — typically
 `644` for files and `755` for directories with `umask 022`.
 
 ```bash
