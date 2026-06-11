@@ -1,0 +1,19 @@
+#deck:Linux Mastery::Module 2 - Permissions::Demo 03 - Permissions
+#separator:Comma
+#columns:Front,Back,Tags
+
+"ls -l shows -rwsr-xr-x on /usr/bin/passwd. What does the s mean and why is it needed?","The s in the owner execute position is the setuid bit. When any user runs passwd, the process temporarily runs with root's permissions (passwd is owned by root). This allows writing to /etc/shadow which only root can access. Without setuid, users could never change their own passwords.","demo03,setuid,permissions"
+
+"You create a file in /var/www/project/. It shows your username as group instead of webteam. How do you fix this permanently for all future files?","Set the setgid bit on the directory: chmod g+s /var/www/project/ or chmod 2775 /var/www/project/. With setgid, all new files created inside inherit the directory's group (webteam) instead of the creator's primary group. Existing files are unaffected — only new files follow the rule.","demo03,setgid,permissions"
+
+"What is umask 027? What permissions does it give to new files and directories?","umask 027 removes write from group and all permissions from others. New files: 640 (rw-r-----). New dirs: 750 (rwx r-x ---). Production use: service accounts should use umask 027 so they cannot accidentally create world-readable files. Set in systemd unit with UMask=0027.","demo03,umask,security"
+
+"A CI/CD pipeline gets Permission denied on deploy.sh. ls -l shows -rw-r--r--. What is wrong and what is the minimum fix?","No execute bit. The script has 644 — read/write for owner, read for group and others, no execute for anyone. Shell cannot execute a script without the execute bit. Fix: chmod 755 deploy.sh (or chmod +x deploy.sh). The x bit is required for any user to run the script as a program.","demo03,chmod,permissions,troubleshooting"
+
+"What does the + at end of permissions mean in ls -l? Example: -rw-r--r--+","The + indicates an ACL (Access Control List) is set on this file beyond standard permissions. Standard ls -l cannot show the full picture. Use getfacl filename to see all ACL entries including per-user and per-group permissions.","demo03,acl,permissions"
+
+"You need to give user ci-runner read access to /etc/nginx/nginx.conf without making it world-readable and without adding ci-runner to the root group. What do you use?","ACL: setfacl -m u:ci-runner:r /etc/nginx/nginx.conf. Then verify: getfacl /etc/nginx/nginx.conf. This grants exactly read permission to one specific user without changing standard permissions, group membership, or world-readability. This is the primary use case for ACLs over standard permissions.","demo03,acl,setfacl,security"
+
+"What is wrong with chmod -R 755 /var/www/html/?","It applies execute permission to ALL files including regular HTML, CSS, JS files — not just directories. Regular files do not need the execute bit. The correct approach: find /var/www/html -type d -exec chmod 755 {} \\; && find /var/www/html -type f -exec chmod 644 {} \\;","demo03,chmod,recursive,security"
+
+"A file has permissions rw-r--r-- and you run chmod o=. What are the new permissions?","rw-r----- (640). chmod o= sets other permissions to nothing (empty). Owner permissions (rw-) unchanged. Group permissions (r--) unchanged. Other permissions cleared to ---. Equivalent to: chmod 640 filename","demo03,chmod,symbolic"
