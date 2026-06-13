@@ -1,4 +1,4 @@
-# Demo 03 — Quiz
+# Quiz — Demo 03: File Permissions, Ownership & Access Control
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to Demo 04.
 

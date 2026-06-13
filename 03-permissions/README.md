@@ -1395,26 +1395,19 @@ remains locked down for everyone else.
 
 ## Key Takeaways
 
-- Permissions have three levels (owner/group/other) and three
-  types (read/write/execute). On directories, `x` means the
-  right to enter — without it, `cd` and file access fail even
-  if you can list the directory.
-- `chmod 755` for executables and directories, `644` for regular
-  files, `600` for private keys — these three values cover 90%
-  of daily use.
-- Octal notation: r=4, w=2, x=1. Add them per category.
-  `755 = rwxr-xr-x`. Memorise the common values.
-- `umask 022` is standard. `umask 027` is hardened. Service
-  accounts should use `umask 027` or stricter.
-- Setuid (`s` in owner position) = run as file owner.
-  Setgid on a directory = new files inherit directory's group.
-  Sticky bit (`t`) = only owner can delete in world-writable dir.
-- `chmod -R 755` on a directory also makes all files executable —
-  wrong for regular files. Use `find -type f/d -exec chmod` instead.
-- `+` after permissions in `ls -l` means ACL is set — use
-  `getfacl` to see the full picture.
-- Finding unexpected setuid files: `find / -perm -4000 -type f`
-  — run this on any new server or container as part of hardening.
+1. **Permissions have three levels (owner/group/other) and three types (read/write/execute) — on directories, `x` means the right to enter, not just to execute a binary.** A web server missing execute on any directory in the path to a file returns 403 even if the file itself is readable.
+
+2. **Memorise the four permission values you use every day: `755` for executables and directories, `644` for regular files, `600` for private keys, `640` for sensitive configs readable by a group.** These cover 90% of daily use without mental arithmetic.
+
+3. **Octal: `r=4`, `w=2`, `x=1`. Add per category. `755 = rwxr-xr-x`, `644 = rw-r--r--`, `600 = rw-------`.** The execute bit in position 3/6/9 shows `s` (setuid/setgid with execute), `S` (setuid/setgid without execute — almost always a mistake), or `t`/`T` (sticky with/without execute).
+
+4. **`umask 022` is standard (new files get `644`). `umask 027` is hardened (new files get `640`, no access for others).** Service accounts and CI/CD runners should use `umask 027` or stricter — set in the systemd unit with `UMask=0027` so it is enforced regardless of shell config.
+
+5. **Setgid on a directory makes all new files and subdirectories inherit the directory's group — not the creator's primary group.** New subdirectories also inherit the setgid bit itself. New files do not. This is the correct fix for shared team directories where files keep showing the wrong group.
+
+6. **`chmod -R 755` on a directory also makes every regular file executable — this is wrong for web content and configs.** The correct approach uses `find -type d -exec chmod 755` and `find -type f -exec chmod 644` separately.
+
+7. **`+` after permissions in `ls -l` means an ACL is set — `getfacl filename` shows the full picture.** Standard `ls -l` cannot display ACL entries. Use ACLs when you need to grant one specific user or group access without changing the file's owner, group, or making it world-readable.
 
 ---
 
@@ -1469,7 +1462,7 @@ find / -nouser -type f 2>/dev/null       # orphaned files (no owner)
 **`03-permissions-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 2 - Permissions::Demo 03 - Permissions
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 03 - Permissions
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -1497,7 +1490,7 @@ find / -nouser -type f 2>/dev/null       # orphaned files (no owner)
 **`03-permissions-quiz.md`:**
 
 ````markdown
-# Demo 03 — Quiz
+# Quiz — Demo 03: File Permissions, Ownership & Access Control
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to Demo 04.
 

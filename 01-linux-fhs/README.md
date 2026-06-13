@@ -834,23 +834,19 @@ missing after reboot, the service has not started yet.
 
 ## Key Takeaways
 
-- **`/etc`** configs. **`/var/log`** logs. **`/var/lib`** app state.
-  **`/run`** runtime only. **`/usr/local/bin`** your manual tools.
-  Know these five without thinking.
-- `/proc`, `/sys`, `/dev` are virtual — kernel generates content
-  on demand, nothing stored, size is zero. Every monitoring tool
-  reads from `/proc`.
-- `/run` and `/tmp` are tmpfs — RAM storage, writable, cleared on
-  reboot. Different from virtual: you write files here normally.
-- `/bin`, `/sbin`, `/lib` are symlinks to `/usr/` on all modern
-  distros. This is UsrMerge. Scripts using `/bin/bash` still work.
-- Ubuntu logs to text files in `/var/log/syslog`. Rocky Linux logs
-  to the binary journal — query with `journalctl`, not `cat`.
-- `file` command identifies what a file actually is from its content,
-  not its name. `statically linked` means no dependencies — runs
-  anywhere. `dynamically linked` means it needs shared libraries.
-- `/usr/local/bin` is per-system. Tools installed in Ubuntu WSL2
-  do not exist in Rocky9 — they are separate filesystems.
+1. **Know the five directories you use every day without thinking: `/etc` configs, `/var/log` logs, `/var/lib` app state, `/run` runtime only, `/usr/local/bin` your manual tools.** Getting to the right place in 5 seconds separates engineers who debug quickly from those who `find` their way around.
+
+2. **`/proc`, `/sys`, and `/dev` are virtual — the kernel generates their contents on demand and nothing is stored on disk or in RAM.** Size is zero, `df` shows `-` for Use%, and you cannot create arbitrary files there. Every monitoring tool (`top`, `free`, `ps`, `ss`) reads from `/proc`.
+
+3. **`/run` and `/tmp` are tmpfs — RAM-backed storage that you write to normally, cleared completely on every reboot.** A missing socket or PID file after reboot means the service has not started yet, not a filesystem problem.
+
+4. **`/bin`, `/sbin`, and `/lib` are symlinks to `/usr/` equivalents on all modern distros (UsrMerge).** Scripts using `/bin/bash` still work via the symlink. Ubuntu marks this explicitly with `bin.usr-is-merged/`; Rocky9 does it silently.
+
+5. **Ubuntu logs to text files in `/var/log/syslog` via rsyslog; Rocky Linux logs to the binary journal — query with `journalctl`, not `cat`.** Writing a monitoring script that greps syslog will silently miss all logs on RHEL-family systems.
+
+6. **The `file` command identifies what a file actually is from its content (magic bytes), not its name or extension.** `statically linked` means no external library dependencies — runs on any Linux. `dynamically linked` means it needs specific shared libraries present.
+
+7. **`/usr/local/bin` is per-system and per-WSL2-instance.** Tools installed in Ubuntu WSL2 do not exist in Rocky9 — separate filesystems, no sharing.
 
 ---
 
@@ -890,7 +886,7 @@ missing after reboot, the service has not started yet.
 **`01-linux-fhs-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 1 - Filesystem::Demo 01 - FHS
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 01 - FHS
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -1060,30 +1056,21 @@ Trap: C would work but is unnecessary — journald is fully functional.
 
 ---
 
-**Q7.** Based on FHS, match each item to the correct directory.
-(All answers required for full credit)
+**Q7.** You are deploying nginx on a fresh server. Which of the
+following correctly maps nginx's runtime PID file, access log,
+package-manager binary, and configuration file to their FHS locations?
 
-- nginx binary installed by apt → ?
-- kubectl downloaded manually → ?
-- nginx configuration file → ?
-- nginx runtime PID file → ?
-- nginx access log → ?
-- Jenkins installed as vendor package → ?
-- nginx cached data → ?
+- A) PID: `/tmp/nginx.pid` — Log: `/opt/nginx/logs/access.log` — Binary: `/usr/local/bin/nginx` — Config: `/var/nginx/`
+- B) PID: `/run/nginx.pid` — Log: `/var/log/nginx/access.log` — Binary: `/usr/bin/nginx` — Config: `/etc/nginx/`
+- C) PID: `/var/run/nginx.pid` — Log: `/var/log/nginx/access.log` — Binary: `/usr/bin/nginx` — Config: `/etc/nginx/nginx.conf`
+- D) PID: `/run/nginx.pid` — Log: `/var/log/nginx/access.log` — Binary: `/usr/local/bin/nginx` — Config: `/etc/nginx/`
 
 <details>
 <summary>Answer</summary>
 
-- nginx binary (apt) → `/usr/bin/nginx`
-- kubectl (manual) → `/usr/local/bin/kubectl`
-- nginx config → `/etc/nginx/`
-- nginx PID file → `/run/nginx.pid`
-- nginx access log → `/var/log/nginx/access.log`
-- Jenkins (vendor) → `/opt/jenkins/`
-- nginx cache → `/var/cache/nginx/`
+**B** — PID files belong in `/run/` (tmpfs, runtime state). Logs belong in `/var/log/servicename/`. A binary installed by the package manager (`apt install nginx`) goes in `/usr/bin/`. Configuration for any service goes in `/etc/servicename/`.
 
-This is the FHS in practice. Knowing these locations is how you
-navigate any server without documentation.
+Trap: C has correct paths for PID, log, and config — but `/var/run` is a legacy symlink to `/run/` on modern systems, not the canonical path. D is wrong because `/usr/local/bin` is for manually installed tools, not package manager installs. A fails on every location.
 
 </details>
 

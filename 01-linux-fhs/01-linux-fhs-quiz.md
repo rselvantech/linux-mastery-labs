@@ -139,30 +139,21 @@ Trap: C would work but is unnecessary — journald is fully functional.
 
 ---
 
-**Q7.** Based on FHS, match each item to the correct directory.
-(All answers required for full credit)
+**Q7.** You are deploying nginx on a fresh server. Which of the
+following correctly maps nginx's runtime PID file, access log,
+package-manager binary, and configuration file to their FHS locations?
 
-- nginx binary installed by apt → ?
-- kubectl downloaded manually → ?
-- nginx configuration file → ?
-- nginx runtime PID file → ?
-- nginx access log → ?
-- Jenkins installed as vendor package → ?
-- nginx cached data → ?
+- A) PID: `/tmp/nginx.pid` — Log: `/opt/nginx/logs/access.log` — Binary: `/usr/local/bin/nginx` — Config: `/var/nginx/`
+- B) PID: `/run/nginx.pid` — Log: `/var/log/nginx/access.log` — Binary: `/usr/bin/nginx` — Config: `/etc/nginx/`
+- C) PID: `/var/run/nginx.pid` — Log: `/var/log/nginx/access.log` — Binary: `/usr/bin/nginx` — Config: `/etc/nginx/nginx.conf`
+- D) PID: `/run/nginx.pid` — Log: `/var/log/nginx/access.log` — Binary: `/usr/local/bin/nginx` — Config: `/etc/nginx/`
 
 <details>
 <summary>Answer</summary>
 
-- nginx binary (apt) → `/usr/bin/nginx`
-- kubectl (manual) → `/usr/local/bin/kubectl`
-- nginx config → `/etc/nginx/`
-- nginx PID file → `/run/nginx.pid`
-- nginx access log → `/var/log/nginx/access.log`
-- Jenkins (vendor) → `/opt/jenkins/`
-- nginx cache → `/var/cache/nginx/`
+**B** — PID files belong in `/run/` (tmpfs, runtime state). Logs belong in `/var/log/servicename/`. A binary installed by the package manager (`apt install nginx`) goes in `/usr/bin/`. Configuration for any service goes in `/etc/servicename/`.
 
-This is the FHS in practice. Knowing these locations is how you
-navigate any server without documentation.
+Trap: C has correct paths for PID, log, and config — but `/var/run` is a legacy symlink to `/run/` on modern systems, not the canonical path. D is wrong because `/usr/local/bin` is for manually installed tools, not package manager installs. A fails on every location.
 
 </details>
 
