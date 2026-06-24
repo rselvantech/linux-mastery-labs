@@ -1211,6 +1211,21 @@ After setfacl -b:  ls -l shows no +,  back to standard permissions only
 
 ---
 
+## What You Learned
+
+- ✅ Read and interpreted any permission string from `ls -l` output
+- ✅ Set permissions using both octal and symbolic notation
+- ✅ Changed file ownership and group with `chown` and `chgrp`
+- ✅ Explained and calculated `umask` and its effect on new files
+- ✅ Identified and set the three special bits: setuid, setgid, sticky
+- ✅ Found dangerous permissions using `find` with `-perm`
+- ✅ Used ACLs (`getfacl`/`setfacl`) when standard permissions were not granular enough
+- ✅ Applied correct permissions for common DevOps scenarios: web server files, SSH keys, scripts, shared directories
+
+**Key Takeaway:** Permissions failures are rarely mysterious once you check three things in order — the bit that's missing, whose identity the kernel is evaluating, and whether the directory chain (not just the file) allows traversal.
+
+---
+
 ## Part 3 — Break-Fix Scenario
 
 ### Scenario — NovaTech deployment pipeline failure
@@ -1396,22 +1411,16 @@ remains locked down for everyone else.
 ## Key Takeaways
 
 1. **Permissions have three levels (owner/group/other) and three types (read/write/execute) — on directories, `x` means the right to enter, not just to execute a binary.** A web server missing execute on any directory in the path to a file returns 403 even if the file itself is readable.
-
 2. **Memorise the four permission values you use every day: `755` for executables and directories, `644` for regular files, `600` for private keys, `640` for sensitive configs readable by a group.** These cover 90% of daily use without mental arithmetic.
-
 3. **Octal: `r=4`, `w=2`, `x=1`. Add per category. `755 = rwxr-xr-x`, `644 = rw-r--r--`, `600 = rw-------`.** The execute bit in position 3/6/9 shows `s` (setuid/setgid with execute), `S` (setuid/setgid without execute — almost always a mistake), or `t`/`T` (sticky with/without execute).
-
 4. **`umask 022` is standard (new files get `644`). `umask 027` is hardened (new files get `640`, no access for others).** Service accounts and CI/CD runners should use `umask 027` or stricter — set in the systemd unit with `UMask=0027` so it is enforced regardless of shell config.
-
 5. **Setgid on a directory makes all new files and subdirectories inherit the directory's group — not the creator's primary group.** New subdirectories also inherit the setgid bit itself. New files do not. This is the correct fix for shared team directories where files keep showing the wrong group.
-
 6. **`chmod -R 755` on a directory also makes every regular file executable — this is wrong for web content and configs.** The correct approach uses `find -type d -exec chmod 755` and `find -type f -exec chmod 644` separately.
-
 7. **`+` after permissions in `ls -l` means an ACL is set — `getfacl filename` shows the full picture.** Standard `ls -l` cannot display ACL entries. Use ACLs when you need to grant one specific user or group access without changing the file's owner, group, or making it world-readable.
 
 ---
 
-## Appendix A — Quick Reference
+## Quick Commands Reference
 
 ### Permission values — memorise these
 
@@ -1457,7 +1466,7 @@ find / -nouser -type f 2>/dev/null       # orphaned files (no owner)
 
 ---
 
-## Appendix B — Anki Cards
+## Appendix A — Anki Cards
 
 **`03-permissions-anki.csv`:**
 
@@ -1485,7 +1494,7 @@ find / -nouser -type f 2>/dev/null       # orphaned files (no owner)
 
 ---
 
-## Appendix C — Quiz
+## Appendix B — Quiz
 
 **`03-permissions-quiz.md`:**
 
@@ -1657,7 +1666,7 @@ Score guide:
 | Score | Action |
 |---|---|
 | 7/7 | Import Anki cards, move to Demo 04 |
-| 6/7 | Review wrong answer, proceed |
-| 5/7 | Re-read relevant section, retry those questions |
-| Below 5/7 | Re-read Demo 03 before proceeding |
+| 6/7 | Review the wrong answer, then proceed |
+| 5/7 | Re-read the relevant section, retry those questions |
+| Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |
 ````

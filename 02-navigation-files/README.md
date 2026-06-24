@@ -911,7 +911,20 @@ stat file2.txt file3.txt  # same atime and mtime, different ctime
 
 ---
 
+## What You Learned
 
+- ✅ Navigated the filesystem confidently using `pwd`, `cd`, and `ls` with all important flags
+- ✅ Used absolute vs relative paths correctly
+- ✅ Created, copied, moved, and deleted files and directories safely
+- ✅ Read all three file timestamps — `atime`, `mtime`, `ctime` — and explained what changes each one
+- ✅ Used `stat` to read a file's complete inode information
+- ✅ Created and managed hard links and soft links, explaining the difference at the inode level
+- ✅ Explained what an inode is and why the link count in `ls -l` matters
+- ✅ Explained what a directory entry is and why filenames are not stored in inodes
+
+**Key Takeaway:** A filename is just a label in a table — the inode is the real file. Once that separation clicks, hard links, instant renames, and "deleted but still using disk space" all stop being mysterious.
+
+---
 
 
 ## Part 3 — Break-Fix Scenario
@@ -1106,23 +1119,19 @@ are removed AND no process has it open.
 
 ## Key Takeaways
 
+## Key Takeaways
+
 1. **`cd -` toggles between the last two directories — use it constantly during incidents instead of retyping paths.** Bouncing between `/var/log` and `/etc/nginx` during a debug session takes one keystroke, not a full path.
-
 2. **An inode stores everything about a file except its name — permissions, owner, timestamps, size, data block pointers, and link count.** The filename lives in the directory entry (the table inside the directory file). This separation is what makes hard links and instant renames possible.
-
 3. **`mtime` = file contents changed. `ctime` = inode metadata changed. `ctime` is NOT creation time — this is one of the most common wrong interview answers.** Writing content updates mtime and ctime together (because mtime is stored inside the inode — any inode write updates ctime).
-
 4. **Hard links share one inode — same inode number, same data blocks, same permissions.** Deleting one directory entry reduces link count by 1. Data is freed only when link count reaches 0 AND no process has the file open.
-
 5. **Soft links store a path string and have their own inode — different from the target.** Delete the target and the symlink becomes dangling. Can cross filesystem boundaries. Can link to directories. `stat` on a symlink shows the symlink's own metadata — use `stat -L` to follow it and show the target's metadata.
-
 6. **A deleted file whose inode is still held open by a process is invisible to `du` but still counted by `df`.** `lsof | grep deleted` finds these. Restart the process to release the file descriptor and free the blocks.
-
 7. **`cp -p` preserves timestamps, permissions, and ownership — without it the copy gets the current time and your umask permissions.** Use `-p` for backups. Use `-a` (= `-r` + `-p` + preserve symlinks) for complete directory migrations — it is the correct flag, not `-r` alone.
 
 ---
 
-## Appendix A — Quick Reference
+## Quick Commands Reference
 
 ### ls flag combinations
 
@@ -1164,7 +1173,7 @@ are removed AND no process has it open.
 
 ---
 
-## Appendix B — Anki Cards
+## Appendix A — Anki Cards
 
 **`02-navigation-files-anki.csv`:**
 
@@ -1200,7 +1209,7 @@ are removed AND no process has it open.
 
 ---
 
-## Appendix C — Quiz
+## Appendix B — Quiz
 
 **`02-navigation-files-quiz.md`:**
 
@@ -1344,10 +1353,12 @@ Trap: D reverses the answer — hard links survive target deletion, soft links d
 
 ---
 
+Score guide:
+
 | Score | Action |
 |---|---|
 | 7/7 | Import Anki cards, move to Demo 03 |
-| 6/7 | Review wrong answer, proceed |
-| 5/7 | Re-read relevant section, retry those questions |
-| Below 5/7 | Re-read full demo and redo walkthrough before proceeding |
+| 6/7 | Review the wrong answer, then proceed |
+| 5/7 | Re-read the relevant section, retry those questions |
+| Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |
 ````

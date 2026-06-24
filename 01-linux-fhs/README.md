@@ -678,6 +678,19 @@ Rocky9:
 
 ---
 
+## What You Learned
+
+- ✅ Named the purpose of every major directory under `/`
+- ✅ Explained the difference between virtual filesystems (`/proc`, `/sys`, `/dev`) and tmpfs filesystems (`/run`, `/tmp`)
+- ✅ Identified immediately where configs, logs, binaries, runtime state, and temporary files live
+- ✅ Explained the three binary installation patterns: package manager, manual install, vendor self-contained
+- ✅ Navigated and explored the filesystem using `ls`, `cd`, `tree`, and `file`
+- ✅ Read and interpreted output of `ls -lh`, `df -h /proc`, `/proc/version`, `/proc/uptime`, `/proc/$$/status`
+
+**Key Takeaway:** The FHS is not arbitrary — every directory's location encodes information about how data behaves (static vs runtime, persistent vs ephemeral). Knowing this map turns "where is the problem" from a search into a lookup.
+
+---
+
 ## Part 3 — Break-Fix Scenario
 
 ### Scenario — NovaTech deployment failure
@@ -834,23 +847,19 @@ missing after reboot, the service has not started yet.
 
 ## Key Takeaways
 
+## Key Takeaways
+
 1. **Know the five directories you use every day without thinking: `/etc` configs, `/var/log` logs, `/var/lib` app state, `/run` runtime only, `/usr/local/bin` your manual tools.** Getting to the right place in 5 seconds separates engineers who debug quickly from those who `find` their way around.
-
 2. **`/proc`, `/sys`, and `/dev` are virtual — the kernel generates their contents on demand and nothing is stored on disk or in RAM.** Size is zero, `df` shows `-` for Use%, and you cannot create arbitrary files there. Every monitoring tool (`top`, `free`, `ps`, `ss`) reads from `/proc`.
-
 3. **`/run` and `/tmp` are tmpfs — RAM-backed storage that you write to normally, cleared completely on every reboot.** A missing socket or PID file after reboot means the service has not started yet, not a filesystem problem.
-
 4. **`/bin`, `/sbin`, and `/lib` are symlinks to `/usr/` equivalents on all modern distros (UsrMerge).** Scripts using `/bin/bash` still work via the symlink. Ubuntu marks this explicitly with `bin.usr-is-merged/`; Rocky9 does it silently.
-
 5. **Ubuntu logs to text files in `/var/log/syslog` via rsyslog; Rocky Linux logs to the binary journal — query with `journalctl`, not `cat`.** Writing a monitoring script that greps syslog will silently miss all logs on RHEL-family systems.
-
 6. **The `file` command identifies what a file actually is from its content (magic bytes), not its name or extension.** `statically linked` means no external library dependencies — runs on any Linux. `dynamically linked` means it needs specific shared libraries present.
-
 7. **`/usr/local/bin` is per-system and per-WSL2-instance.** Tools installed in Ubuntu WSL2 do not exist in Rocky9 — separate filesystems, no sharing.
 
 ---
 
-## Appendix A — Quick Reference
+## Quick Commands Reference
 
 ### Shell operators used in this demo
 
@@ -881,7 +890,7 @@ missing after reboot, the service has not started yet.
 
 ---
 
-## Appendix B — Anki Cards
+## Appendix A — Anki Cards
 
 **`01-linux-fhs-anki.csv`:**
 
@@ -910,7 +919,7 @@ missing after reboot, the service has not started yet.
 ---
 
 
-## Appendix C — Quiz
+## Appendix B — Quiz
 
 **`01-linux-fhs-quiz.md`:**
 
@@ -1081,7 +1090,7 @@ Score guide:
 | Score | Action |
 |---|---|
 | 7/7 | Import Anki cards, move to Demo 02 |
-| 6/7 | Review wrong answer, proceed |
-| 5/7 | Re-read relevant Part 1 section, retry |
-| Below 5/7 | Re-read Demo 01 before proceeding |
+| 6/7 | Review the wrong answer, then proceed |
+| 5/7 | Re-read the relevant section, retry those questions |
+| Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |
 ````

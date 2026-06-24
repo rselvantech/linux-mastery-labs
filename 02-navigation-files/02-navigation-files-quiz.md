@@ -137,9 +137,11 @@ Trap: D reverses the answer — hard links survive target deletion, soft links d
 
 ---
 
+Score guide:
+
 | Score | Action |
 |---|---|
 | 7/7 | Import Anki cards, move to Demo 03 |
-| 6/7 | Review wrong answer, proceed |
-| 5/7 | Re-read relevant section, retry those questions |
-| Below 5/7 | Re-read full demo and redo walkthrough before proceeding |
+| 6/7 | Review the wrong answer, then proceed |
+| 5/7 | Re-read the relevant section, retry those questions |
+| Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

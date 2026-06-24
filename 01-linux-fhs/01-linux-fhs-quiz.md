@@ -164,6 +164,6 @@ Score guide:
 | Score | Action |
 |---|---|
 | 7/7 | Import Anki cards, move to Demo 02 |
-| 6/7 | Review wrong answer, proceed |
-| 5/7 | Re-read relevant Part 1 section, retry |
-| Below 5/7 | Re-read Demo 01 before proceeding |
+| 6/7 | Review the wrong answer, then proceed |
+| 5/7 | Re-read the relevant section, retry those questions |
+| Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |
