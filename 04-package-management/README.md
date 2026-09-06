@@ -970,8 +970,143 @@ File is missing entirely — was installed by the package, now gone.
 ### 1.7 Dockerfile RUN layer — correct package installation pattern
 
 Every `RUN` instruction in a Dockerfile creates a new image layer.
-Layers are cached. Getting this wrong either breaks reproducibility
-or bloats the image.
+Per Docker's own documentation, the cache for a `RUN` instruction
+is keyed on the exact text of that instruction — "the cache for
+RUN instructions isn't invalidated automatically between builds...
+rebuilding the image one week later will still get you the same
+packages as before" (docs.docker.com/build/cache/invalidation/).
+If the instruction text hasn't changed, the layer is reused
+regardless of how much time has passed or what's changed on the
+actual package repository.
+
+
+**Why this section exists — the actual problem being solved:**
+
+The goal is not "always install the newest available package." A
+Dockerfile is typically rebuilt many times during normal
+development — adding a `COPY` line, changing an `ENV`, fixing
+something unrelated — long before anyone deliberately touches the
+package list. The real risk is the **install list and the package
+index silently drifting apart from each other** across routine
+rebuilds.
+
+**The bug, shown step by step — two separate `RUN` lines:**
+
+```
+DAY 1 — first build:
+
+  RUN apt-get update              ──▶  [Layer A: fresh index cached]
+  RUN apt-get install -y curl     ──▶  [Layer B: installs curl 8.5.0-10.6]
+
+
+LATER — curl 8.5.0-10.9 is now published. You make an UNRELATED
+change elsewhere in the Dockerfile and rebuild:
+
+  RUN apt-get update              ──▶  text unchanged ──▶ CACHE HIT
+                                        [Layer A: reused, same index
+                                         as Day 1]
+  RUN apt-get install -y curl     ──▶  text unchanged ──▶ CACHE HIT
+                                        [Layer B: reused, still 10.6]
+
+  Nothing wrong yet — both layers are simply reused, as expected.
+
+
+NOW — you actually edit the install line, adding git:
+
+  RUN apt-get update              ──▶  text STILL unchanged
+                                        ──▶  CACHE HIT
+                                        [Layer A: reused — same index
+                                         as Day 1, now weeks/months old]
+  RUN apt-get install -y curl git ──▶  text CHANGED (added git)
+                                        ──▶  cache MISS, reruns fresh
+                                        ──▶  runs against the STALE
+                                              index from Layer A
+                                        ──▶  installs curl 8.5.0-10.6
+                                              (old), not the current
+                                              repository's version
+```
+
+**The same edit, with one combined `RUN` line:**
+
+```
+DAY 1 — first build:
+
+  RUN apt-get update && apt-get install -y curl
+                                   ──▶  [Layer A: one layer, fresh
+                                         index, installs curl 10.6]
+
+LATER — unrelated change, rebuild:
+
+  RUN apt-get update && apt-get install -y curl
+                                   ──▶  text unchanged ──▶ CACHE HIT
+                                   ──▶  [Layer A: reused as-is]
+
+  Same as before — reused, fine, expected.
+
+NOW — you edit the install line, adding git:
+
+  RUN apt-get update && apt-get install -y curl git
+                                   ──▶  text CHANGED
+                                   ──▶  the ENTIRE instruction is one
+                                         cache key ──▶ cache MISS
+                                   ──▶  update AND install both
+                                         rerun together, fresh,
+                                         against a current index
+```
+
+This is the official recommended fix, stated directly in Docker's
+own caching guide: "Combine apt-get update and apt-get install in a
+single instruction to ensure that update always runs when you
+change the installed packages."
+
+**What this does and does NOT fix — stated plainly:**
+
+```
+Does NOT do:                          Does do:
+- Refresh the index automatically     - Guarantees that whenever you
+  on a schedule or timer                edit the install list, the
+- Make an untouched Dockerfile          index step is FORCED to rerun
+  "self-update" over time                alongside it — never split,
+- Replace --no-cache when you           never silently mismatched
+  genuinely want a full refresh
+  right now
+```
+
+**Where `--no-cache` fits — a different problem, not a competing
+fix:**
+
+```bash
+docker build --no-cache -t myimage .
+```
+
+`--no-cache` forces every layer in the build to rerun from scratch,
+regardless of whether its instruction text changed. This is the
+right tool for a deliberate, occasional full refresh — a scheduled
+rebuild to pick up security patches, or a one-off "give me today's
+latest packages." It's the wrong default for routine development
+builds, where you want unrelated, unchanged layers to stay cached
+for speed. The combined `RUN` line and `--no-cache` solve different
+problems and are typically both used in production: the combined
+line as the permanent pattern in the file, `--no-cache` invoked
+periodically (e.g. a weekly CI rebuild) for a genuine refresh.
+
+**A related caching mechanism, outside this demo's scope —
+`COPY`/`ADD` invalidate differently than `RUN`:**
+
+Everything above describes `RUN`'s cache key (instruction text).
+`COPY` and `ADD` work differently — per Docker's own documentation,
+"the builder calculates a cache checksum from all the files to
+determine if it can reuse the layer. If any file changes, the
+builder invalidates the cache at that step"
+(docs.docker.com/build/cache/optimize/). And critically, once any
+layer invalidates, "all other layers that come after it are also
+affected" (docs.docker.com/build/cache/) — so a `COPY` of
+application source code placed *before* an `apt-get` `RUN` line
+would force that `RUN` line to rerun on every source-code change,
+even with zero edits to the `RUN` line itself. This demo's
+Dockerfile has no `COPY` instruction, so this doesn't apply here —
+full coverage of `COPY`/`ADD` caching and instruction-ordering
+strategy is deferred to a future Docker-focused demo.
 
 **The correct pattern:**
 
@@ -993,21 +1128,13 @@ apt-get update                   Refresh the package index. Without this,
                                  you might install an old version or fail to
                                  find the package at all.
 
-&& (all in one RUN layer)        apt-get update and apt-get install must be
-                                 in the SAME RUN instruction. If they are in
-                                 separate RUN layers, Docker caches each layer.
-                                 A future build may use the cached update layer
-                                 (stale index) but re-run install — installing
-                                 whatever version the stale index knows about.
-                                 This is called cache busting failure.
-
-                                 Concrete example: today, both RUN lines run
-                                 fresh. Three weeks later Ubuntu publishes a
-                                 patched curl. You rebuild — Docker sees the
-                                 update line's text is unchanged and reuses
-                                 the cached layer instead of re-running it.
-                                 The install layer then runs against that
-                                 three-week-old cached index, not the live repo.
+&& (all in one RUN layer)        Ties apt-get update and apt-get install to
+                                 ONE cache key. Per Docker's documentation,
+                                 RUN's cache is keyed on instruction text —
+                                 combining them means any edit to the install
+                                 list forces both to rerun together. This does
+                                 not refresh anything automatically on its
+                                 own; see --no-cache above for that.
 
 -y                               Non-interactive. Required in Dockerfiles —
                                  no terminal to answer prompts.
@@ -1017,19 +1144,17 @@ apt-get update                   Refresh the package index. Without this,
                                  useful but not required), Suggests (optional).
                                  Plain "apt-get install" pulls in Depends AND
                                  Recommends. This flag skips the Recommends
-                                 tier — containers rarely need "commonly useful
-                                 extras," only the hard requirement.
-                                 Typical image size reduction: 20–40%.
+                                 tier. Typical image size reduction: 20–40%.
 
 apt-get clean                    Delete downloaded .deb files from the cache.
                                  The files in /var/cache/apt/archives/ are no
                                  longer needed after install.
 
-rm -rf /var/lib/apt/lists/*      Delete the downloaded package index. Not needed
-                                 at runtime. Must be in the SAME RUN layer —
-                                 if in a separate layer, the files still exist
-                                 in the earlier cached layer and are included in
-                                 the image even if invisible in later layers.
+rm -rf /var/lib/apt/lists/*      Delete the downloaded package index. Must be
+                                 in the SAME RUN layer — if in a separate
+                                 layer, the files still exist in the earlier
+                                 cached layer and are included in the image
+                                 even if invisible in later layers.
 ```
 
 **A note on pinning exact package versions (`package=version`):**
@@ -1038,28 +1163,26 @@ Pinning the exact version string (e.g. `curl=8.5.0-2ubuntu10.6`)
 can make a build perfectly reproducible — but only if that exact
 string still exists in the repo when you build. Ubuntu publishes
 frequent security patch rebuilds that bump the patch suffix every
-few weeks, sometimes days. A version copied from documentation,
-from a teammate's machine, or from an earlier build attempt can
-simply no longer exist by the time you build again:
+few weeks, sometimes days. A version copied from documentation, or
+from an earlier build attempt, can simply no longer exist by the
+time you build again:
 
 ```
 E: Version '8.5.0-2ubuntu10.6' for 'curl' was not found
 ```
 
 If you need this level of reproducibility, the version string must
-be fetched **immediately before the build, every time** — never
-reused from an earlier session:
+be fetched **immediately before the build, every time**:
 
 ```bash
 apt-cache policy curl | grep Candidate
-# Candidate: 8.5.0-2ubuntu10.9     ← copy this, right now, not from memory
+# Candidate: 8.5.0-2ubuntu10.9     ← use exactly this, copied fresh
 ```
 
-For most DevOps tooling images — where you want "this OS release,
-these tools, kept reasonably current" rather than byte-for-byte
-reproducibility — pinning only the base image tag (`FROM ubuntu:24.04`,
-never `:latest`) and leaving package versions unpinned is the more
-maintainable default. This is the pattern used in Task 6 of this demo.
+For most DevOps tooling images, pinning only the base image tag
+(`FROM ubuntu:24.04`, never `:latest`) and leaving package versions
+unpinned is the more maintainable default — the pattern used in
+Task 6 of this demo.
 
 **What NOT to do:**
 
@@ -1067,27 +1190,57 @@ maintainable default. This is the pattern used in Task 6 of this demo.
 # WRONG — separate update and install layers
 RUN apt-get update
 RUN apt-get install -y curl git
+# Not wrong on the FIRST build. Becomes wrong the next time someone
+# edits the install line: the update layer gets silently reused
+# (possibly stale) while install reruns fresh against that stale
+# index. See the step-by-step walkthrough above.
 
 # WRONG — apt-get upgrade in a container
 RUN apt-get update && apt-get upgrade -y && apt-get install -y curl
-# apt-get upgrade in a container replaces the base image's packages
-# with newer versions — defeating the purpose of a pinned base image.
-# Security patches should come from rebuilding with a newer base image,
-# not from running upgrade inside the container.
+# Replaces the base image's carefully chosen package set with
+# whatever's newest at build time, defeating the purpose of a
+# pinned base image. Security patches should come from rebuilding
+# with a newer base image, not running upgrade inside the container.
 
 # WRONG — cleaning in a separate layer
 RUN apt-get update && apt-get install -y curl
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-# The cache still exists in the install layer — Docker includes it.
-# The clean layer only hides it. Image is the same size.
+# The cache still exists in the install layer. The clean layer
+# only hides it. Image is the same size.
 
 # RISKY — hardcoded exact version pins copied from elsewhere
 RUN apt-get update && apt-get install -y curl=8.5.0-2ubuntu10.6
 # This exact patch-suffix version may no longer exist in the repo
 # by the time you build. Fails with "Version ... was not found"
-# unless the string was fetched fresh, from this exact system,
-# immediately before this exact build.
+# unless fetched fresh, immediately before this exact build.
 ```
+
+**Can you use `apt` instead of `apt-get` here? Short answer: don't, even though it would often work.**
+
+```
+apt        Designed for interactive human use — friendlier output,
+           colorized, progress bars. Its own man page explicitly
+           warns: "the apt command is meant to be pleasant for
+           end users and does not need to be backward compatible
+           like apt-get." Output FORMAT is not guaranteed stable
+           between versions.
+
+apt-get    The older, scriptable interface. Output format and
+           flag behavior are stable across versions by design —
+           this is the actual contract Debian maintains, precisely
+           BECAUSE so much automation (Dockerfiles, Ansible,
+           shell scripts) depends on it not changing.
+```
+
+Nothing will obviously break if you write `RUN apt install -y curl`
+today — it works. The risk is a future Ubuntu release changing
+`apt`'s output or prompt behavior in a way that's irrelevant to a
+human typing interactively, but breaks a script that happened to
+depend on it. `apt-get` carries no such risk because backward
+compatibility for scripts is its explicit design goal. This is why
+every official Docker base image, and Debian's own documentation,
+uses `apt-get` in scripts and Dockerfiles, reserving `apt` for
+humans at a terminal.
 
 ---
 
@@ -1479,7 +1632,7 @@ build time — never a version string copied from elsewhere.
 #   - Cache cleaned in the same layer (no hidden bloat)
 #
 # Base image tag is pinned — never use :latest. Individual package
-# versions are intentionally NOT pinned here — see Part 2, Task 6
+# versions are intentionally NOT pinned here — see Part 1 section 1.7
 # for why hardcoded patch-suffix versions go stale within weeks.
 FROM ubuntu:24.04
 
@@ -1524,7 +1677,7 @@ CMD ["/bin/bash"]
 ```bash
 cd ~/path/to/04-package-management/src
 
-# Build the image
+# Build the image — first build, everything fresh
 docker build -t devops-base:demo04 .
 
 # Verify installed packages inside the container
@@ -1534,12 +1687,6 @@ docker run --rm devops-base:demo04 jq --version
 
 # Inspect image layers — see the single RUN layer
 docker history devops-base:demo04
-
-# Check image size
-docker images devops-base:demo04
-
-# Clean up
-docker rmi devops-base:demo04
 ```
 
 **What to observe in `docker history` output:**
@@ -1554,7 +1701,51 @@ One RUN layer = update + install + clean all in one step.
 If you see two RUN layers for apt, the pattern is wrong.
 ```
 
-**Paste your `docker history` output and the final image size.**
+**Now — reproduce the cache mechanism from section 1.7 live:**
+
+```bash
+# Rebuild with NO changes — confirm the layer is fully cached
+docker build -t devops-base:demo04 .
+# Look for "CACHED" next to the RUN line in the build output —
+# this confirms Docker reused the layer because the instruction
+# text didn't change, exactly as section 1.7 describes
+
+docker history devops-base:demo04
+# SIZE for the RUN layer should be identical to the first build —
+# nothing re-executed
+```
+
+```bash
+# Now edit the Dockerfile — add "vim" to the install list
+sed -i 's/       procps \\/       procps \\\n       vim \\/' src/Dockerfile
+cat src/Dockerfile | grep -A2 procps
+# Confirm vim was added to the install line
+
+# Rebuild
+docker build -t devops-base:demo04 .
+# This time the RUN line should NOT say "CACHED" — the instruction
+# text changed (vim was added), so the entire layer reruns,
+# including apt-get update, fresh — exactly the guarantee section
+# 1.7 describes: editing the install list forces update to rerun
+# alongside it, never silently split
+
+docker run --rm devops-base:demo04 vim --version | head -1
+# Confirms vim installed successfully in the same rebuild
+```
+
+```bash
+# Finally — force a full refresh regardless of cache, the
+# DIFFERENT tool for the DIFFERENT problem covered in section 1.7
+docker build --no-cache -t devops-base:demo04 .
+# Every layer reruns from scratch this time, including the base
+# image setup — not because anything in the Dockerfile changed,
+# but because --no-cache was explicitly requested
+```
+
+**Paste your build output from the unchanged rebuild (showing
+`CACHED`), the edited rebuild (showing the layer re-executing), and
+the `--no-cache` build — in that order, with a one-line note on
+what triggered each one to behave differently.**
 
 ---
 
@@ -1769,14 +1960,21 @@ the binary itself was modified.
 **Q4. Why must `apt-get update` and `apt-get install` be in the
 same `RUN` instruction in a Dockerfile?**
 
-Docker caches each `RUN` layer. If `apt-get update` and
-`apt-get install` are in separate layers, a future build can
-use the cached `update` layer (with a stale package index)
-while re-running `install` — installing whatever version the
-stale index knows about rather than the latest. This is called
-cache busting failure and causes non-reproducible builds.
-Combining them in one `RUN` ensures the index is always fresh
-when packages are installed.
+Docker's cache key For `RUN` instruction is the exact text of an instruction — an
+unchanged instruction is reused regardless of how much time has
+passed. The real risk is on the next edit: if `update` and
+`install` are separate lines and someone later edits only the
+`install` line (adding a package, say), Docker reuses the
+unchanged `update` layer — a possibly stale cached index — while
+re-running `install` fresh against that stale data, installing
+whatever the old index knew about rather than the current
+repository. Combining them into one instruction means any edit to
+the install list changes the entire instruction's text, forcing
+`update` and `install` to rerun together every time, never split
+apart. This is not automatic staleness-busting on a schedule —
+if the Dockerfile is never touched again, neither version
+refreshes the index on its own; both still need `--no-cache` or a
+new base image to force that.
 
 ---
 
@@ -1792,7 +1990,7 @@ when packages are installed.
 
 5. **`rpm -V` prints nothing when a package is intact — any output means a file differs from the database record.** `c` in the file type column means config file (expected to be modified). No tag on a modified binary is a security indicator requiring immediate investigation.
 
-6. **In a Dockerfile: `apt-get update && apt-get install` in one `RUN` layer, `--no-install-recommends`, pinned versions, and cleanup in the same layer.** Separate layers cause stale index builds; cleanup in a separate layer does not reduce image size because the files exist in the earlier layer.
+6. **In a Dockerfile: `apt-get update && apt-get install` in one `RUN` layer, `--no-install-recommends`, and cleanup in the same layer.** Docker's cache key for `RUN` is the instruction's exact text, not elapsed time — splitting update/install risks a stale-index install only when someone later edits the install line and the update layer gets silently reused. Combining them ties both to one cache key, so any edit to the install list forces both to rerun together. Cleanup in a separate layer never reduces image size, regardless of caching, because the files already exist in an earlier layer.
 
 7. **`dnf history undo N` can roll back a transaction on RHEL systems** — a capability `apt` does not have. Record transaction numbers before major upgrades so you have a rollback target.
 
@@ -1889,7 +2087,7 @@ when packages are installed.
 
 "A Kubernetes worker node's kubelet upgraded unexpectedly from 1.29 to 1.30 during dnf upgrade. Node is NotReady. What should have been done after the initial install?","dnf versionlock add kubelet kubeadm kubectl (RHEL) or apt-mark hold kubelet kubeadm kubectl (Ubuntu). All three packages must be version-locked together — they must stay in lockstep with the control plane. The lock is released, upgrade performed at planned version, then re-applied.","demo04,versionlock,kubernetes"
 
-"Why must apt-get update and apt-get install be in the same RUN instruction in a Dockerfile?","Docker caches each RUN layer. If they are separate, a future build uses the cached update layer (stale index) but re-runs install — installing whatever version the stale index knows, not the latest. This is cache busting failure causing non-reproducible builds. One RUN layer ensures the index is always fresh when packages install.","demo04,dockerfile,apt,caching"
+"Why must apt-get update and apt-get install be in the same RUN instruction in a Dockerfile?","Docker's cache key is the exact TEXT of an instruction, not elapsed time - an unchanged line is reused no matter how stale the real repo is. The actual risk: if update/install are split and someone later edits only the install line, Docker reuses the unchanged (possibly stale) update layer while installing fresh against that stale index. Combining them means any edit to the install list invalidates the whole instruction, forcing both to rerun together - never split. This is NOT automatic refresh on a timer; an untouched Dockerfile stays cached either way without --no-cache or a new base image.","demo04,dockerfile,apt,caching"
 
 "What does --no-install-recommends do in apt-get install? Why use it in containers?","Prevents installation of recommended packages — packages not strictly required for the tool to function. apt installs recommended packages by default. In a container, recommended packages add size with no benefit. Typical image size reduction: 20-40%. Always use --no-install-recommends in Dockerfiles.","demo04,dockerfile,apt,containers"
 
@@ -2108,7 +2306,7 @@ This appendix exists so you stop trying to memorize two parallel
 command sets independently. Learn the concept once; use this table
 to look up the syntax for whichever distro you're on right now.
 
-### High-level tool: apt vs dnf
+### C.1 High-level tool: apt vs dnf
 
 | Action | apt (Debian/Ubuntu) | dnf (RHEL/Rocky) | Notes |
 |---|---|---|---|
@@ -2129,7 +2327,7 @@ to look up the syntax for whichever distro you're on right now.
 | Undo a transaction | *(no equivalent — manual recovery only)* | `dnf history undo N` | No apt equivalent — notable gap |
 | Hold/lock version | `apt-mark hold pkg` | `dnf versionlock add pkg` (requires plugin install) | apt: built-in. dnf: separate plugin |
 
-### Low-level tool: dpkg vs rpm
+### C.2 Low-level tool: dpkg vs rpm
 
 | Action | dpkg (Debian/Ubuntu) | rpm (RHEL/Rocky) | Notes |
 |---|---|---|---|
@@ -2145,7 +2343,7 @@ to look up the syntax for whichever distro you're on right now.
 | Import GPG key | *(not a dpkg function — handled via apt keyring files)* | `rpm --import URL` | Different mechanisms entirely, not just different syntax |
 | View/set selections (hold etc.) | `dpkg --get-selections` | *(handled by dnf versionlock plugin instead)* | Different underlying systems |
 
-### What has no equivalent at all
+### C.3 What has no equivalent at all
 
 Memorize these as gaps, not commands — knowing what *doesn't* exist
 on one side is exactly what prevents confusion when moving between
@@ -2305,3 +2503,175 @@ part of why `rpm -V`'s integrity-check capability has no direct
 dpkg equivalent (see the comparison gap table above): the
 structured per-file expected-value storage that makes verification
 possible is built into RPM's database design from the start.
+
+## Appendix E — End-to-End Install/Upgrade Flow
+
+This appendix walks the complete request → disk sequence for both
+`apt install`/`apt upgrade` and `dnf install`/`dnf upgrade`,
+side by side — every file touched, in what order, and which value
+wins when more than one source could apply.
+
+### E.1 Install flow — `apt install curl` (Ubuntu)
+
+```
+1. Read local index cache
+   /var/lib/apt/lists/*Packages
+   (NOT the live repo — this is the cached copy from your last
+   `apt update`. If you haven't run update, this may be stale or
+   missing entirely on a fresh system.)
+
+2. Resolve dependencies
+   Check Depends:/Recommends: fields in the index entry for curl.
+   Walk this recursively for each dependency.
+
+3. Check pin priority, if any pin files exist
+   /etc/apt/preferences.d/*
+   Default priority is 500 for any available version, unless a
+   pin file raises/lowers it for specific packages (section 1.4).
+   Highest-priority candidate wins.
+
+4. Download the .deb file(s)
+   From the repo URL in /etc/apt/sources.list.d/*.list
+   Verify GPG signature using the key referenced by signed-by=
+   in that .list file (section 1.5) — fails here with
+   NO_PUBKEY/GPG check FAILED if the key isn't imported.
+
+5. Unpack and run pre-install scripts
+   dpkg unpacks the .deb's data.tar.xz, runs any preinst script
+   from control.tar.xz (Appendix D, section D.1)
+
+6. Place files on disk
+   Following the FHS pattern from Demo 01/this demo's section 1.1
+   connecting content — binary to /usr/bin/, config to /etc/,
+   etc.
+
+7. Run post-install scripts
+   postinst script — may create a service account, enable a
+   systemd unit, etc.
+
+8. Write the install record
+   /var/lib/dpkg/status     — plain text, one stanza per package
+   /var/lib/dpkg/info/      — per-package file lists, scripts
+
+   This is what every later dpkg -l/-L/-S query reads — NOT the
+   original .deb file, which is discarded after step 4 unless you
+   keep it manually.
+```
+
+### E.2 Install flow — `dnf install curl` (Rocky9)
+
+```
+1. Read local index cache
+   /var/cache/dnf/<repo-id>/repodata/*.xml (or .solv, dnf's own
+   compiled cache format)
+   dnf checks repo metadata freshness automatically — unlike apt,
+   there's no separate "update" step you must remember to run
+   first (section 1.3's "no separate update command" point).
+
+2. Resolve dependencies
+   dnf's solver (libsolv) computes the full dependency graph,
+   including any virtual package "provides" matches.
+
+3. Check versionlock, if the plugin is installed and active
+   dnf versionlock's config file — restricts candidate versions
+   to whatever was locked (section 1.4).
+
+4. Download the .rpm file(s)
+   From the baseurl= in the matching /etc/yum.repos.d/*.repo file
+   Verify GPG signature against keys already imported via
+   rpm --import (section 1.5) — fails here with
+   "GPG check FAILED" if the key isn't present.
+
+5. Unpack and run pre-install scriptlets
+   rpm unpacks the cpio payload, runs any %pre scriptlet from the
+   Header section (Appendix D, section D.1)
+
+6. Place files on disk
+   Following the same FHS pattern as the apt flow above —
+   package manager doesn't change where files land, only how
+   they get there.
+
+7. Run post-install scriptlets
+   %post scriptlet — same purpose as Debian's postinst
+
+8. Write the install record
+   /var/lib/rpm/rpmdb.sqlite — a real SQLite database (Appendix
+   D, section D.3), not plain text files.
+
+   This is what every later rpm -qa/-ql/-qf/-V query reads — NOT
+   the original .rpm file, which is discarded after step 4 unless
+   kept manually.
+```
+
+### E.3 Upgrade flow — what's different from install
+
+```
+apt upgrade curl                      dnf upgrade curl
+─────────────────────                 ─────────────────────
+Reads /var/lib/dpkg/status to         Reads /var/lib/rpm/rpmdb.sqlite
+find the CURRENTLY installed          to find the CURRENTLY installed
+version first                         version first
+
+Compares against the candidate        Compares against the candidate
+version in the local index            version in the local index
+(same staleness risk as install       (dnf checks freshness itself,
+if apt update wasn't run recently     reducing but not eliminating
+— section 1.2)                        the same risk)
+
+If held (apt-mark hold), SKIPS        If versionlocked, SKIPS this
+this package silently, printing       package, printing "Skipping
+"kept back" in the summary            packages with conflicts"
+(section 1.4)                         (section 1.4)
+
+Old .deb's files are removed by       Old .rpm's files are removed by
+dpkg using the OLD install record's   rpm using the OLD install record's
+file manifest, then the NEW           file manifest, then the NEW
+package's files are placed and        package's files are placed and
+the database record is REPLACED,      the database record is REPLACED,
+not appended                          not appended
+
+A failed/interrupted upgrade can      dnf history (section 1.3) lets
+leave dpkg in a "half-configured"     you see exactly which
+state — dpkg --configure -a           transaction an upgrade was,
+attempts to finish a stalled          and dnf history undo N can
+configuration step                    reverse it entirely — no dpkg
+                                       equivalent exists
+```
+
+### E.4 Priority — which value wins, when more than one source applies
+
+```
+For a package version, in order of what's actually checked first:
+
+1. A versionlock/hold entry, if one exists       → wins outright,
+   (dnf versionlock / apt-mark hold)                upgrade refuses
+                                                     to touch it
+
+2. A pin file with Pin-Priority > 1000            → wins even over
+   (apt only — /etc/apt/preferences.d/)              a newer version
+                                                     that would
+                                                     otherwise install
+
+3. The highest version available in the           → normal default
+   local index (apt) / repo metadata (dnf)            behavior
+
+4. Pin files with priority 1-999                   → only break ties
+   between multiple AVAILABLE repos offering
+   the same package, doesn't override #3 alone
+
+
+For a CONFIG FILE, which copy wins after install (relevant for both
+distros, mechanism differs slightly):
+
+apt:  if you've locally modified a config file and a package
+      upgrade ships a new default version, apt PROMPTS you
+      interactively (in a terminal) to keep yours, take the new
+      one, or view a diff — never silently overwrites a modified
+      config file by default
+
+dnf:  ships the new default as filename.rpmnew alongside your
+      existing (preserved) file, rather than prompting — you must
+      manually diff and merge .rpmnew files yourself; nothing
+      prompts you that this happened unless you check for .rpmnew
+      files explicitly after an upgrade
+```
