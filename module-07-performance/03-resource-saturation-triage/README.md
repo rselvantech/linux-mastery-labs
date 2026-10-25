@@ -1,9 +1,9 @@
-# Demo 26c — Resource Saturation Triage
+# Demo M07-03 — Resource Saturation Triage
 
 ## Overview
 
-Demo 26 assumed you had already narrowed a slowdown to one process and
-gave you tools to trace it. Demo 26b gave you limits to stop one service
+Demo M07-01 assumed you had already narrowed a slowdown to one process and
+gave you tools to trace it. Demo M07-02 gave you limits to stop one service
 from starving the rest. This demo covers the step that comes *before*
 both: when a host is "slow" and you don't yet know which resource is the
 problem. CPU, memory, disk, and — on virtual machines — the hypervisor
@@ -34,16 +34,16 @@ By the end of this demo you will be able to:
    single-thread bottleneck that host-wide averages hide
 6. Recognize what `iowait` does and does not tell you, and use
    `iostat -x` to check whether a local disk is actually busy
-7. Decide when to hand off to Demo 26's tracing tools once the saturated
+7. Decide when to hand off to Demo M07-01's tracing tools once the saturated
    resource is known
 
 ## Directory Structure
 
 ```
-26c-resource-saturation-triage/
-├── README.md                                    # this file
-├── 26c-resource-saturation-triage-anki.csv      # Anki flashcard deck
-└── 26c-resource-saturation-triage-quiz.md       # standalone quiz
+03-resource-saturation-triage/
+├── README.md                                   # this file
+├── m07-03-resource-saturation-triage-anki.csv  # Anki flashcard deck
+└── m07-03-resource-saturation-triage-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -65,9 +65,9 @@ By the end of this demo you will be able to:
 > host (a dedicated guest), so every non-zero steal example below is
 > marked `⚠️ Simulated scenario`.
 
-## Recall Check — 26b-systemd-resource-control
+## Recall Check — 02-systemd-resource-control
 
-Answer these from memory before continuing — no looking back at Demo 26b.
+Answer these from memory before continuing — no looking back at Demo M07-02.
 
 1. A service is killed for exceeding `MemoryMax=` while `free -h` shows
    gigabytes free on the host. Is that a contradiction?
@@ -97,7 +97,7 @@ Answer these from memory before continuing — no looking back at Demo 26b.
 
 ### 1.1 Triage before tracing
 
-Tracing tools (Demo 26) answer "what is this process doing?" Triage
+Tracing tools (Demo M07-01) answer "what is this process doing?" Triage
 answers a different question: "which resource is this whole machine short
 of?" The order matters, because the answer decides which tool you reach
 for next:
@@ -176,7 +176,7 @@ processes on the same single CPU:
 **saturated**. Notice also that `sy` (52–63%) is larger than `us`: `yes`
 spends most of its time in the kernel because it makes a `write` system
 call for every line. **A high `sy` means the time is going into system
-calls — that is the signal to reach for `strace -c` from Demo 26.**
+calls — that is the signal to reach for `strace -c` from Demo M07-01.**
 
 **`wa` — waiting for I/O.** Real output while writing 4 GB with
 `dd ... oflag=direct`:
@@ -280,19 +280,19 @@ hosts with many devices.
 
 | What you see | Resource | Next step |
 |---|---|---|
-| `r` well above the CPU count, `us` high | CPU saturation | `perf top`, `ltrace -c` (Demo 26) |
-| `sy` larger than `us` | Kernel / system calls | `strace -c` (Demo 26) |
-| `so` sustained above 0, `free` small | Memory pressure | find the largest consumers; check service limits (Demo 26b) |
+| `r` well above the CPU count, `us` high | CPU saturation | `perf top`, `ltrace -c` (Demo M07-01) |
+| `sy` larger than `us` | Kernel / system calls | `strace -c` (Demo M07-01) |
+| `so` sustained above 0, `free` small | Memory pressure | find the largest consumers; check service limits (Demo M07-02) |
 | `b` above 0, `wa` high, `iostat -x` shows high `await` | Local disk | identify the process doing the I/O |
-| `b` above 0, `wa` high, local disk quiet | Something else blocking on I/O (for example a network filesystem) | list D-state processes; see Demo 16 |
+| `b` above 0, `wa` high, local disk quiet | Something else blocking on I/O (for example a network filesystem) | list D-state processes; see Demo M04-07 |
 | `st` sustained and non-trivial, `us` moderate | Hypervisor contention | not fixable in the guest — escalate |
-| One CPU at 100%, aggregate low | Single-threaded bottleneck | `perf top -p PID` (Demo 26) |
+| One CPU at 100%, aggregate low | Single-threaded bottleneck | `perf top -p PID` (Demo M07-01) |
 
 Any numeric threshold for "sustained and non-trivial" is a rule of thumb
 that depends on the workload — not a standard.
 
 Triage names the resource, not the cause. Once you know it is CPU, or
-disk, or steal, the tools from Demo 26 answer *why*.
+disk, or steal, the tools from Demo M07-01 answer *why*.
 
 ---
 
@@ -339,7 +339,7 @@ kill %1
 ```
 
 Confirm `sy` now rivals or exceeds `us`. This is the same distinction
-Demo 26 uses `strace -c` to explore.
+Demo M07-01 uses `strace -c` to explore.
 
 ### Task 3 — I/O-bound
 
@@ -434,7 +434,7 @@ kill %1 2>/dev/null; rm -f /tmp/ddtest
   hide
 - ✅ Recognized the limits of `iowait` and used `iostat -x` to check the
   disk directly
-- ✅ Chose the next tool from Demo 26 based on which resource was
+- ✅ Chose the next tool from Demo M07-01 based on which resource was
   saturated
 
 ---
@@ -506,7 +506,7 @@ and nine processes are blocked in uninterruptible sleep — the machine is
 waiting on I/O. It does not prove the *local disk* is the cause, and
 `proc(5)` warns that iowait is not a reliable figure. A quiet local disk
 points elsewhere: the usual suspect is a network filesystem (NFS, CIFS)
-whose server is slow or unreachable, which is Demo 16's territory. Find the
+whose server is slow or unreachable, which is Demo M04-07's territory. Find the
 blocked processes and what they wait on with
 `ps -eo pid,stat,wchan:20,comm | awk '$2 ~ /^D/'` (the `wchan` column names
 the kernel function the process is sleeping in), and check for network
@@ -577,7 +577,7 @@ more cores.
    N-CPU host shows as about 100/N percent in the aggregate; use a
    per-CPU view before concluding the host is idle.
 7. **Triage names the resource, not the cause.** Once you know which
-   resource is saturated, hand off to Demo 26's tools (or Demo 26b's
+   resource is saturated, hand off to Demo M07-01's tools (or Demo M07-02's
    limits) to find out why.
 
 > **Demo scope:** Primary concept: top-down triage of which resource is
@@ -612,10 +612,10 @@ more cores.
 
 ## Appendix A — Anki Cards
 
-**`26c-resource-saturation-triage-anki.csv`:**
+**`m07-03-resource-saturation-triage-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 7 - Performance::Demo 26c - Resource Saturation Triage
+#deck:Linux Mastery::Module 7 - Performance::Demo M07-03 - Resource Saturation Triage
 #separator:Comma
 #columns:Front,Back,Tags
 "What does the FIRST row of vmstat output represent?","Averages since boot, not a live reading — ignore it and read the rows after it.","demo26c,vmstat"
@@ -634,13 +634,13 @@ more cores.
 
 ## Appendix B — Quiz
 
-**`26c-resource-saturation-triage-quiz.md`:**
+**`m07-03-resource-saturation-triage-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 26c: Resource Saturation Triage
+# Quiz — Demo M07-03: Resource Saturation Triage
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 26d.
+> Target: 80% or above before moving to Demo M07-04.
 
 ---
 
@@ -658,7 +658,7 @@ reading?
 
 **B** — `r` far above the CPU count with almost no idle time is CPU
 saturation. `wa=0` rules out I/O, `st=0` rules out steal, and swap columns
-are not involved. Next tools: `perf top` and `ltrace -c` from Demo 26.
+are not involved. Next tools: `perf top` and `ltrace -c` from Demo M07-01.
 
 </details>
 
@@ -723,7 +723,7 @@ very small, and `r` low. What is the host telling you, and where do you
 look next?
 
 - A) CPU saturation — check `perf top`
-- B) Memory pressure: it is actively swapping out; find the largest memory consumers and check whether a per-service limit is involved (Demo 26b)
+- B) Memory pressure: it is actively swapping out; find the largest memory consumers and check whether a per-service limit is involved (Demo M07-02)
 - C) A disk fault — run `fsck`
 - D) Steal time from the hypervisor
 
@@ -757,7 +757,7 @@ the following rows were all zero.
 ---
 
 **Q7.** `vmstat` shows `us=37 sy=63` on a busy process, with `r` equal to
-the CPU count. Which tool from Demo 26 is the sensible next step?
+the CPU count. Which tool from Demo M07-01 is the sensible next step?
 
 - A) `ltrace -c`, because the time is in libraries
 - B) `strace -c`, because most CPU time is in the kernel, meaning heavy system-call activity
@@ -778,7 +778,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 26d |
+| 7/7 | Import Anki cards, move to Demo M07-04 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

@@ -1,10 +1,10 @@
-# Demo 08a — Cron & Log Rotation
+# Demo M02-06 — Cron & Log Rotation
 
 ## Overview
 
-Demo 08 compared systemd timers against cron but never taught cron's own
+Demo M02-05 compared systemd timers against cron but never taught cron's own
 syntax — this demo closes that gap. It also covers a topic mentioned in
-passing since Demo 01 (`/var/log` grows forever unless something manages it)
+passing since Demo M01-07 (`/var/log` grows forever unless something manages it)
 but never explained: log rotation. The two belong together because
 `logrotate`'s own trigger, on many systems, still runs *through* cron — the
 same scheduling mechanism you're learning here, not a separate one.
@@ -27,7 +27,7 @@ By the end of this demo you will be able to:
    `missingok`, `notifempty`, `size`, and `postrotate`/`endscript`
 6. Explain how `logrotate` actually gets triggered — via cron on some
    systems, via a `.timer`/`.service` pair on others — and connect this
-   back to Demo 08
+   back to Demo M02-05
 7. Diagnose a `logrotate` configuration that silently isn't rotating a log
 
 ---
@@ -35,10 +35,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-08a-cron-log-rotation/
-├── README.md                              # this file
-├── 08a-cron-log-rotation-anki.csv         # Anki flashcard deck
-└── 08a-cron-log-rotation-quiz.md          # standalone quiz
+06-cron-log-rotation/
+├── README.md                          # this file
+├── m02-06-cron-log-rotation-anki.csv  # Anki flashcard deck
+└── m02-06-cron-log-rotation-quiz.md   # standalone quiz
 ```
 
 ---
@@ -53,21 +53,21 @@ By the end of this demo you will be able to:
 | `logrotate` trigger mechanism | `/etc/cron.daily/logrotate` (cron-based) on most current images | Often a `logrotate.timer`/`logrotate.service` pair (systemd-based) — verify with Task 6, don't assume | Verify with Task 6 |
 
 The cron package name difference (`cron` vs `cronie`) is the same kind of
-distro-family naming split you've already seen with `sudo`/`wheel` (Demo 05)
-and `ssh`/`sshd` unit names (Demo 07) — different name, same job.
+distro-family naming split you've already seen with `sudo`/`wheel` (Demo M02-02)
+and `ssh`/`sshd` unit names (Demo M02-04) — different name, same job.
 
 ---
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 08.
+> Answer from memory before reading further. From Demo M02-05.
 
 1. A `.timer` unit has `OnCalendar=daily` and `Persistent=true`. The machine
    is off for exactly one missed run. How many catch-up runs happen when
    it's powered back on?
 
 2. What's the practical advantage of a `.timer`-triggered service's logging
-   over a cron job's, according to Demo 08's comparison?
+   over a cron job's, according to Demo M02-05's comparison?
 
 3. You edit an existing `.timer` file's schedule. What must you run before
    the change takes effect?
@@ -175,7 +175,7 @@ a personal crontab is, each line must say who to run the command as:
 The line silently fails to run — cron doesn't send an error to your terminal
 for a malformed `/etc/cron.d/` entry, it just never executes it (or, on some
 implementations, the second field is misread as part of the command, which
-then fails for an unrelated-looking reason). Demo 08's Break-Fix Incident 1
+then fails for an unrelated-looking reason). Demo M02-05's Break-Fix Incident 1
 in this demo is exactly this mistake.
 
 ### 1.3 run-parts and the cron.{hourly,daily,weekly,monthly} directories
@@ -253,8 +253,8 @@ old log files on a schedule, based on per-application configuration.
                         overrides them)
 /etc/logrotate.d/       One file per application/service — the same
                         drop-in-directory pattern you've already seen with
-                        /etc/sudoers.d/ (Demo 05), /etc/systemd/system/
-                        (Demo 07), and /etc/cron.d/ (this demo, §1.2)
+                        /etc/sudoers.d/ (Demo M02-02), /etc/systemd/system/
+                        (Demo M02-04), and /etc/cron.d/ (this demo, §1.2)
 ```
 
 ```bash
@@ -303,7 +303,7 @@ size 50M                    Rotate early if the log exceeds this size,
                             schedule would otherwise trigger it
 create MODE USER GROUP      After rotating, create a new empty log file
                             with these permissions — critical for a
-                            service account (Demo 05) that expects to
+                            service account (Demo M02-02) that expects to
                             keep writing to the same filename
 postrotate / endscript      A shell command block run once, after
                             rotation — almost always used to tell the
@@ -314,7 +314,7 @@ postrotate / endscript      A shell command block run once, after
 ```
 
 **Why `postrotate` matters, concretely:** renaming a log file doesn't close
-the file descriptor a running process already has open to it (Demo 02's
+the file descriptor a running process already has open to it (Demo M01-08's
 inode/directory-entry distinction applies directly here — the process still
 holds the old inode via its open file descriptor, even after the filename
 changes). Without a `postrotate` step telling the service to reopen its log
@@ -356,7 +356,7 @@ Cron-based (traditional):     /etc/cron.daily/logrotate — a script that
 
 systemd-timer-based (newer):  logrotate.timer + logrotate.service —
                               exactly the .timer/.service pairing from
-                              Demo 08, just applied to logrotate instead
+                              Demo M02-05, just applied to logrotate instead
                               of a custom NovaTech job.
 ```
 
@@ -513,7 +513,7 @@ cat /tmp/postrotate-test.log
 ls /etc/cron.daily/logrotate 2>/dev/null && echo "This system uses cron to trigger logrotate"
 systemctl list-timers --all | grep -i logrotate && echo "This system uses a systemd timer to trigger logrotate"
 # Note which one your system actually uses — do not assume based on distro
-# alone, confirm it directly, consistent with Demo 08's own list-timers habit
+# alone, confirm it directly, consistent with Demo M02-05's own list-timers habit
 ```
 
 ---
@@ -662,7 +662,7 @@ Check both directly: `ls /etc/cron.daily/logrotate` for the cron-based
 mechanism, and `systemctl list-timers --all | grep -i logrotate` for the
 timer-based one. Which mechanism a given install uses can vary even within
 the same distro family depending on packaging choices, so confirming
-directly — the same habit Demo 08 established for any timer — is more
+directly — the same habit Demo M02-05 established for any timer — is more
 reliable than assuming.
 
 ---
@@ -709,10 +709,10 @@ reliable than assuming.
 
 ## Appendix A — Anki Cards
 
-**`08a-cron-log-rotation-anki.csv`:**
+**`m02-06-cron-log-rotation-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 2 - System Administration::Demo 08a - Cron and Log Rotation
+#deck:Linux Mastery::Module 2 - System Administration::Demo M02-06 - Cron and Log Rotation
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -741,13 +741,13 @@ reliable than assuming.
 
 ## Appendix B — Quiz
 
-**`08a-cron-log-rotation-quiz.md`:**
+**`m02-06-cron-log-rotation-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 08a: Cron & Log Rotation
+# Quiz — Demo M02-06: Cron & Log Rotation
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 09.
+> Target: 80% or above before moving to Demo M02-07.
 
 ---
 
@@ -827,7 +827,7 @@ minimum, not relative to when the line was added or the system last booted.
 <summary>Answer</summary>
 
 **B** — This connects directly to how inodes and open file descriptors
-work (Demo 02): the rename doesn't affect what file a running process is
+work (Demo M01-08): the rename doesn't affect what file a running process is
 already writing to. `postrotate` (commonly `systemctl reload` or a signal)
 is what makes the service pick up the new file.
 
@@ -896,7 +896,7 @@ distro?
 <details>
 <summary>Answer</summary>
 
-**B** — This is the same "verify directly, don't assume" habit Demo 08
+**B** — This is the same "verify directly, don't assume" habit Demo M02-05
 established for timers generally — packaging decisions aren't guaranteed
 to be uniform across every install of a given distro.
 
@@ -926,7 +926,7 @@ default for single-purpose or lightly-shared systems.
 
 | Score | Action |
 |---|---|
-| 8/8 | Import Anki cards, move to Demo 09 |
+| 8/8 | Import Anki cards, move to Demo M02-07 |
 | 6-7/8 | Review the wrong answers, then proceed |
 | 4-5/8 | Re-read the relevant sections, retry those questions |
 | Below 4/8 | Re-read the full demo and redo the walkthrough before proceeding |

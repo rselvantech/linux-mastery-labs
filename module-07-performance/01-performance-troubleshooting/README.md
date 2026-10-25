@@ -1,8 +1,8 @@
-# Demo 26 — Performance Troubleshooting
+# Demo M07-01 — Performance Troubleshooting
 
 ## Overview
 
-Demo 09/10 covered monitoring — knowing *that* something is slow. This
+Demo M02-07/10 covered monitoring — knowing *that* something is slow. This
 demo covers the next level down: knowing *why*, at the level of individual
 system calls, library calls, and CPU cycles. `strace` and `ltrace` show
 exactly what a process is asking the kernel and its libraries to do;
@@ -23,10 +23,10 @@ don't know why," rather than guessing.
 ## Directory Structure
 
 ```
-26-performance-troubleshooting/
-├── README.md                                  # this file
-├── 26-performance-troubleshooting-anki.csv    # Anki flashcard deck
-└── 26-performance-troubleshooting-quiz.md     # standalone quiz
+01-performance-troubleshooting/
+├── README.md                                    # this file
+├── m07-01-performance-troubleshooting-anki.csv  # Anki flashcard deck
+└── m07-01-performance-troubleshooting-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -38,7 +38,7 @@ don't know why," rather than guessing.
 
 > **Verification note:** `strace`/`ltrace`/`perf` could not be installed
 > or run live in this sandbox (no network access — the same constraint
-> already disclosed in `08a-cron-log-rotation` and the Vim/Neovim demos).
+> already disclosed in `06-cron-log-rotation` and the Vim/Neovim demos).
 > §1.1–1.3 and §1.5's sample outputs (syscall percentages, cycle counts,
 > IPC figures, `perf top` rows) are illustrative and built from stable,
 > well-documented tool behavior — recommend a real verification pass on
@@ -49,9 +49,9 @@ don't know why," rather than guessing.
 > were all confirmed exactly as described) and can be treated as
 > confirmed.
 
-## Recall Check — 23d-neovim-lsp
+## Recall Check — 05-neovim-lsp
 
-Answer these from memory before continuing — no looking back at Demo 23d.
+Answer these from memory before continuing — no looking back at Demo M06-05.
 
 **Q1.** What's the actual, defensible differentiator between Neovim and
 Vim, and what common but incorrect argument does it rule out?
@@ -169,7 +169,7 @@ perf stat ls /tmp
 
 `perf stat` reads hardware and kernel performance counters — actual CPU
 cycles consumed, instructions executed, cache behavior, context switches —
-giving a much lower-level picture than `top`/`vmstat` (Demo 09/10). **The
+giving a much lower-level picture than `top`/`vmstat` (Demo M02-07/10). **The
 `instructions per cycle` (IPC) figure is a genuinely useful efficiency
 signal**: a low IPC (well under 1.0) can indicate the CPU is frequently
 stalled waiting on memory rather than doing useful work, even while
@@ -241,7 +241,7 @@ needing to guess which library calls to filter for in advance.
 
 ### 1.6 /proc/PID — process-specific live data
 
-Demo 09 and Demo 16 covered `/proc/loadavg` and `/proc/meminfo` —
+Demo M02-07 and Demo M04-07 covered `/proc/loadavg` and `/proc/meminfo` —
 system-wide data. Every running process also has its own directory under
 `/proc/PID/`:
 
@@ -258,7 +258,7 @@ cat /proc/1234/limits
 
 ls -la /proc/1234/fd/
 # Every file descriptor the process currently has open — the direct,
-# authoritative source lsof (Demo 12) actually reads from; useful when you
+# authoritative source lsof (Demo M03-02) actually reads from; useful when you
 # want the raw view without lsof's formatting/filtering layer.
 
 cat /proc/1234/cmdline | tr '\0' ' '
@@ -272,7 +272,7 @@ cat /proc/1234/cmdline | tr '\0' ' '
 `top`, `lsof`) ultimately reads from** — when a formatted tool's output is
 ambiguous or seems wrong, reading the raw `/proc/PID/` files directly is
 the way to confirm what's actually true, the same "go to the source" habit
-Demo 16 established for `/proc`/`/sys` generally.
+Demo M04-07 established for `/proc`/`/sys` generally.
 
 ## Part 2 — Hands-On Lab
 
@@ -567,10 +567,10 @@ when `ltrace`/`perf top` become the right next tools instead.
 
 ## Appendix A — Anki Cards
 
-**`26-performance-troubleshooting-anki.csv`:**
+**`m07-01-performance-troubleshooting-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 7 - Performance::Demo 26 - Performance Troubleshooting
+#deck:Linux Mastery::Module 7 - Performance::Demo M07-01 - Performance Troubleshooting
 #separator:Comma
 #columns:Front,Back,Tags
 "What does top's CPU% actually measure, and what does it NOT measure?","Time the process was scheduled on a core. It does not measure how efficiently that time was used — that's perf stat's instructions-per-cycle (IPC) figure.","demo26,perf,top,fundamentals"
@@ -585,13 +585,13 @@ when `ltrace`/`perf top` become the right next tools instead.
 
 ## Appendix B — Quiz
 
-**`26-performance-troubleshooting-quiz.md`:**
+**`m07-01-performance-troubleshooting-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 26: Performance Troubleshooting
+# Quiz — Demo M07-01: Performance Troubleshooting
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 26b.
+> Target: 80% or above before moving to Demo M07-02.
 
 ---
 
@@ -702,7 +702,7 @@ restart.
 <summary>Answer</summary>
 
 **B** — This is the same "go to the source" principle established for
-`/proc`/`/sys` generally in Demo 16, applied here to per-process data.
+`/proc`/`/sys` generally in Demo M04-07, applied here to per-process data.
 
 </details>
 
@@ -730,7 +730,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 26b |
+| 7/7 | Import Anki cards, move to Demo M07-02 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

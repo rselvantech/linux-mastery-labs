@@ -1,8 +1,8 @@
-# Demo 34b — Signal Handling, Safe Temp Files & Concurrency
+# Demo M09-03 — Signal Handling, Safe Temp Files & Concurrency
 
 ## Overview
 
-Demo 34's `trap` section covered the basics — register a handler, clean up
+Demo M09-02's `trap` section covered the basics — register a handler, clean up
 on exit. This demo covers the three things that actually cause production
 incidents when they're missing: a script that leaves things in a known,
 safe state when killed mid-operation rather than a "partially applied"
@@ -29,10 +29,10 @@ here is a documentation paraphrase.
 ## Directory Structure
 
 ```
-34b-signal-trap-handling/
-├── README.md                                  # this file
-├── 34b-signal-trap-handling-anki.csv          # Anki flashcard deck
-└── 34b-signal-trap-handling-quiz.md           # standalone quiz
+03-signal-trap-handling/
+├── README.md                             # this file
+├── m09-03-signal-trap-handling-anki.csv  # Anki flashcard deck
+└── m09-03-signal-trap-handling-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -48,9 +48,9 @@ here is a documentation paraphrase.
 > background process and launching two real overlapping script instances.
 > No `[Unverified]` markers are needed anywhere in this demo.
 
-## Recall Check — 34-shell-scripting-advanced
+## Recall Check — 02-shell-scripting-advanced
 
-Answer these from memory before continuing — no looking back at Demo 34.
+Answer these from memory before continuing — no looking back at Demo M09-02.
 
 **Q1.** What specific failure does `set -o pipefail` catch that plain
 `set -e` does not?
@@ -82,7 +82,7 @@ argument — `report.txt` becomes an unconsumed positional argument, and
 
 ### 1.1 SIGTERM vs. SIGINT — different signals, different intent
 
-Demo 34 §1.2 registered one handler for both `INT` and `TERM` together.
+Demo M09-02 §1.2 registered one handler for both `INT` and `TERM` together.
 They're not actually the same situation: `SIGINT` is what a human sends
 with Ctrl+C — immediate, at-the-keyboard, "stop now." `SIGTERM` is the
 default signal `kill` and process managers (systemd, Kubernetes, cron's
@@ -213,7 +213,7 @@ process's file descriptor closes, crash included.
 
 ### 1.5 Surviving a kill mid-operation — recording state, not just cleaning up
 
-Demo 34's `trap` deleted a temp file on exit — a cleanup action. A
+Demo M09-02's `trap` deleted a temp file on exit — a cleanup action. A
 multi-step operation (a deploy, a migration) needs something more: a
 record of *how far it got*, so an interrupted run doesn't leave the
 system in an ambiguous state nobody can safely reason about afterward.
@@ -568,10 +568,10 @@ afterward.
 
 ## Appendix A — Anki Cards
 
-**`34b-signal-trap-handling-anki.csv`:**
+**`m09-03-signal-trap-handling-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 9 - Shell Scripting::Demo 34b - Signal Handling, Safe Temp Files & Concurrency
+#deck:Linux Mastery::Module 9 - Shell Scripting::Demo M09-03 - Signal Handling, Safe Temp Files & Concurrency
 #separator:Comma
 #columns:Front,Back,Tags
 "What's the actual difference in intent between SIGINT and SIGTERM?","SIGINT is a human pressing Ctrl+C, typically wanting an immediate stop. SIGTERM is the default signal process managers (systemd, Kubernetes, cron) send to request a GRACEFUL shutdown. A script handling only one behaves wrong when it actually receives the other.","demo34b,signals,fundamentals"
@@ -586,13 +586,13 @@ afterward.
 
 ## Appendix B — Quiz
 
-**`34b-signal-trap-handling-quiz.md`:**
+**`m09-03-signal-trap-handling-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 34b: Signal Handling, Safe Temp Files & Concurrency
+# Quiz — Demo M09-03: Signal Handling, Safe Temp Files & Concurrency
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 34c.
+> Target: 80% or above before moving to Demo M09-04.
 
 **Q1. Why might a script need a specific handler for `SIGTERM`, separate from `SIGINT`?**
 
@@ -717,7 +717,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 34c |
+| 7/7 | Import Anki cards, move to Demo M09-04 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

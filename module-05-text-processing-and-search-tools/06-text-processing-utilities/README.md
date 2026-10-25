@@ -1,4 +1,4 @@
-# Demo 19 — Text Processing Utilities
+# Demo M05-06 — Text Processing Utilities
 
 ## Overview
 
@@ -6,7 +6,7 @@
 rearrange, and summarize text once you've found it. `cut`, `sort`, `uniq`,
 `tr`, `wc`, `xargs`, `tee`, `paste`, and `column` are individually simple —
 most do one thing — but composed in a pipeline, they cover a huge share of
-everyday text-wrangling without needing `sed` or `awk` at all. Demo 18's log
+everyday text-wrangling without needing `sed` or `awk` at all. Demo M05-05's log
 investigation ended with exactly this kind of composition (`sort | uniq
 -c`); this demo builds out the full toolkit that pattern draws from.
 
@@ -31,10 +31,10 @@ investigation ended with exactly this kind of composition (`sort | uniq
 ## Directory Structure
 
 ```
-19-text-processing-utilities/
+06-text-processing-utilities/
 ├── README.md                                  # this file
-├── 19-text-processing-utilities-anki.csv      # Anki flashcard deck
-└── 19-text-processing-utilities-quiz.md       # standalone quiz
+├── m05-06-text-processing-utilities-anki.csv  # Anki flashcard deck
+└── m05-06-text-processing-utilities-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -43,9 +43,9 @@ investigation ended with exactly this kind of composition (`sort | uniq
 |---|---|---|---|
 | All lab tasks | ✅ | ✅ | Not required |
 
-## Recall Check — 18-grep-search
+## Recall Check — 05-grep-search
 
-Answer these from memory before continuing — no looking back at Demo 18.
+Answer these from memory before continuing — no looking back at Demo M05-05.
 
 1. `grep -c 'ERROR' file.log` returns 42; a manual count of every
    occurrence gives 47. What explains this, and what command gives the true
@@ -94,7 +94,7 @@ with irregular spacing (multiple spaces between fields, common in command
 output like `ps` or `df`), `cut -d' '` treats every single space as a
 separate field boundary — producing a mess of empty fields rather than
 sensibly collapsing repeated whitespace. This is exactly the situation
-where `awk` (Demo 21), which handles repeated whitespace as a single field
+where `awk` (Demo M05-08), which handles repeated whitespace as a single field
 separator by default, is the better tool — `cut` is the right choice for
 genuinely delimiter-consistent data (CSV, `/etc/passwd`-style colon-
 separated files), not free-form command output.
@@ -142,7 +142,7 @@ requested.
 
 **A closely related but distinct flag: `-h` (human-numeric), for output
 that already carries a size suffix** — exactly the shape `du -h`/`df -h`
-(Demo 14) produce:
+(Demo M04-01) produce:
 
 ```bash
 printf '2K\n500\n1M\n10K\n' > /tmp/sizes.txt
@@ -191,7 +191,7 @@ printf 'apple\nbanana\napple\n' | sort | uniq
 ```bash
 sort names.txt | uniq -c
 # -c: prefix each unique line with its count — this is exactly the pattern
-# Demo 18 used to break down log lines by backend, and one of the single
+# Demo M05-05 used to break down log lines by backend, and one of the single
 # most useful pipeline idioms in this whole demo.
 
 sort names.txt | uniq -d
@@ -265,14 +265,14 @@ lines, fields, or delimiters beyond what you explicitly translate — it's
 the right tool for character-level transformation, not the tool for
 anything field- or line-structure-aware.
 
-**`tr` accepts the same POSIX named classes Demo 17 §1.4 covered for
+**`tr` accepts the same POSIX named classes Demo M05-01 §1.4 covered for
 `grep`** — `[:lower:]`, `[:upper:]`, `[:digit:]`, etc. — with the same
 locale-correctness rationale applying here too:
 
 ```bash
 echo "hello" | tr '[:lower:]' '[:upper:]'
 # HELLO — equivalent to tr 'a-z' 'A-Z' but locale-correct, same reasoning
-# as Demo 17's [[:digit:]] vs [0-9] discussion
+# as Demo M05-01's [[:digit:]] vs [0-9] discussion
 ```
 
 **`-c` complements the first set — operate on everything NOT listed,
@@ -836,10 +836,10 @@ a pipeline like this.
 
 ## Appendix A — Anki Cards
 
-**`19-text-processing-utilities-anki.csv`:**
+**`m05-06-text-processing-utilities-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo 19 - Text Processing Utilities
+#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-06 - Text Processing Utilities
 #separator:Comma
 #columns:Front,Back,Tags
 "uniq is run on an unsorted file containing 'apple, banana, apple' and doesn't remove the duplicate apple. Why?","uniq only removes ADJACENT duplicate lines, not duplicates anywhere in the file. Since the two 'apple' lines aren't next to each other, uniq sees no duplicates to remove — sort first to make duplicates adjacent.","demo19,uniq,common-mistake"
@@ -853,7 +853,7 @@ a pipeline like this.
 "Why is cut often a poor fit for parsing typical command output like ps or df, compared to awk?","cut is delimiter-based and treats every occurrence of the delimiter (e.g. every space) as a field boundary, including repeated ones — irregular spacing produces many spurious empty fields. awk collapses repeated whitespace into a single separator by default.","demo19,cut,awk,comparison"
 "What does cut -f2 --complement do differently from cut -f2?","--complement inverts the selection — it returns every field EXCEPT field 2, rather than field 2 itself. Useful for 'drop this one column' without listing every other field explicitly.","demo19,cut,complement"
 "What does tr -c do?","Complements the first character set — the translation/deletion applies to everything NOT in the listed set, instead of what IS in it. E.g. tr -c '[:digit:]' '#' replaces every non-digit character with #, leaving digits untouched.","demo19,tr,complement"
-"Does tr support the same POSIX named character classes ([:lower:], [:digit:], etc.) that grep does?","Yes — tr '[:lower:]' '[:upper:]' works the same way as grep's [[:lower:]], for the same locale-correctness reasons covered for grep in Demo 17.","demo19,tr,posix-classes,cross-demo"
+"Does tr support the same POSIX named character classes ([:lower:], [:digit:], etc.) that grep does?","Yes — tr '[:lower:]' '[:upper:]' works the same way as grep's [[:lower:]], for the same locale-correctness reasons covered for grep in Demo M05-01.","demo19,tr,posix-classes,cross-demo"
 "What does wc -L measure, as opposed to wc -l/-w/-c?","The character length of the single LONGEST line in the file — not a count of anything (lines/words/bytes), a genuinely different kind of measurement. Useful for sizing display columns or flagging a suspiciously long line.","demo19,wc,longest-line"
 "What's the difference between paste (default, multiple files) and paste -s (one file)?","Default paste merges corresponding lines from MULTIPLE files side by side into columns. paste -s instead flattens ONE file's own multiple lines into a SINGLE row — the reverse operation of tr ',' '\\n'.","demo19,paste,serial"
 "What does tee -a do differently from plain tee?","Appends to the target file instead of overwriting it — the same overwrite-vs-append distinction as shell's > vs >>, applied to tee specifically.","demo19,tee,append"
@@ -862,13 +862,13 @@ a pipeline like this.
 
 ## Appendix B — Quiz
 
-**`19-text-processing-utilities-quiz.md`:**
+**`m05-06-text-processing-utilities-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 19: Text Processing Utilities
+# Quiz — Demo M05-06: Text Processing Utilities
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 20.
+> Target: 80% or above before moving to Demo M05-07.
 
 ---
 
@@ -1020,7 +1020,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 20 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M05-07 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

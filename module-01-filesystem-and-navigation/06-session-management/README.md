@@ -1,4 +1,4 @@
-# Demo 00f — Session & Process Management
+# Demo M01-06 — Session & Process Management
 
 ## Overview
 
@@ -32,10 +32,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-00f-session-management/
-├── README.md                              # this file
-├── 00f-session-management-anki.csv        # Anki flashcard deck
-└── 00f-session-management-quiz.md         # standalone quiz
+06-session-management/
+├── README.md                           # this file
+├── m01-06-session-management-anki.csv  # Anki flashcard deck
+└── m01-06-session-management-quiz.md   # standalone quiz
 ```
 
 ---
@@ -62,7 +62,7 @@ screen`) — none are guaranteed present by default. `nohup` and
 
 ---
 
-## Recall Check — Demo 00e
+## Recall Check — Demo M01-05
 
 Before starting, answer from memory:
 
@@ -452,10 +452,10 @@ session you can detach from and return to exactly as you left it.
 
 ## Appendix A — Anki Cards
 
-**`00f-session-management-anki.csv`:**
+**`m01-06-session-management-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 00f - Session & Process Management
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo M01-06 - Session & Process Management
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -477,19 +477,19 @@ session you can detach from and return to exactly as you left it.
 
 "A migration script is run with cmd & then disown, and it intermittently dies after the engineer logs off - not every time. Is this consistent with disown's actual protection, or a sign something else is wrong?","Consistent with disown's actual (limited) protection. disown only blocks ONE specific source of SIGHUP - the shell's own exit-time signaling of its remaining jobs. Other sources of SIGHUP at logout (terminal/session-level propagation) are NOT blocked by disown alone, so intermittent failure depending on exact disconnect conditions is expected, not random.","demo00f,disown,intermittent,break-fix"
 
-"Why does which fail to find disown, even though disown clearly works when typed at a bash prompt?","disown is a bash builtin with no corresponding executable file anywhere in PATH - which only searches PATH for files. This is the same which-vs-builtin gap covered for cd in Demo 00c: type disown correctly reports 'disown is a shell builtin', while which disown finds nothing.","demo00f,disown,which,builtin"
+"Why does which fail to find disown, even though disown clearly works when typed at a bash prompt?","disown is a bash builtin with no corresponding executable file anywhere in PATH - which only searches PATH for files. This is the same which-vs-builtin gap covered for cd in Demo M01-03: type disown correctly reports 'disown is a shell builtin', while which disown finds nothing.","demo00f,disown,which,builtin"
 ```
 
 ---
 
 ## Appendix B — Quiz
 
-**`00f-session-management-quiz.md`:**
+**`m01-06-session-management-quiz.md`:**
 
 ```
-# Quiz — Demo 00f: Session & Process Management
+# Quiz — Demo M01-06: Session & Process Management
 
-> One correct answer per question. Target: 80% before Demo 01.
+> One correct answer per question. Target: 80% before Demo M01-07.
 
 ---
 
@@ -629,7 +629,7 @@ until a condition changes.
 <summary>Answer</summary>
 
 **B** — Same `which`-vs-builtin gap covered for `cd` back in Demo
-00c. `type disown` correctly reports "disown is a shell builtin";
+M01-03. `type disown` correctly reports "disown is a shell builtin";
 `which`, being a pure `PATH` file search, finds nothing.
 
 </details>
@@ -640,7 +640,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 01 |
+| 7/7 | Import Anki cards, move to Demo M01-07 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

@@ -1,4 +1,4 @@
-# Demo 13b — DNS Resolution Path Failure
+# Demo M03-06 — DNS Resolution Path Failure
 
 ## Overview
 
@@ -27,10 +27,10 @@ resolution chain when a lookup is slow or failing.
 ## Directory Structure
 
 ```
-13b-dns-resolution/
-├── README.md                      # this file
-├── 13b-dns-resolution-anki.csv    # Anki flashcard deck
-└── 13b-dns-resolution-quiz.md     # standalone quiz
+06-dns-resolution/
+├── README.md                       # this file
+├── m03-06-dns-resolution-anki.csv  # Anki flashcard deck
+└── m03-06-dns-resolution-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -55,10 +55,10 @@ resolution chain when a lookup is slow or failing.
 > normal host. This is itself a real example of §1.2's point: never trust
 > a config file's contents over confirming what's actually happening.
 
-## Recall Check — 27c-security-auditing
+## Recall Check — 04-security-auditing
 
 Answer these from memory before continuing — no looking back at Demo
-27c.
+M08-04.
 
 **Q1.** What's the fundamental difference between `lynis` and OpenSCAP?
 
@@ -189,7 +189,7 @@ cause is DNS; if DNS resolves quickly and the delay happens afterward
 (during the TCP handshake or TLS negotiation), the cause is elsewhere
 entirely, and no amount of DNS tuning will fix it. This distinction
 matters because the two have completely different fixes (§1.6 tunes
-resolution; a TCP/TLS-side problem needs Demo 13d/Demo 27b's tools
+resolution; a TCP/TLS-side problem needs Demo M03-08/Demo M08-03's tools
 instead).
 
 ### 1.6 Remediation
@@ -298,8 +298,8 @@ checked instead?
 No — a 12ms DNS query time cannot account for a 750ms delay. DNS is
 very likely not the bottleneck here, even though the symptom (slow first
 connection) superficially matches a DNS-latency pattern. The next place
-to look is the TCP handshake and TLS negotiation itself (Demo 13d's
-tooling for network-level latency, or Demo 27b's tooling if this is a
+to look is the TCP handshake and TLS negotiation itself (Demo M03-08's
+tooling for network-level latency, or Demo M08-03's tooling if this is a
 certificate-chain-related TLS delay) — the DNS-latency hypothesis should
 be ruled out by measurement, not assumed just because the symptom
 matches the general shape.
@@ -440,10 +440,10 @@ slow" complaints.
 
 ## Appendix A — Anki Cards
 
-**`13b-dns-resolution-anki.csv`:**
+**`m03-06-dns-resolution-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 3 - Networking::Demo 13b - DNS Resolution Path Failure
+#deck:Linux Mastery::Module 3 - Networking::Demo M03-06 - DNS Resolution Path Failure
 #separator:Comma
 #columns:Front,Back,Tags
 "An application fails only on the FIRST connection to a hostname, then works fine. What pattern does this suggest?","DNS resolution — a cold lookup gets cached, so subsequent connections skip the slow/failing step entirely. This specific 'first time only' shape is DNS's recognizable signature.","demo13b,dns,fundamentals"
@@ -458,13 +458,13 @@ slow" complaints.
 
 ## Appendix B — Quiz
 
-**`13b-dns-resolution-quiz.md`:**
+**`m03-06-dns-resolution-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 13b: DNS Resolution Path Failure
+# Quiz — Demo M03-06: DNS Resolution Path Failure
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 13c.
+> Target: 80% or above before moving to Demo M03-07.
 
 **Q1. An application fails on the first connection to a hostname, then succeeds on every subsequent connection. What does this pattern suggest?**
 
@@ -588,7 +588,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 13c |
+| 7/7 | Import Anki cards, move to Demo M03-07 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

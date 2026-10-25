@@ -1,4 +1,4 @@
-# Demo 09 — Live System Monitoring
+# Demo M02-07 — Live System Monitoring
 
 ## Overview
 
@@ -29,10 +29,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-09-live-system-monitoring/
-├── README.md                          # this file
-├── 09-live-system-monitoring-anki.csv # Anki flashcard deck
-└── 09-live-system-monitoring-quiz.md  # standalone quiz
+07-live-system-monitoring/
+├── README.md                              # this file
+├── m02-07-live-system-monitoring-anki.csv # Anki flashcard deck
+└── m02-07-live-system-monitoring-quiz.md  # standalone quiz
 ```
 
 ---
@@ -48,7 +48,7 @@ By the end of this demo you will be able to:
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 08.
+> Answer from memory before reading further. From Demo M02-05.
 
 1. A `.timer` unit has no `Unit=` line under `[Timer]`. Which service does
    it activate when it fires?
@@ -131,7 +131,7 @@ us   User processes — time spent running normal (non-niced) user-space code
 sy   System — time spent in the kernel servicing system calls on behalf of
      processes (not the kernel's own background work, but work done for a caller)
 ni   Niced — time spent running processes that have a positive nice value
-     (Demo 06); separated out so you can see how much CPU low-priority work
+     (Demo M02-03); separated out so you can see how much CPU low-priority work
      is actually consuming
 id   Idle — CPU genuinely has nothing to do
 wa   I/O wait — CPU idle SPECIFICALLY because it's waiting on disk/network
@@ -324,7 +324,7 @@ htop
 # cores stay comparatively idle. This is exactly the imbalance top's single
 # aggregate %Cpu(s) line would hide. Press F5 for tree view and confirm both
 # yes processes appear as children of this shell, live-updating — compare
-# this against a one-shot pstree from Demo 06.
+# this against a one-shot pstree from Demo M02-03.
 
 # Clean up:
 kill $(jobs -p)
@@ -609,10 +609,10 @@ batch mode (`top -b -n`) with extra parsing.
 
 ## Appendix A — Anki Cards
 
-**`09-live-system-monitoring-anki.csv`:**
+**`m02-07-live-system-monitoring-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 2 - System Administration::Demo 09 - Live System Monitoring
+#deck:Linux Mastery::Module 2 - System Administration::Demo M02-07 - Live System Monitoring
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -641,13 +641,13 @@ batch mode (`top -b -n`) with extra parsing.
 
 ## Appendix B — Quiz
 
-**`09-live-system-monitoring-quiz.md`:**
+**`m02-07-live-system-monitoring-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 09: Live System Monitoring
+# Quiz — Demo M02-07: Live System Monitoring
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 10.
+> Target: 80% or above before moving to Demo M02-08.
 
 ---
 
@@ -697,7 +697,7 @@ outside what's visible or fixable from inside the guest OS itself.
 
 **Q3.** `top`'s CPU line shows a nonzero `ni` value. What is this measuring?
 
-- A) Time spent on processes with a positive nice value (Demo 06) — lower
+- A) Time spent on processes with a positive nice value (Demo M02-03) — lower
   scheduling priority than default
 - B) Network I/O time
 - C) The percentage of processes currently in a "new" (just-created) state
@@ -824,7 +824,7 @@ an updated snapshot.
 
 | Score | Action |
 |---|---|
-| 8/8 | Import Anki cards, move to Demo 10 |
+| 8/8 | Import Anki cards, move to Demo M02-08 |
 | 6-7/8 | Review the wrong answers, then proceed |
 | 4-5/8 | Re-read the relevant sections, retry those questions |
 | Below 4/8 | Re-read the full demo and redo the walkthrough before proceeding |

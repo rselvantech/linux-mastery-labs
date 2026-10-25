@@ -1,8 +1,8 @@
-# Demo 20 — sed Editing
+# Demo M05-07 — sed Editing
 
 ## Overview
 
-Demo 18's `grep` finds; this demo's `sed` changes. `sed` ("stream editor")
+Demo M05-05's `grep` finds; this demo's `sed` changes. `sed` ("stream editor")
 reads text line by line and applies editing commands to it — substitution
 is the command you'll use 90% of the time, but `sed`'s addressing model and
 its hold-space mechanism let it do genuinely programmatic text
@@ -28,10 +28,10 @@ versus when it's being stretched past what it's built for.
 ## Directory Structure
 
 ```
-20-sed-editing/
+07-sed-editing/
 ├── README.md                    # this file
-├── 20-sed-editing-anki.csv      # Anki flashcard deck
-└── 20-sed-editing-quiz.md       # standalone quiz
+├── m05-07-sed-editing-anki.csv  # Anki flashcard deck
+└── m05-07-sed-editing-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -40,9 +40,9 @@ versus when it's being stretched past what it's built for.
 |---|---|---|---|
 | All lab tasks | ✅ (GNU sed) | ✅ (GNU sed) | Not required |
 
-## Recall Check — 19-text-processing-utilities
+## Recall Check — 06-text-processing-utilities
 
-Answer these from memory before continuing — no looking back at Demo 19.
+Answer these from memory before continuing — no looking back at Demo M05-06.
 
 1. `uniq` is run on an unsorted file with a duplicate line that isn't
    adjacent to its twin. What happens, and why?
@@ -86,7 +86,7 @@ echo "aaa" | sed 's/a/b/g'
 
 echo "Hello World" | sed 's/hello/hi/i'
 # hi World — i flag: case-insensitive matching (GNU sed extension — not
-# guaranteed portable to every sed, the same category of caveat Demo 17
+# guaranteed portable to every sed, the same category of caveat Demo M05-01
 # flagged for BRE's \| and \w)
 
 echo "aaa" | sed 's/a/b/2'
@@ -94,7 +94,7 @@ echo "aaa" | sed 's/a/b/2'
 # (the 2nd match), not all or just the first
 ```
 
-**`sed` uses BRE by default, same as `grep` without `-E`** (Demo 17's
+**`sed` uses BRE by default, same as `grep` without `-E`** (Demo M05-01's
 flavor table) — `sed -E` (or `-r` on some systems) switches to ERE, exactly
 the same distinction and the same reason to be deliberate about which one a
 pattern was written for.
@@ -138,7 +138,7 @@ price &99
 > giving the wrong result "price 10099".
 
 **Captured groups from the pattern — `\1`, `\2`, etc. — can be referenced
-in the replacement, not just within the pattern itself (Demo 17's
+in the replacement, not just within the pattern itself (Demo M05-01's
 backreferences were pattern-internal; this is the same capturing
 mechanism, used across the `s///`'s two halves instead):**
 
@@ -148,12 +148,12 @@ echo "John Smith" | sed 's/\(.*\) \(.*\)/\2, \1/'
 ```
 Smith, John
 ```
-> Live-verified. `\(.*\)` and `\(.*\)` (BRE grouping, per Demo 17 §1.2)
+> Live-verified. `\(.*\)` and `\(.*\)` (BRE grouping, per Demo M05-01 §1.2)
 > capture "John" and "Smith" as groups 1 and 2; the replacement `\2, \1`
 > reorders them. This is arguably the single most practically useful
 > `sed` capability beyond plain substitution — reordering fields,
 > reformatting structured text — and it's a different use of grouping
-> from Demo 17's backreference-within-a-pattern (`(\w+) \1`, matching a
+> from Demo M05-01's backreference-within-a-pattern (`(\w+) \1`, matching a
 > repeated word): here the capture happens once in the pattern and gets
 > *placed* somewhere new in the replacement, rather than requiring the
 > same text to repeat within the match itself.
@@ -357,7 +357,7 @@ sed -f script.sed file.txt
 no arithmetic — the moment a task needs to reference "the third
 whitespace-separated value on this line" by position, sum values across
 lines, or do conditional logic based on a field's actual value (not just
-its text pattern), `awk` (Demo 21) is almost always the better tool.
+its text pattern), `awk` (Demo M05-08) is almost always the better tool.
 `sed`'s hold space *can* technically express some of that with enough
 one-liner cleverness, but at real cost to readability — if you're reaching
 for hold space to do something field- or arithmetic-related, that's usually
@@ -602,7 +602,7 @@ this particular mistake.
 **Q3. A teammate needs to swap "Last, First" formatted names to "First Last" across a file. What's the `sed` approach, and what regex concept does it rely on beyond plain substitution?**
 
 `sed 's/\(.*\), \(.*\)/\2 \1/' file.txt` — this relies on captured groups
-(Demo 17 §1.2's grouping) being referenced in the *replacement* text via
+(Demo M05-01 §1.2's grouping) being referenced in the *replacement* text via
 `\1`/`\2`, not just matched in the pattern. The pattern captures the last
 name and first name as two groups; the replacement reassembles them in a
 different order. This is distinct from a pattern-internal backreference
@@ -633,7 +633,7 @@ pushing `sed`'s hold space further.
    specific captured groups from the pattern — and both can be reordered
    or decorated freely.** This is what makes `sed` capable of real
    restructuring (swapping fields, reformatting dates), not just literal
-   find-and-replace — and it's a different use of grouping from Demo 17's
+   find-and-replace — and it's a different use of grouping from Demo M05-01's
    pattern-internal backreferences, since the capture here gets placed
    somewhere new in the output rather than required to repeat in the match.
 3. **`-n` combined with `p` is the correct pattern for extracting specific
@@ -654,7 +654,7 @@ pushing `sed`'s hold space further.
    `sed` usage never needs any of them; if a task needs field awareness or
    arithmetic, `awk` is almost always the better fit.
 7. **`sed` uses BRE by default, same as `grep`.** `sed -E`/`-r` switches
-   to ERE — the same flavor-deliberateness from Demo 17 applies here
+   to ERE — the same flavor-deliberateness from Demo M05-01 applies here
    exactly, and `i` (case-insensitive) is a GNU extension, not guaranteed
    portable to every `sed`.
 8. **Choosing a non-`/` delimiter (`s#...#...#`) avoids escaping noise when
@@ -720,16 +720,16 @@ pushing `sed`'s hold space further.
 
 ## Appendix A — Anki Cards
 
-**`20-sed-editing-anki.csv`:**
+**`m05-07-sed-editing-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo 20 - sed Editing
+#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-07 - sed Editing
 #separator:Comma
 #columns:Front,Back,Tags
 "sed 's/a/b/' on the input 'aaa' produces 'baa', not 'bbb'. Why?","s/// replaces only the FIRST match per line by default. The g flag (s/a/b/g) is required to replace every match on the line.","demo20,sed,substitution,common-mistake"
 "What does & mean in a sed replacement string, e.g. sed 's/hello/[&]/'?","& represents the WHOLE matched text — here it's replaced with 'hello' itself, so the output is '[hello]'. It lets you reuse the match in the replacement without retyping it.","demo20,sed,ampersand,fundamentals"
 "How do you insert a LITERAL ampersand character in a sed replacement, instead of the whole-match meaning?","Escape it: \\& — an unescaped & means 'the whole match'; \\& produces an actual '&' character in the output.","demo20,sed,ampersand,escaping"
-"sed 's/\\(.*\\) \\(.*\\)/\\2, \\1/' is run on 'John Smith'. What's the output, and what regex concept does this rely on?","'Smith, John' — this relies on captured groups from the PATTERN being referenced in the REPLACEMENT via \\1/\\2, reordering them. Different from Demo 17's pattern-internal backreferences (matching a repeated word within the match itself).","demo20,sed,backreferences,cross-demo"
+"sed 's/\\(.*\\) \\(.*\\)/\\2, \\1/' is run on 'John Smith'. What's the output, and what regex concept does this rely on?","'Smith, John' — this relies on captured groups from the PATTERN being referenced in the REPLACEMENT via \\1/\\2, reordering them. Different from Demo M05-01's pattern-internal backreferences (matching a repeated word within the match itself).","demo20,sed,backreferences,cross-demo"
 "What's the difference between sed's d command and its a/i/c commands?","d deletes the addressed line(s) entirely. a appends a new line AFTER the address; i inserts a new line BEFORE the address; c replaces (changes) the addressed line(s) entirely with new content — structurally different from s///'s targeted in-line editing.","demo20,sed,commands,fundamentals"
 "What does sed '3q' do differently from sed -n '1,3p'?","Both show only the first 3 lines, but 3q genuinely STOPS sed processing entirely once line 3 finishes — it never reads lines 4+ at all. -n '1,3p' still reads the whole file, just suppresses printing most of it. q matters for performance on very large input.","demo20,sed,quit,performance"
 "sed '5p' file.txt | head -1 prints line 5, but the raw sed '5p' file.txt command (without head) shows line 5 twice while every other line appears once. Why?","sed prints every line once by default; p is an ADDITIONAL explicit print layered on top, not a replacement. Without -n suppressing the default output, the addressed line (5) gets both its normal print and the extra p print, while unaddressed lines only get their one normal print.","demo20,sed,addressing,common-mistake"
@@ -742,13 +742,13 @@ pushing `sed`'s hold space further.
 
 ## Appendix B — Quiz
 
-**`20-sed-editing-quiz.md`:**
+**`m05-07-sed-editing-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 20: sed Editing
+# Quiz — Demo M05-07: sed Editing
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 21.
+> Target: 80% or above before moving to Demo M05-08.
 
 ---
 
@@ -900,7 +900,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 21 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M05-08 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

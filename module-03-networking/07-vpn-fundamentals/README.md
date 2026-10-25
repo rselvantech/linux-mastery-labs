@@ -1,8 +1,8 @@
-# Demo 13c — VPN Fundamentals
+# Demo M03-07 — VPN Fundamentals
 
 ## Overview
 
-Demo 13 covered how traffic is routed, bridged, bonded, and distributed
+Demo M03-04 covered how traffic is routed, bridged, bonded, and distributed
 across networks you control. This demo covers what happens when the path
 between two hosts is a network you *don't* control: a VPN builds a
 private, encrypted layer-3 link across it. The focus is WireGuard, because
@@ -31,10 +31,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-13c-vpn-fundamentals/
-├── README.md                          # this file
-├── 13c-vpn-fundamentals-anki.csv      # Anki flashcard deck
-└── 13c-vpn-fundamentals-quiz.md       # standalone quiz
+07-vpn-fundamentals/
+├── README.md                         # this file
+├── m03-07-vpn-fundamentals-anki.csv  # Anki flashcard deck
+└── m03-07-vpn-fundamentals-quiz.md   # standalone quiz
 ```
 
 ---
@@ -57,7 +57,7 @@ By the end of this demo you will be able to:
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 13.
+> Answer from memory before reading further. From Demo M03-04.
 
 1. Two static routes overlap: a `/16` via one gateway and a `/24` inside
    it via another. Which is used for an address in the `/24`, and which
@@ -99,7 +99,7 @@ things working together:
 1. **A virtual network interface** (`wg0`, `tun0`). Packets sent into it
    are handed to the VPN software instead of a physical NIC.
 2. **Routes** that decide which destinations go into that interface.
-   Everything from Demo 11 and Demo 13 applies unchanged.
+   Everything from Demo M03-01 and Demo M03-04 applies unchanged.
 3. **Encapsulation and encryption.** The software wraps each inner packet
    inside an encrypted outer packet (for WireGuard, a UDP datagram) and
    sends it across the real network to the peer, which unwraps it.
@@ -114,7 +114,7 @@ Two distinctions come up constantly:
 | **Split tunnel** | Only specific destination networks go through the VPN; everything else uses the normal gateway. |
 
 Full versus split tunnel is purely a routing decision, which makes it the
-same longest-prefix-match logic from Demo 13 §1.1.
+same longest-prefix-match logic from Demo M03-04 §1.1.
 
 ### 1.2 The WireGuard model
 
@@ -189,7 +189,7 @@ sudo systemctl enable --now wg-quick@wg0
 > ⚠️ [VERIFY — docs only, not live-tested]: when a `wg-quick` peer uses
 > `AllowedIPs = 0.0.0.0/0`, `wg-quick` installs policy-routing rules using
 > a firewall mark, so that the tunnel's own UDP packets bypass the tunnel
-> instead of looping. This is the practical reason Demo 13 §1.2 exists.
+> instead of looping. This is the practical reason Demo M03-04 §1.2 exists.
 > Confirm with `ip rule show` after bringing up a full-tunnel config on
 > your lab VM.
 
@@ -287,7 +287,7 @@ layer to look at:
 
 | `wg show` evidence | Layer | Check next |
 |---|---|---|
-| Sent bytes grow, received is 0, no `latest handshake` | **Reachability / keys** | Is UDP 51820 allowed through every firewall (Demo 12/12a)? Is the endpoint right? Are the public keys the right way round? |
+| Sent bytes grow, received is 0, no `latest handshake` | **Reachability / keys** | Is UDP 51820 allowed through every firewall (Demo M03-02/12a)? Is the endpoint right? Are the public keys the right way round? |
 | Handshake is recent, but pings fail | **Routing / `AllowedIPs`** | `ip route get` for the destination, both sides' `AllowedIPs`, `ip_forward` on gateways, NAT if needed |
 | Handshake recent, small packets work, large ones hang | **MTU** | `ping -M do -s N`, interface MTU, fragment/ICMP handling on the path |
 
@@ -629,7 +629,7 @@ input udp dport 51820 accept` (and the same in the persistent ruleset).
 It is easy to miss because WireGuard never answers unknown or unreachable
 peers, so there is no "connection refused" message, and `ss -ulpn` shows
 the port listening, which only proves the socket exists, not that packets
-can reach it. This is the same lesson as Demo 12: "listening" and
+can reach it. This is the same lesson as Demo M03-02: "listening" and
 "reachable" are separate facts.
 
 </details>
@@ -739,10 +739,10 @@ The operational basics (routing, firewall, MTU) are the same either way.
 
 ## Appendix A — Anki Cards
 
-**`13c-vpn-fundamentals-anki.csv`:**
+**`m03-07-vpn-fundamentals-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 3 - Networking::Demo 13c - VPN Fundamentals
+#deck:Linux Mastery::Module 3 - Networking::Demo M03-07 - VPN Fundamentals
 #separator:Comma
 #columns:Front,Back,Tags
 "Name the three ordinary Linux components that together make up a VPN tunnel.","A virtual network interface (e.g. wg0), routes that send chosen destinations into it, and encapsulation/encryption of packets sent to the peer.","demo13c,vpn,fundamentals"
@@ -756,7 +756,7 @@ The operational basics (routing, firewall, MTU) are the same either way.
 "What does ping -M do -s 1372 test, and what size is the packet on the wire?","It sends an ICMP echo with the Don't Fragment flag set; the on-wire packet is payload plus 28 bytes (20 IP + 8 ICMP), so 1400 bytes here.","demo13c,mtu,ping"
 "A gateway forwards traffic for clients you cannot reconfigure and the tunnel has a lower-than-default path MTU. What can you do at the gateway?","Clamp TCP MSS so handshakes advertise a segment size that fits, e.g. an nftables rule using tcp option maxseg size set rt mtu on SYN packets in the forward chain.","demo13c,mtu,mss"
 "Which of these protocols can OpenVPN use as transport that WireGuard cannot?","TCP (including TCP/443). WireGuard is UDP only.","demo13c,openvpn,comparison"
-"On an AllowedIPs = 0.0.0.0/0 config, what does wg-quick add so the tunnel's own UDP packets do not loop back into the tunnel?","Policy-routing rules using a firewall mark, so packets carrying the mark use the normal routing table. This is why multiple routing tables matter (Demo 13 section 1.2).","demo13c,wireguard,policy-routing"
+"On an AllowedIPs = 0.0.0.0/0 config, what does wg-quick add so the tunnel's own UDP packets do not loop back into the tunnel?","Policy-routing rules using a firewall mark, so packets carrying the mark use the normal routing table. This is why multiple routing tables matter (Demo M03-04 section 1.2).","demo13c,wireguard,policy-routing"
 "How do you make a wg-quick tunnel start at boot?","sudo systemctl enable --now wg-quick@wg0, with the configuration in /etc/wireguard/wg0.conf.","demo13c,wireguard,systemd"
 ```
 
@@ -764,13 +764,13 @@ The operational basics (routing, firewall, MTU) are the same either way.
 
 ## Appendix B — Quiz
 
-**`13c-vpn-fundamentals-quiz.md`:**
+**`m03-07-vpn-fundamentals-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 13c: VPN Fundamentals
+# Quiz — Demo M03-07: VPN Fundamentals
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 13d.
+> Target: 80% or above before moving to Demo M03-08.
 
 ---
 
@@ -931,7 +931,7 @@ alive. WireGuard has no TCP mode (C), and A and D are unrelated.
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 13d |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M03-08 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

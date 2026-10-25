@@ -1,4 +1,4 @@
-# Demo 27 — Security and Hardening
+# Demo M08-01 — Security and Hardening
 
 ## Overview
 
@@ -7,24 +7,24 @@ repeated failed logins, tracking sensitive changes — sits on top of tools
 this series has already built. This demo covers SELinux/AppArmor, SSH
 hardening, `fail2ban`, and `auditd` basics — the core hardening toolkit
 for a production Linux host. Firewall mechanics themselves
-(`firewalld`/`ufw`) already live in Demo 12 — this demo references that
+(`firewalld`/`ufw`) already live in Demo M03-02 — this demo references that
 rather than re-teaching it.
 
 ## Demo Objectives
 
-1. Explain Mandatory Access Control (SELinux/AppArmor) and how it differs from the permission model in Demo 03
+1. Explain Mandatory Access Control (SELinux/AppArmor) and how it differs from the permission model in Demo M01-10
 2. Check and change SELinux/AppArmor mode, and read a basic denial
-3. Harden SSH via `sshd_config`, building on Demo 11's key-auth setup
+3. Harden SSH via `sshd_config`, building on Demo M03-01's key-auth setup
 4. Configure `fail2ban` to block repeated failed login attempts
 5. Use `auditd`/`ausearch` for basic sensitive-action tracking
 
 ## Directory Structure
 
 ```
-27-security-hardening/
-├── README.md                              # this file
-├── 27-security-hardening-anki.csv        # Anki flashcard deck
-└── 27-security-hardening-quiz.md         # standalone quiz
+01-security-hardening/
+├── README.md                           # this file
+├── m08-01-security-hardening-anki.csv  # Anki flashcard deck
+└── m08-01-security-hardening-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -47,9 +47,9 @@ rather than re-teaching it.
 > verification pass on an actual Ubuntu/Rocky9 machine before treating
 > exact command output shapes as guaranteed.
 
-## Recall Check — 26d-sysctl-tuning
+## Recall Check — 04-sysctl-tuning
 
-Answer these from memory before continuing — no looking back at Demo 26d.
+Answer these from memory before continuing — no looking back at Demo M07-04.
 
 1. Does a value set with `sysctl -w` survive a reboot? What actually
    makes a setting persistent?
@@ -76,9 +76,9 @@ Answer these from memory before continuing — no looking back at Demo 26d.
 
 ## Part 1 — Concepts
 
-### 1.1 Mandatory Access Control — a layer beyond Demo 03's permissions
+### 1.1 Mandatory Access Control — a layer beyond Demo M01-10's permissions
 
-Demo 03's `rwx` permissions and ACLs are **Discretionary Access Control
+Demo M01-10's `rwx` permissions and ACLs are **Discretionary Access Control
 (DAC)** — the file's *owner* decides who can access it, and any process
 running as that owner can access anything the owner is allowed to.
 **Mandatory Access Control (MAC)** — SELinux and AppArmor — adds a
@@ -157,9 +157,9 @@ its broader configuration philosophy (Ubuntu: AppArmor, simpler and more
 directly tied to specific applications; Rocky9/RHEL-family: SELinux, more
 granular and centrally policy-driven).
 
-### 1.4 SSH hardening — building on Demo 11
+### 1.4 SSH hardening — building on Demo M03-01
 
-Demo 11 set up SSH key authentication. Hardening `/etc/ssh/sshd_config`
+Demo M03-01 set up SSH key authentication. Hardening `/etc/ssh/sshd_config`
 closes off what that key-only auth was implicitly working around:
 
 ```bash
@@ -173,7 +173,7 @@ PubkeyAuthentication yes
 ```
 
 `PasswordAuthentication no` disables password login entirely — now that
-Demo 11 set up key-based auth, there's no longer a reason to leave password
+Demo M03-01 set up key-based auth, there's no longer a reason to leave password
 auth (a much weaker, brute-forceable auth method) available at all.
 `PermitRootLogin no` blocks direct root SSH login — anyone needing root
 access should authenticate as their own user first, then `sudo`, which
@@ -189,7 +189,7 @@ sudo sshd -t
 # lock you out of a remote server entirely if the service fails to
 # restart cleanly.
 sudo systemctl restart sshd
-# Same restart pattern as any systemd service (Demo 07) — restarting
+# Same restart pattern as any systemd service (Demo M02-04) — restarting
 # doesn't disconnect currently-active sessions, only affects new
 # connection attempts.
 ```
@@ -214,9 +214,9 @@ bantime = 3600
 triggers a ban. `bantime`: the offending IP is banned for 3600 seconds (1
 hour). **`fail2ban` doesn't invent its own blocking mechanism — it
 actually manipulates the same firewall (`firewalld`/`ufw`/`iptables`) rules
-Demo 12 already covered**, adding and removing ban rules dynamically as
+Demo M03-02 already covered**, adding and removing ban rules dynamically as
 attempts are detected and bans expire. This is a direct, concrete
-application of Demo 12's firewall knowledge, not a separate blocking
+application of Demo M03-02's firewall knowledge, not a separate blocking
 system to learn independently.
 
 ```bash
@@ -312,10 +312,10 @@ sudo sed -i '/# test change/d' /etc/hosts
 
 ## What You Learned
 
-- ✅ Explained MAC (SELinux/AppArmor) and how it differs from Demo 03's permission model
+- ✅ Explained MAC (SELinux/AppArmor) and how it differs from Demo M01-10's permission model
 - ✅ Checked and changed SELinux/AppArmor mode, and read a basic denial
 - ✅ Hardened SSH via `sshd_config`, testing before restarting
-- ✅ Configured `fail2ban`, understanding it manipulates Demo 12's firewall rules directly
+- ✅ Configured `fail2ban`, understanding it manipulates Demo M03-02's firewall rules directly
 - ✅ Used `auditd`/`ausearch` for sensitive-action tracking
 
 ## Part 3 — Break-Fix Scenario
@@ -423,9 +423,9 @@ console access, if that's even available. `sshd -t` validates the config
 without touching the running service at all, catching exactly this class
 of mistake before it becomes a lockout.
 
-**Q3. `fail2ban` bans an IP by manipulating firewall rules. Does this mean it's a separate blocking mechanism from what Demo 12 covered?**
+**Q3. `fail2ban` bans an IP by manipulating firewall rules. Does this mean it's a separate blocking mechanism from what Demo M03-02 covered?**
 No — `fail2ban` directly manipulates the same `firewalld`/`ufw`/`iptables`
-rules from Demo 12, adding and removing ban rules dynamically as failed
+rules from Demo M03-02, adding and removing ban rules dynamically as failed
 attempts are detected and bans expire. It's an automation layer on top of
 the existing firewall mechanism, not an independent blocking system with
 its own separate enforcement.
@@ -444,7 +444,7 @@ goals, and `auditd` specifically serves the latter.
 ## Key Takeaways
 
 1. **MAC (SELinux/AppArmor) is a second, independent access-control layer
-   beyond Demo 03's DAC permissions — not a replacement for it.** A
+   beyond Demo M01-10's DAC permissions — not a replacement for it.** A
    process can be fully permitted by `rwx`/ACLs and still blocked by MAC
    policy; `ls -la` alone can never reveal a MAC denial.
 2. **SELinux Permissive mode and AppArmor complain mode are diagnostic
@@ -454,7 +454,7 @@ goals, and `auditd` specifically serves the latter.
    edit.** A syntax error combined with a restart can lock you out of a
    remote server entirely.
 4. **`fail2ban` isn't a separate blocking system — it directly manipulates
-   the same firewall rules Demo 12 already covered**, automating what
+   the same firewall rules Demo M03-02 already covered**, automating what
    would otherwise be manual ban/unban firewall commands.
 5. **`auditd` provides accountability, not prevention.** It doesn't block
    anything; its value is a reliable, queryable record of who did what to
@@ -506,16 +506,16 @@ goals, and `auditd` specifically serves the latter.
 
 ## Appendix A — Anki Cards
 
-**`27-security-hardening-anki.csv`:**
+**`m08-01-security-hardening-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 8 - Security::Demo 27 - Security Hardening
+#deck:Linux Mastery::Module 8 - Security::Demo M08-01 - Security Hardening
 #separator:Comma
 #columns:Front,Back,Tags
 "A service fails what looks like a permissions error, but ls -la shows completely correct DAC ownership/mode bits. What's a category of cause this hasn't ruled out?","MAC (SELinux/AppArmor) denial — DAC permissions (what ls -la shows) and MAC policy are two independent layers. A process can be fully permitted by DAC and still blocked by MAC.","demo27,mac,dac,troubleshooting"
 "What's the difference between what SELinux Permissive mode and Enforcing mode actually do?","Permissive: SELinux still evaluates every policy decision and LOGS what would be denied, without actually blocking it. Enforcing: denials are actually blocked. Permissive is a diagnostic tool, not 'SELinux off'.","demo27,selinux,modes"
 "Why must sshd -t be run before restarting sshd after editing sshd_config?","A syntax error combined with a restart can mean sshd fails to come back up cleanly, potentially locking you out of a remote server entirely. sshd -t validates config without touching the running service.","demo27,ssh,sshd-config,safety"
-"Does fail2ban use its own independent blocking mechanism separate from firewalld/ufw?","No — fail2ban directly manipulates the SAME firewall rules covered in Demo 12, adding and removing ban rules dynamically as failed attempts are detected and bans expire. It's automation on top of the existing firewall, not a separate system.","demo27,fail2ban,firewall,cross-demo"
+"Does fail2ban use its own independent blocking mechanism separate from firewalld/ufw?","No — fail2ban directly manipulates the SAME firewall rules covered in Demo M03-02, adding and removing ban rules dynamically as failed attempts are detected and bans expire. It's automation on top of the existing firewall, not a separate system.","demo27,fail2ban,firewall,cross-demo"
 "A legitimate automation/CI account gets banned by fail2ban. What's the most likely underlying cause, beyond just unbanning it once?","The automation's SSH key/credentials likely changed or expired without the pipeline being updated — repeated failed auth attempts per deploy run accumulate toward maxretry faster than typical human error would. Unbanning alone doesn't fix the recurring cause.","demo27,fail2ban,troubleshooting"
 "What does auditd actually provide, given it doesn't prevent any action from happening?","Accountability — a reliable, queryable record of who did what to specifically watched files/actions, essential during incident investigation, even though it does nothing to stop the action from happening in real time.","demo27,auditd,fundamentals"
 "Why might a file moved into /var/www/html/ from elsewhere have the wrong SELinux context even with completely correct DAC permissions?","SELinux contexts are typically inherited from the parent directory only when a file is CREATED there directly. A file moved in (mv/cp from elsewhere, or extracted from an archive) often retains its ORIGINAL context, which may not match what the serving policy expects.","demo27,selinux,context,troubleshooting"
@@ -525,13 +525,13 @@ goals, and `auditd` specifically serves the latter.
 
 ## Appendix B — Quiz
 
-**`27-security-hardening-quiz.md`:**
+**`m08-01-security-hardening-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 27: Security and Hardening
+# Quiz — Demo M08-01: Security and Hardening
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 27a.
+> Target: 80% or above before moving to Demo M08-02.
 
 ---
 
@@ -586,7 +586,7 @@ goals, and `auditd` specifically serves the latter.
 **Q4. Does `fail2ban` use a blocking mechanism independent of `firewalld`/`ufw`?**
 
 - A) Yes, it has its own proprietary blocking system
-- B) No — it directly manipulates the same firewall rules from Demo 12, adding/removing ban rules dynamically
+- B) No — it directly manipulates the same firewall rules from Demo M03-02, adding/removing ban rules dynamically
 - C) Yes, but only on Rocky9
 - D) No, it blocks at the DNS level instead
 
@@ -651,7 +651,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 27a |
+| 7/7 | Import Anki cards, move to Demo M08-02 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

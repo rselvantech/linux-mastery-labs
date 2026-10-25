@@ -1,8 +1,8 @@
-# Demo 26d — Basic sysctl Tuning
+# Demo M07-04 — Basic sysctl Tuning
 
 ## Overview
 
-Demo 26b limited what one *service* may consume. Some limits and
+Demo M07-02 limited what one *service* may consume. Some limits and
 behaviours, though, belong to the whole *host*: how eagerly the kernel
 swaps, how long a listening socket's queue may grow, how many file handles
 the system may hold open. Linux exposes these as runtime parameters you
@@ -38,16 +38,16 @@ By the end of this demo you will be able to:
    verify, and write down a rollback
 6. Explain what three common parameters control, and the risk of changing
    each
-7. Choose between `sysctl`, a systemd directive (Demo 26b), and a
+7. Choose between `sysctl`, a systemd directive (Demo M07-02), and a
    per-process limit for a given problem
 
 ## Directory Structure
 
 ```
-26d-sysctl-tuning/
-├── README.md                        # this file
-├── 26d-sysctl-tuning-anki.csv       # Anki flashcard deck
-└── 26d-sysctl-tuning-quiz.md        # standalone quiz
+04-sysctl-tuning/
+├── README.md                      # this file
+├── m07-04-sysctl-tuning-anki.csv  # Anki flashcard deck
+└── m07-04-sysctl-tuning-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -66,9 +66,9 @@ By the end of this demo you will be able to:
 > they appear. Parameter values shown (for example `fs.file-max`) are from
 > the authoring host and will differ on yours.
 
-## Recall Check — 26c-resource-saturation-triage
+## Recall Check — 03-resource-saturation-triage
 
-Answer these from memory before continuing — no looking back at Demo 26c.
+Answer these from memory before continuing — no looking back at Demo M07-03.
 
 1. A guest VM looks saturated (`r` above the CPU count, no idle time) but
    `st` is high. Can you fix it from inside the guest?
@@ -219,7 +219,7 @@ The dependable check is always to **read the value back** after applying.
    changing it.
 2. **Change** it at runtime with `sysctl -w`.
 3. **Measure** against the symptom that motivated the change, using the
-   tools from Demos 26/26c. If nothing improves, revert.
+   tools from Demos M07-01/26c. If nothing improves, revert.
 4. **Persist** it in a named `.conf` file, with a comment giving the
    reason, the date, and the previous value.
 5. **Apply and verify**: `sudo sysctl --system`, then read the value back.
@@ -231,7 +231,7 @@ The dependable check is always to **read the value back** after applying.
 **`vm.swappiness`** — how strongly the kernel prefers reclaiming memory by
 swapping out process memory versus dropping cache. Lower values favour
 keeping process memory in RAM. It is the host-wide counterpart to the
-per-service controls from Demo 26b. Risk: too low, and a machine under
+per-service controls from Demo M07-02. Risk: too low, and a machine under
 memory pressure with little cache to drop can reach out-of-memory sooner.
 The accepted range depends on the kernel version (the authoring host
 rejected 999).
@@ -246,16 +246,16 @@ application's own setting has to be raised too.
 `/proc/sys/fs/file-nr` shows three numbers: allocated, unused, and the
 maximum (`66  0  407239` on the authoring host). Most "too many open
 files" errors are hit at the **per-process** limit long before this
-system-wide one — see `/proc/PID/limits` (Demo 26) and `LimitNOFILE=` in a
-unit file (Demo 26b). A related parameter, `kernel.perf_event_paranoid`
+system-wide one — see `/proc/PID/limits` (Demo M07-01) and `LimitNOFILE=` in a
+unit file (Demo M07-02). A related parameter, `kernel.perf_event_paranoid`
 (2 on the authoring host), controls how much access unprivileged users get
-to the `perf` tools from Demo 26.
+to the `perf` tools from Demo M07-01.
 
 ### 1.7 What sysctl is not for
 
 | Problem | Right tool |
 |---|---|
-| Cap one service's memory or CPU | systemd directives — `MemoryMax=`, `CPUQuota=` (Demo 26b) |
+| Cap one service's memory or CPU | systemd directives — `MemoryMax=`, `CPUQuota=` (Demo M07-02) |
 | Raise one process's open-file limit | `LimitNOFILE=` / `ulimit -n`; confirm in `/proc/PID/limits` |
 | Change host-wide kernel behaviour | `sysctl` |
 | Kernel modules and kernel internals | outside this curriculum |
@@ -373,7 +373,7 @@ per-process limit) and how you would confirm it:
 <details>
 <summary>Answers</summary>
 
-1. A systemd directive — `MemoryMax=512M` in the unit (Demo 26b). A sysctl
+1. A systemd directive — `MemoryMax=512M` in the unit (Demo M07-02). A sysctl
    would change the whole host, not one service.
 2. A per-process limit — the service has hit its own open-files limit, not
    the system-wide `fs.file-max`. Confirm with `/proc/PID/limits`; raise it
@@ -542,7 +542,7 @@ measure-persist-verify workflow — rather than a bulk copy.
    writes only what files contain, so the old value must be set again
    explicitly.
 6. **Know the scope of each tool.** `sysctl` changes host-wide behaviour;
-   one service's limits belong in systemd directives (Demo 26b); one
+   one service's limits belong in systemd directives (Demo M07-02); one
    process's open-file limit belongs in `LimitNOFILE=`/`ulimit`, confirmed
    in `/proc/PID/limits`.
 7. **Raising `somaxconn` alone does nothing if the application asks for a
@@ -583,10 +583,10 @@ measure-persist-verify workflow — rather than a bulk copy.
 
 ## Appendix A — Anki Cards
 
-**`26d-sysctl-tuning-anki.csv`:**
+**`m07-04-sysctl-tuning-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 7 - Performance::Demo 26d - sysctl Tuning
+#deck:Linux Mastery::Module 7 - Performance::Demo M07-04 - sysctl Tuning
 #separator:Comma
 #columns:Front,Back,Tags
 "Which sysctl flag sets a parameter at runtime?","-w (for example: sudo sysctl -w vm.swappiness=10). It changes the running kernel only.","demo26d,sysctl"
@@ -605,13 +605,13 @@ measure-persist-verify workflow — rather than a bulk copy.
 
 ## Appendix B — Quiz
 
-**`26d-sysctl-tuning-quiz.md`:**
+**`m07-04-sysctl-tuning-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 26d: Basic sysctl Tuning
+# Quiz — Demo M07-04: Basic sysctl Tuning
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 27.
+> Target: 80% or above before moving to Demo M08-01.
 
 ---
 
@@ -714,7 +714,7 @@ setting is the limiting value here.
 512 MB without affecting anything else on the host. Which mechanism fits?
 
 - A) `sysctl -w vm.swappiness=0`
-- B) A systemd directive on that service — `MemoryMax=512M` (Demo 26b)
+- B) A systemd directive on that service — `MemoryMax=512M` (Demo M07-02)
 - C) `sysctl -w fs.file-max=512`
 - D) Raising `net.core.somaxconn`
 
@@ -751,7 +751,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 27 |
+| 7/7 | Import Anki cards, move to Demo M08-01 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

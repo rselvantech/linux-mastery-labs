@@ -1,4 +1,4 @@
-# Demo 00a — Wildcards, Globbing & Quoting
+# Demo M01-01 — Wildcards, Globbing & Quoting
 
 ## Overview
 
@@ -45,20 +45,20 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-00a-globbing-quoting/
-├── README.md                      # this file
-├── 00a-globbing-quoting-anki.csv  # Anki flashcard deck (Appendix A)
-├── 00a-globbing-quoting-quiz.md   # standalone quiz (Appendix B)
-└── src/                           # lab working directories (git-ignored)
-    ├── glob-lab/                  # Tasks 1-2: wildcards and brace expansion
-    │   └── project/               # filled in Task 2 with src, docs and tests
-    ├── quoting/                   # Task 3: word splitting and quoting
-    └── cleanup-demo/              # Task 5: the rm footgun
+01-globbing-quoting/
+├── README.md                         # this file
+├── m01-01-globbing-quoting-anki.csv  # Anki flashcard deck (Appendix A)
+├── m01-01-globbing-quoting-quiz.md   # standalone quiz (Appendix B)
+└── src/                              # lab working directories (git-ignored)
+    ├── glob-lab/                     # Tasks 1-2: wildcards and brace expansion
+    │   └── project/                  # filled in Task 2 with src, docs and tests
+    ├── quoting/                      # Task 3: word splitting and quoting
+    └── cleanup-demo/                 # Task 5: the rm footgun
 ```
 
 All lab work happens inside `src/`. The folders are created by the
 lab commands themselves (`mkdir -p`), so you only need to be in the
-demo directory (`00a-globbing-quoting/`) when you start.
+demo directory (`01-globbing-quoting/`) when you start.
 
 > **Note: add `src/` to `.gitignore`.** The lab folders contain
 > throwaway files (including files the lab deliberately deletes), so
@@ -107,7 +107,7 @@ In bash, these `rewriting stages/expansions` run in this fixed order:
 
 That is the complete order for everything this course uses. Two
 things happen even earlier and are covered elsewhere: **alias
-expansion** (Demo 00c) and, in interactive shells only, **history
+expansion** (Demo M01-03) and, in interactive shells only, **history
 expansion** (the `!` character). A rarely needed one, process
 substitution `<(cmd)`, is left out.
 
@@ -576,7 +576,7 @@ return to your normal shell.
 ### Task 1 — Globbing (Concepts §1.2)
 
 ```bash
-# from the demo directory: 00a-globbing-quoting/
+# from the demo directory: 01-globbing-quoting/
 mkdir -p src/glob-lab && cd src/glob-lab
 touch file.txt file1.txt file2.txt file3.log notes.md report_2024.csv report_2025.csv .hidden
 ls -a
@@ -803,7 +803,7 @@ no error.
 **Clean up and leave bash (optional, since `src/` is git-ignored):**
 
 ```bash
-cd ../..                  # back to 00a-globbing-quoting/
+cd ../..                  # back to 01-globbing-quoting/
 rm -rf src/glob-lab src/quoting src/cleanup-demo
 exit                      # only if you started bash from zsh in Step 0
 ```
@@ -980,10 +980,10 @@ tool sees it.
 
 ## Appendix A — Anki Cards
 
-**`00a-globbing-quoting-anki.csv`:**
+**`m01-01-globbing-quoting-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 00a - Globbing & Quoting
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo M01-01 - Globbing & Quoting
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -1026,12 +1026,12 @@ tool sees it.
 
 ## Appendix B — Quiz
 
-**`00a-globbing-quoting-quiz.md`:**
+**`m01-01-globbing-quoting-quiz.md`:**
 
 ```
-# Quiz — Demo 00a: Wildcards, Globbing & Quoting
+# Quiz — Demo M01-01: Wildcards, Globbing & Quoting
 
-> One correct answer per question. Target: 80% (10/12) before Demo 00b.
+> One correct answer per question. Target: 80% (10/12) before Demo M01-02.
 > Assume bash.
 
 ---
@@ -1269,7 +1269,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 12/12 | Import Anki cards, move to Demo 00b |
+| 12/12 | Import Anki cards, move to Demo M01-02 |
 | 11/12 | Review the wrong answer, then proceed |
 | 9-10/12 | Re-read the relevant section, retry those questions |
 | Below 9/12 | Re-read the full demo and redo the lab |

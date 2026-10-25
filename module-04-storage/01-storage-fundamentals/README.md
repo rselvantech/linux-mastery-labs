@@ -1,4 +1,4 @@
-# Demo 14 — Storage Fundamentals
+# Demo M04-01 — Storage Fundamentals
 
 ## Overview
 
@@ -7,7 +7,7 @@ volume, a mount point for shared storage, swap space sized correctly for its
 workload. This demo covers the full path from raw block device to usable,
 persistent storage: identifying disks, partitioning them, formatting them
 with a filesystem, mounting them (both temporarily and permanently), and
-reading disk usage correctly. Demo 15 builds on this with LVM, remote
+reading disk usage correctly. Demo M04-04 builds on this with LVM, remote
 filesystems, and storage troubleshooting — this demo is the "provision and
 mount" half.
 
@@ -24,10 +24,10 @@ mount" half.
 ## Directory Structure
 
 ```
-14-storage-fundamentals/
-├── README.md                              # this file
-├── 14-storage-fundamentals-anki.csv       # Anki flashcard deck
-└── 14-storage-fundamentals-quiz.md        # standalone quiz
+01-storage-fundamentals/
+├── README.md                             # this file
+├── m04-01-storage-fundamentals-anki.csv  # Anki flashcard deck
+└── m04-01-storage-fundamentals-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -36,9 +36,9 @@ mount" half.
 |---|---|---|---|
 | All lab tasks | ✅ (use a lab/scratch disk, never the root disk) | ✅ (same caution) | Not required |
 
-## Recall Check — 13-topology-traffic-distribution
+## Recall Check — 04-topology-traffic-distribution
 
-Answer these from memory before continuing — no looking back at Demo 13.
+Answer these from memory before continuing — no looking back at Demo M03-04.
 
 1. A bond is configured in `active-backup` mode. A team expects doubled
    throughput. Is this expectation correct? Why or why not?
@@ -161,7 +161,7 @@ mount | grep sdb1
 ```
 
 **This mount is temporary** — exactly the same persistence trap as `ip addr
-add` (Demo 11) and firewalld rules without `--permanent` (Demo 12). It
+add` (Demo M03-01) and firewalld rules without `--permanent` (Demo M03-02). It
 disappears on reboot unless written into `/etc/fstab`:
 
 ```bash
@@ -213,7 +213,7 @@ du -sh /mnt/data/*
 answers "what's actually taking up space and where," which `df` can't.
 
 **These two commands can legitimately disagree**, and the most common cause
-is a deleted-but-still-open file (the same mechanism Demo 02 covered with
+is a deleted-but-still-open file (the same mechanism Demo M01-08 covered with
 `lsof`): `df` still counts that space as used (the filesystem hasn't
 reclaimed it — a process still holds the file open), while `du`, which only
 walks what's currently visible in the directory tree, doesn't see the
@@ -251,7 +251,7 @@ echo '/swapfile  none  swap  sw  0  0' | sudo tee -a /etc/fstab
 ```
 
 Swap isn't simply "extra RAM" — accessing swapped data means disk I/O
-instead of memory access, orders of magnitude slower. Demo 09's `vmstat`
+instead of memory access, orders of magnitude slower. Demo M02-07's `vmstat`
 `si`/`so` columns are exactly how you'd notice a system actually relying on
 swap under load, which is a performance problem to investigate, not a
 capacity feature to lean on. Swap's practical value is providing a buffer
@@ -459,8 +459,8 @@ Tasks:
 — `df` reports filesystem-level used space, which still counts a deleted
 file's blocks as long as some process holds it open, while `du` only walks
 what's currently visible in the directory tree and never sees a deleted
-file at all. The tool to find the responsible process is `lsof` (Demo 12,
-built on the pattern from Demo 02): `sudo lsof +L1 /var/log` (or `lsof
+file at all. The tool to find the responsible process is `lsof` (Demo M03-02,
+built on the pattern from Demo M01-08): `sudo lsof +L1 /var/log` (or `lsof
 /var/log | grep deleted`) to find open file handles with a link count of
 zero — deleted files still held open. The fix is restarting or otherwise
 closing whatever process is holding the deleted file(s) open (commonly a
@@ -472,8 +472,8 @@ about space `df` correctly counts as used that `du` structurally cannot see.
 
 **Incident 2:** No `/etc/fstab` entry means this volume was mounted manually
 with a bare `mount` command at some point — exactly the persistence trap
-§1.4 describes, the same pattern as `ip addr add` (Demo 11) and firewalld
-rules without `--permanent` (Demo 12): it worked until the next reboot, then
+§1.4 describes, the same pattern as `ip addr add` (Demo M03-01) and firewalld
+rules without `--permanent` (Demo M03-02): it worked until the next reboot, then
 vanished, because nothing told the system to remount it automatically. Fix:
 identify the volume's UUID with `blkid`, add a proper fstab entry using that
 UUID (not the device path, since `/dev/sdb` naming isn't guaranteed stable
@@ -554,7 +554,7 @@ decrease, not just grow.
    filesystem-type argument in `mkpart` is only a metadata hint, not an
    actual format operation.
 6. **Swap is a safety buffer, not routine extra RAM.** Active swap usage
-   (`vmstat`'s `si`/`so`, from Demo 09) means disk I/O standing in for
+   (`vmstat`'s `si`/`so`, from Demo M02-07) means disk I/O standing in for
    memory access — a performance problem to investigate, not a capacity
    feature to lean on.
 7. **Swap has a tunable aggressiveness, not just an on/off state.**
@@ -617,33 +617,33 @@ decrease, not just grow.
 
 ## Appendix A — Anki Cards
 
-**`14-storage-fundamentals-anki.csv`:**
+**`m04-01-storage-fundamentals-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 4 - Storage::Demo 14 - Storage Fundamentals
+#deck:Linux Mastery::Module 4 - Storage::Demo M04-01 - Storage Fundamentals
 #separator:Comma
 #columns:Front,Back,Tags
 "df shows a partition at 95% used, but du -sh on the same path only accounts for half that space. What's the most likely cause?","A deleted file still held open by a running process. df counts it as used (filesystem hasn't reclaimed the blocks); du only sees files currently visible in the directory tree and can't account for a deleted one at all.","demo14,df,du,troubleshooting"
 "Why is UUID preferred over a raw device path like /dev/sdb1 in /etc/fstab?","Device names aren't guaranteed stable across reboots — disk enumeration order can shift. A filesystem's UUID is generated once and doesn't change, avoiding a silent wrong-device mount.","demo14,fstab,uuid"
-"A filesystem is mounted with a plain mount command but has no /etc/fstab entry. What happens after a reboot?","It disappears — a mount without a corresponding fstab entry is temporary, the same persistence trap as ip addr add (Demo 11) or a firewalld rule without --permanent (Demo 12).","demo14,mount,persistence,cross-demo"
+"A filesystem is mounted with a plain mount command but has no /etc/fstab entry. What happens after a reboot?","It disappears — a mount without a corresponding fstab entry is temporary, the same persistence trap as ip addr add (Demo M03-01) or a firewalld rule without --permanent (Demo M03-02).","demo14,mount,persistence,cross-demo"
 "What does mount -a do, and why run it instead of just rebooting to test a new fstab entry?","It applies every entry in /etc/fstab immediately, surfacing a syntax error right away in a live session. Rebooting to test is slower and, if the entry is wrong, risks a boot that hangs waiting on a bad mount.","demo14,fstab,mount-a"
 "When would you choose parted over fdisk for partitioning?","When scripting partition creation non-interactively, or when working with GPT and disks larger than 2TB, where fdisk's older MBR-era assumptions become limiting.","demo14,fdisk,parted,comparison"
 "Why might ext4 be preferred over xfs for a volume expected to need shrinking later?","ext4 supports online shrinking in more scenarios; xfs generally cannot be shrunk at all without recreating the filesystem entirely.","demo14,ext4,xfs,comparison"
 "What's the correct tool to find which process is responsible for a df/du space discrepancy caused by a deleted-but-open file?","lsof — looking for open file handles pointing at deleted files (e.g. lsof | grep deleted).","demo14,lsof,df,du,cross-demo"
 "Is swap best thought of as extra RAM capacity for routine use?","No — accessing swapped data means disk I/O instead of memory access, orders of magnitude slower. Swap's real value is as a buffer against sudden memory spikes and enabling clean OOM handling, not routine extra capacity.","demo14,swap,fundamentals"
-"Which vmstat columns (from Demo 09) directly indicate a system is actively relying on swap under load?","si and so (swap in/swap out) — sustained non-zero values mean the kernel is genuinely moving pages to/from disk, a performance problem to investigate.","demo14,swap,vmstat,cross-demo"
+"Which vmstat columns (from Demo M02-07) directly indicate a system is actively relying on swap under load?","si and so (swap in/swap out) — sustained non-zero values mean the kernel is genuinely moving pages to/from disk, a performance problem to investigate.","demo14,swap,vmstat,cross-demo"
 "What should you always run before partitioning any disk, and why?","lsblk (ideally lsblk -f) — it's the cheapest way to confirm you're about to operate on the intended disk and not accidentally the root filesystem, where a mistake can mean destroyed data.","demo14,lsblk,safety"
 ```
 
 ## Appendix B — Quiz
 
-**`14-storage-fundamentals-quiz.md`:**
+**`m04-01-storage-fundamentals-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 14: Storage Fundamentals
+# Quiz — Demo M04-01: Storage Fundamentals
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 15.
+> Target: 80% or above before moving to Demo M04-04.
 
 ---
 
@@ -795,7 +795,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 15 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M04-04 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

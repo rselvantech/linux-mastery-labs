@@ -1,22 +1,22 @@
-# Demo 07 — systemd and Service Management
+# Demo M02-04 — systemd and Service Management
 
 ## Overview
 
 Every long-running service on a modern Linux server — nginx,
 sshd, Docker, your own custom application — is managed by
 **systemd**, the init system that starts as PID 1 and supervises
-everything else for the life of the machine. Demo 06 showed that a
+everything else for the life of the machine. Demo M02-03 showed that a
 service account's process is just a normal process once it's
 running; this demo covers the mechanism that actually starts it,
 keeps it running, restarts it on failure, and controls whether it
 survives a reboot.
 
 This demo covers `systemctl`, writing your own unit file (using
-the exact service account pattern from Demo 05), the enable-vs-start
+the exact service account pattern from Demo M02-02), the enable-vs-start
 distinction that catches almost everyone at some point, dependency
 ordering, and reading service failures through `journalctl` —
 including the Ubuntu-vs-Rocky9 logging difference first introduced
-in Demo 01.
+in Demo M01-07.
 
 ---
 
@@ -31,7 +31,7 @@ By the end of this demo you will be able to:
 3. Explain the enable-vs-start distinction and all four
    combinations of enabled/started state
 4. Write a correct `.service` unit file, including running it as a
-   dedicated service account (Demo 05)
+   dedicated service account (Demo M02-02)
 5. Configure automatic restart on failure with `Restart=`
 6. Explain unit dependency ordering with `After=`, `Requires=`,
    and `Wants=`
@@ -44,10 +44,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-07-systemd-services/
-├── README.md                          # this file
-├── 07-systemd-services-anki.csv       # Anki flashcard deck
-└── 07-systemd-services-quiz.md        # standalone quiz
+04-systemd-services/
+├── README.md                         # this file
+├── m02-04-systemd-services-anki.csv  # Anki flashcard deck
+└── m02-04-systemd-services-quiz.md   # standalone quiz
 ```
 
 ---
@@ -61,7 +61,7 @@ By the end of this demo you will be able to:
 | Legacy syslog text file | `/var/log/syslog` also present | Not present by default | Not present by default |
 
 Both distros use `journalctl`/journald identically for systemd
-unit logs — the Demo 01 syslog-vs-journal difference is about
+unit logs — the Demo M01-07 syslog-vs-journal difference is about
 *other* system logs, not about how you read service logs in this
 demo. Covered explicitly in section 1.7.
 
@@ -69,7 +69,7 @@ demo. Covered explicitly in section 1.7.
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 06.
+> Answer from memory before reading further. From Demo M02-03.
 
 1. `ps aux` shows a process with `STAT` = `Z`. Will `kill -9` fix
    it? What's the actual fix?
@@ -78,7 +78,7 @@ demo. Covered explicitly in section 1.7.
    SSH session disconnects. Why, and what's the fix?
 
 3. A service account was created with `/usr/sbin/nologin` per
-   Demo 05. Does this prevent its running process from appearing
+   Demo M02-02. Does this prevent its running process from appearing
    in `ps` or being managed normally?
 
 <details>
@@ -110,7 +110,7 @@ demo. Covered explicitly in section 1.7.
 **systemd** is the init system on virtually every modern Linux
 distribution, including both Ubuntu and Rocky Linux. It is the
 very first process the kernel starts at boot — **PID 1**, the same
-PID 1 introduced in Demo 06's process tree — and it supervises
+PID 1 introduced in Demo M02-03's process tree — and it supervises
 every other process on the system for the machine's entire uptime.
 
 **What came before — SysVinit, and why it was replaced:**
@@ -223,7 +223,7 @@ Active    The current runtime state — this is what start/stop affects
           "failed" = it tried to start/run and failed
 
 Main PID  The primary process systemd is tracking for this unit —
-          this connects directly to Demo 06's process concepts;
+          this connects directly to Demo M02-03's process concepts;
           everything under CGroup is the process tree systemd
           is supervising for this one unit
 ```
@@ -280,7 +280,7 @@ systemctl status nginx | grep -E "Loaded|Active"
 
 Unit files live in `/etc/systemd/system/` (for custom/locally-created
 units — the correct location, analogous to `/etc/sudoers.d/` from
-Demo 05: a dedicated, version-controllable location rather than
+Demo M02-02: a dedicated, version-controllable location rather than
 mixing with distro-provided units in `/usr/lib/systemd/system/`).
 
 **A minimal, correct unit file:**
@@ -323,7 +323,7 @@ Type=oneshot    For a command that runs once and exits — combined
                 with a .timer (section 1.8) for scheduled tasks
 
 User=           Run as this user — THIS is the actual mechanism
-Group=          that makes Demo 05's service account pattern work.
+Group=          that makes Demo M02-02's service account pattern work.
                 Creating a /usr/sbin/nologin account accomplishes
                 nothing on its own until a unit file's User=
                 directive tells systemd to start the process as
@@ -434,8 +434,8 @@ maintained by `systemd-journald` — and is the standard way to read
 logs for any systemd-managed service, on **both** Ubuntu and
 Rocky9 identically.
 
-**Connecting back to Demo 01's syslog-vs-journal distinction:**
-Demo 01 covered that Ubuntu writes general system logs to
+**Connecting back to Demo M01-07's syslog-vs-journal distinction:**
+Demo M01-07 covered that Ubuntu writes general system logs to
 `/var/log/syslog` (text, via rsyslog) while Rocky9 relies on the
 binary journal. That distinction is about **general system
 logging**. For **systemd unit logs specifically** — which is what
@@ -517,15 +517,15 @@ systemctl cat sshd 2>/dev/null || systemctl cat ssh
 
 **Paste your `systemctl status` output for ssh/sshd — identify the
 Main PID and confirm it matches an entry in `ps -ef` (tying back
-to Demo 06).**
+to Demo M02-03).**
 
 ---
 
-### Task 2 — Write a custom unit file using the Demo 05 service account
+### Task 2 — Write a custom unit file using the Demo M02-02 service account
 
 ```bash
-# Reuse the novatech-svc service account created in Demo 05
-# (re-create it if needed, exactly as in Demo 05 Task 7):
+# Reuse the novatech-svc service account created in Demo M02-02
+# (re-create it if needed, exactly as in Demo M02-02 Task 7):
 sudo useradd -r -s /usr/sbin/nologin -d /opt/novatech-app -c "NovaTech App service account" novatech-svc 2>/dev/null
 
 sudo mkdir -p /opt/novatech-app/bin
@@ -604,7 +604,7 @@ systemctl status novatech-app | grep "Main PID"
 MAIN_PID=$(systemctl show -p MainPID novatech-app | cut -d= -f2)
 echo "Main PID: $MAIN_PID"
 
-# Kill it directly with SIGKILL (Demo 06 concept) — simulating a crash
+# Kill it directly with SIGKILL (Demo M02-03 concept) — simulating a crash
 sudo kill -9 $MAIN_PID
 
 # Wait past RestartSec, then check again
@@ -674,13 +674,13 @@ systemctl status novatech-app
 - ✅ Explained what systemd is, why it replaced SysVinit, and what a unit is
 - ✅ Used `systemctl` to start, stop, restart, reload, enable, and disable a service, and checked its status
 - ✅ Explained the enable-vs-start distinction and all four combinations of enabled/started state
-- ✅ Wrote a correct `.service` unit file, running it as the dedicated service account created in Demo 05
+- ✅ Wrote a correct `.service` unit file, running it as the dedicated service account created in Demo M02-02
 - ✅ Configured automatic restart on failure with `Restart=` and `RestartSec=`, and proved it by killing the process directly
 - ✅ Explained unit dependency ordering with `After=`, `Requires=`, and `Wants=`
 - ✅ Used `journalctl` to investigate a running and a failed service, on both Ubuntu and Rocky9
 - ✅ Diagnosed and fixed a broken unit file from its failure state, using `journalctl` to find the actual cause
 
-**Key Takeaway:** systemd is the missing piece between "I wrote a script" and "this runs reliably in production." `User=` is what actually activates Demo 05's service account pattern, `Restart=` is what gives you Demo 06's crash recovery without a separate watchdog, and `journalctl -u` is always your first command when a service fails — not guessing, not grepping random log files.
+**Key Takeaway:** systemd is the missing piece between "I wrote a script" and "this runs reliably in production." `User=` is what actually activates Demo M02-02's service account pattern, `Restart=` is what gives you Demo M02-03's crash recovery without a separate watchdog, and `journalctl -u` is always your first command when a service fails — not guessing, not grepping random log files.
 
 ---
 
@@ -728,7 +728,7 @@ journalctl -u custom-app -n 20 --no-pager
    future reboot?
 
 2. For Incident 2: `journalctl` shows "Permission denied." Given
-   what you know about service accounts (Demo 05) and unit files
+   what you know about service accounts (Demo M02-02) and unit files
    (`User=`, section 1.4), what are the two most likely causes?
 
 3. After fixing Incident 2, what command sequence confirms the fix
@@ -760,14 +760,14 @@ separate `enable` later (or never).
 
 1. **The `ExecStart` script itself lacks the execute bit** —
    `chmod +x` was never run on `/opt/custom/bin/run.sh`. This is a
-   straightforward Demo 03 permissions issue, just surfacing here
+   straightforward Demo M01-10 permissions issue, just surfacing here
    through systemd instead of a direct shell attempt.
 
 2. **The service account specified in `User=` doesn't have
    permission to read/execute the file or its containing
    directory** — e.g., the unit file says `User=custom-svc` but
    the script's ownership or directory permissions only allow a
-   different user. This connects Demo 03 (permissions), Demo 05
+   different user. This connects Demo M01-10 (permissions), Demo M02-02
    (service accounts), and this demo's `User=` directive directly.
 
 **Diagnosis:**
@@ -830,7 +830,7 @@ quickly?**
 Most likely, the files the service needs to read/write are owned
 by a different user or lack the necessary permissions for
 `appuser` specifically — the same kind of issue covered in Demo
-03's permission model, just surfacing through systemd. The fastest
+M01-10's permission model, just surfacing through systemd. The fastest
 verification is to reproduce it directly: `sudo -u appuser
 /path/to/the/command` run manually outside of systemd reproduces
 the exact same permission error in a much faster feedback loop than
@@ -873,13 +873,13 @@ have answered immediately.
 
 1. **`enable`/`disable` controls boot-time startup; `start`/`stop` controls right-now running state — these are completely independent settings with four real combinations.** "Disabled + Started" — running now but gone after the next reboot — is one of the most common silent production incidents. Always use `enable --now` together when bringing up a new service.
 
-2. **`User=`/`Group=` in a unit file is the actual mechanism that activates a Demo 05 service account.** Creating a `/usr/sbin/nologin` account by itself does nothing — it only becomes useful once a unit file tells systemd to run a process as that account.
+2. **`User=`/`Group=` in a unit file is the actual mechanism that activates a Demo M02-02 service account.** Creating a `/usr/sbin/nologin` account by itself does nothing — it only becomes useful once a unit file tells systemd to run a process as that account.
 
 3. **`Restart=on-failure` with `RestartSec=` gives automatic crash recovery with no separate watchdog tool needed — SysVinit had no built-in equivalent.** Always pair it with `StartLimitBurst=`/`StartLimitIntervalSec=` to avoid an infinite crash-restart loop on a genuinely broken service.
 
 4. **`After=` is ordering only; `Requires=` is a hard dependency that can cascade failures; `Wants=` is the safer soft dependency for "I'd like this running too."** Default to `After=` + `Wants=` unless a unit genuinely cannot function at all without another one present.
 
-5. **`journalctl -u servicename` is always the first command when a service fails — `systemctl status` tells you THAT it failed, `journalctl` tells you WHY.** Both Ubuntu and Rocky9 use `journalctl` identically for unit logs; Demo 01's syslog-vs-journal distinction is about general system logging, not service-specific logs.
+5. **`journalctl -u servicename` is always the first command when a service fails — `systemctl status` tells you THAT it failed, `journalctl` tells you WHY.** Both Ubuntu and Rocky9 use `journalctl` identically for unit logs; Demo M01-07's syslog-vs-journal distinction is about general system logging, not service-specific logs.
 
 6. **Always run `systemctl daemon-reload` after creating or editing any unit file** — systemd caches unit definitions in memory and won't see file changes until told to re-read them. Forgetting this is one of the most common "I fixed it but nothing changed" mistakes.
 
@@ -934,16 +934,16 @@ have answered immediately.
 
 ## Appendix A — Anki Cards
 
-**`07-systemd-services-anki.csv`:**
+**`m02-04-systemd-services-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 2 - System Administration::Demo 07 - systemd and Service Management
+#deck:Linux Mastery::Module 2 - System Administration::Demo M02-04 - systemd and Service Management
 #separator:Comma
 #columns:Front,Back,Tags
 
 "A service was started manually with systemctl start last week. After a server reboot, it's not running. What's the root cause?","The service was started but never enabled - the 'Disabled + Started' combination. enable/disable controls boot-time startup; start/stop controls right-now running state. These are completely independent. Fix: systemctl enable --now servicename - enables for future boots AND starts immediately in one command.","demo07,enable,start,systemctl"
 
-"A unit file specifies User=appuser but the service fails with a permission error. What's the fastest way to verify the actual cause?","Reproduce it directly: sudo -u appuser /path/to/the/command run manually outside systemd. This reproduces the exact same permission error in a much faster feedback loop than repeatedly restarting the unit and checking journalctl each time. The actual fix is usually a Demo 03 permissions issue (missing execute bit, wrong ownership) surfacing through the User= directive.","demo07,permissions,user-directive,troubleshooting"
+"A unit file specifies User=appuser but the service fails with a permission error. What's the fastest way to verify the actual cause?","Reproduce it directly: sudo -u appuser /path/to/the/command run manually outside systemd. This reproduces the exact same permission error in a much faster feedback loop than repeatedly restarting the unit and checking journalctl each time. The actual fix is usually a Demo M01-10 permissions issue (missing execute bit, wrong ownership) surfacing through the User= directive.","demo07,permissions,user-directive,troubleshooting"
 
 "What is the difference between Requires= and Wants= when declaring a unit dependency?","Requires= is a HARD dependency - if the required unit fails to start, this unit fails too, which can cascade failures across unrelated units. Wants= is a SOFT dependency - systemd tries to start the wanted unit but proceeds regardless of whether it succeeds. Wants= (paired with After= for ordering) is the safer default unless a unit genuinely cannot function at all without another one present.","demo07,requires,wants,dependencies"
 
@@ -953,22 +953,22 @@ have answered immediately.
 
 "What does Restart=on-failure with RestartSec=5 actually do, and why pair it with StartLimitBurst=?","Restart=on-failure tells systemd to automatically restart the service if it exits with a non-zero code, crashes, or is killed by a signal. RestartSec=5 waits 5 seconds before each restart attempt, avoiding a tight restart loop. StartLimitBurst= (with StartLimitIntervalSec=) acts as a circuit breaker - after too many restarts in too short a window, systemd stops trying and marks the unit failed, rather than retrying forever on a genuinely broken service.","demo07,restart,resilience"
 
-"A unit file has User=novatech-svc and ExecStart=/opt/novatech-app/bin/app. What two things from Demo 05 does this directive actually connect to systemd?","User= is the mechanism that ACTIVATES a Demo 05 service account - creating a /usr/sbin/nologin account by itself accomplishes nothing until a unit file's User= directive tells systemd to actually run a process as that account. Without this connection, the carefully-configured service account would never be used to run anything.","demo07,user-directive,service-accounts,demo05"
+"A unit file has User=novatech-svc and ExecStart=/opt/novatech-app/bin/app. What two things from Demo M02-02 does this directive actually connect to systemd?","User= is the mechanism that ACTIVATES a Demo M02-02 service account - creating a /usr/sbin/nologin account by itself accomplishes nothing until a unit file's User= directive tells systemd to actually run a process as that account. Without this connection, the carefully-configured service account would never be used to run anything.","demo07,user-directive,service-accounts,demo05"
 
-"Why does journalctl work identically on both Ubuntu and Rocky9 for systemd unit logs, even though Demo 01 described different logging conventions for the two distros?","Demo 01's syslog-vs-journal distinction is about GENERAL system logging - Ubuntu mirrors logs into /var/log/syslog (text, via rsyslog) while Rocky9 relies solely on the binary journal. For SYSTEMD UNIT LOGS SPECIFICALLY, both distros use journalctl/systemd-journald identically - rsyslog on Ubuntu just mirrors a copy of journal content for convenience, it doesn't replace journalctl as the source of truth for a service's own logs.","demo07,journalctl,demo01,distro-differences"
+"Why does journalctl work identically on both Ubuntu and Rocky9 for systemd unit logs, even though Demo M01-07 described different logging conventions for the two distros?","Demo M01-07's syslog-vs-journal distinction is about GENERAL system logging - Ubuntu mirrors logs into /var/log/syslog (text, via rsyslog) while Rocky9 relies solely on the binary journal. For SYSTEMD UNIT LOGS SPECIFICALLY, both distros use journalctl/systemd-journald identically - rsyslog on Ubuntu just mirrors a copy of journal content for convenience, it doesn't replace journalctl as the source of truth for a service's own logs.","demo07,journalctl,demo01,distro-differences"
 ```
 
 ---
 
 ## Appendix B — Quiz
 
-**`07-systemd-services-quiz.md`:**
+**`m02-04-systemd-services-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 07: systemd and Service Management
+# Quiz — Demo M02-04: systemd and Service Management
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 08.
+> Target: 80% or above before moving to Demo M02-05.
 
 ---
 
@@ -1085,11 +1085,11 @@ a restart will pick up file changes — one of the most common
 ---
 
 **Q6.** Why does `journalctl` work identically on Ubuntu and
-Rocky9 for systemd unit logs, despite Demo 01 describing different
+Rocky9 for systemd unit logs, despite Demo M01-07 describing different
 general logging conventions for the two distros?
 
 - A) Ubuntu doesn't actually use systemd, so this is a trick question
-- B) Demo 01's syslog-vs-journal distinction is about general system
+- B) Demo M01-07's syslog-vs-journal distinction is about general system
   logging; for unit-specific logs, both distros rely on
   systemd-journald identically — Ubuntu's rsyslog mirroring doesn't
   replace journalctl as the source of truth
@@ -1099,7 +1099,7 @@ general logging conventions for the two distros?
 <details>
 <summary>Answer</summary>
 
-**B** — The Demo 01 distinction is about general system logs, not
+**B** — The Demo M01-07 distinction is about general system logs, not
 the systemd unit logs this demo focuses on. Both distros use
 `journalctl`/journald identically for any `.service` unit's logs.
 
@@ -1132,7 +1132,7 @@ file is created, not just on later edits.
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 08 |
+| 7/7 | Import Anki cards, move to Demo M02-05 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

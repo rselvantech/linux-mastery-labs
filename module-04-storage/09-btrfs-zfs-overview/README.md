@@ -1,4 +1,4 @@
-# Demo 16b — Btrfs/ZFS Conceptual Overview
+# Demo M04-09 — Btrfs/ZFS Conceptual Overview
 
 > **A note on this demo's structure:** unlike every other demo in this
 > module, this one is explicitly conceptual per the curriculum's own
@@ -13,8 +13,8 @@
 
 ## Overview
 
-Every filesystem covered so far in this module — ext4, xfs (Demo 14),
-LVM on top of either (Demo 15) — shares one foundational trait: writes
+Every filesystem covered so far in this module — ext4, xfs (Demo M04-01),
+LVM on top of either (Demo M04-04) — shares one foundational trait: writes
 happen **in place**. Modifying a file means overwriting the actual disk
 blocks that already hold its data. Btrfs and ZFS take a fundamentally
 different approach: **copy-on-write (CoW)**. A write never overwrites
@@ -36,9 +36,9 @@ matter as much as the technical trade-offs.
 1. Explain what copy-on-write actually changes about how a write
    happens, in contrast to ext4/xfs's in-place overwrite model
 2. Explain why CoW makes snapshots effectively instant and cheap, in
-   contrast to LVM's snapshot mechanism (Demo 15)
+   contrast to LVM's snapshot mechanism (Demo M04-04)
 3. Explain built-in checksumming and self-healing, and how that differs
-   from relying on RAID (Demo 15a) or hardware alone to catch corruption
+   from relying on RAID (Demo M04-05) or hardware alone to catch corruption
 4. State the Btrfs vs. ZFS licensing situation precisely, and its real,
    current practical consequence for which distros ship which by default
 5. State the current production-readiness status of Btrfs's parity RAID
@@ -49,10 +49,10 @@ matter as much as the technical trade-offs.
 ## Directory Structure
 
 ```
-16b-btrfs-zfs-overview/
-├── README.md                              # this file
-├── 16b-btrfs-zfs-overview-anki.csv        # Anki flashcard deck
-└── 16b-btrfs-zfs-overview-quiz.md         # standalone quiz
+09-btrfs-zfs-overview/
+├── README.md                           # this file
+├── m04-09-btrfs-zfs-overview-anki.csv  # Anki flashcard deck
+└── m04-09-btrfs-zfs-overview-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -61,9 +61,9 @@ matter as much as the technical trade-offs.
 |---|---|---|---|
 | Conceptual only — no hands-on lab | Btrfs is in-kernel and installable (`btrfs-progs`); ZFS available via Ubuntu's installer, marked experimental since 24.04 LTS | **Btrfs is not supported at all** — removed from RHEL since version 7.4, and Rocky Linux tracks RHEL 1:1 on this; ZFS available via a separate OpenZFS-compatible repository, not in the base distro | Not applicable |
 
-## Recall Check — 16a-disk-quotas
+## Recall Check — 08-disk-quotas
 
-Answer these from memory before continuing — no looking back at Demo 16a.
+Answer these from memory before continuing — no looking back at Demo M04-08.
 
 1. What's the most common real-world mistake when enabling quotas —
    the step people skip after editing `/etc/fstab`?
@@ -96,12 +96,12 @@ Answer these from memory before continuing — no looking back at Demo 16a.
 
 ### 1.1 Copy-on-write — what actually changes
 
-In ext4 or xfs (Demo 14), modifying a file's contents means the
+In ext4 or xfs (Demo M04-01), modifying a file's contents means the
 filesystem locates the existing blocks on disk and overwrites them
 directly. This is fast and simple, but it has a direct consequence:
 there's no free, built-in way to "go back" to the pre-write state — the
 old data is gone the moment the new data lands, unless a separate
-snapshot mechanism (like LVM's, Demo 15) was already in place to
+snapshot mechanism (like LVM's, Demo M04-04) was already in place to
 preserve it beforehand.
 
 Btrfs and ZFS never overwrite in place. A write to any existing block
@@ -114,7 +114,7 @@ through deliberately rather than treating "CoW" as a buzzword.
 
 ### 1.2 Snapshots — why CoW makes them nearly free
 
-Demo 15 covered LVM snapshots: when you create one, LVM starts tracking
+Demo M04-04 covered LVM snapshots: when you create one, LVM starts tracking
 which blocks change afterward, copying the *original* block to the
 snapshot's reserved space the moment the live volume's data changes —
 copy-on-write happening at the block layer, bolted onto a filesystem
@@ -130,11 +130,11 @@ per §1.1, so the snapshot's old blocks simply aren't freed yet). This is
 why Btrfs subvolume snapshots and ZFS dataset snapshots are cheap enough
 to take automatically and frequently (before every package upgrade, for
 instance) in a way that would be impractical with LVM's reserved-space
-model from Demo 15.
+model from Demo M04-04.
 
 ### 1.3 Built-in checksumming and self-healing
 
-Neither ext4/xfs nor plain LVM/RAID (Demo 15a) checksums file data
+Neither ext4/xfs nor plain LVM/RAID (Demo M04-05) checksums file data
 itself — RAID protects against a *disk failing entirely*, but silent
 data corruption on a disk that's still nominally "working" (a bit flip,
 a firmware bug) can go completely undetected, since nothing is verifying
@@ -146,7 +146,7 @@ has redundancy available (a mirrored or parity RAID configuration within
 Btrfs/ZFS itself, not a separate mdadm array), it automatically repairs
 the bad copy from a good one — this is what "self-healing" means in this
 context, and it's a genuinely different capability from anything covered
-in Demo 15a's RAID discussion, which detects a disk being *entirely*
+in Demo M04-05's RAID discussion, which detects a disk being *entirely*
 gone, not a single silently corrupted block on a disk that's still
 functioning.
 
@@ -194,7 +194,7 @@ version).
 ### 1.5 RAID modes — a genuine, persistent gap
 
 Both filesystems can provide RAID-like redundancy natively (distinct
-from, and layered independently of, the mdadm RAID covered in Demo 15a):
+from, and layered independently of, the mdadm RAID covered in Demo M04-05):
 
 | | Btrfs | ZFS |
 |---|---|---|
@@ -203,7 +203,7 @@ from, and layered independently of, the mdadm RAID covered in Demo 15a):
 
 This is a specific, persistent, well-documented gap, not a passing
 concern — if parity RAID (maximizing usable capacity while tolerating a
-disk failure, the RAID5/6 trade-off from Demo 15a's comparison table)
+disk failure, the RAID5/6 trade-off from Demo M04-05's comparison table)
 matters for a given use case, that's a genuine point in ZFS's favor, or
 an argument for layering Btrfs on top of a separate mdadm RAID5/6 array
 instead of using Btrfs's own parity RAID mode.
@@ -213,12 +213,12 @@ instead of using Btrfs's own parity RAID mode.
 | | Btrfs | ZFS |
 |---|---|---|
 | RAM footprint | Light — fine on modest hardware | Heavy — ZFS's ARC (Adaptive Replacement Cache) uses as much RAM as it's given for caching |
-| Encryption | No native encryption — layer LUKS (Demo 15b) underneath, same as ext4/xfs | Native, per-dataset encryption built in |
+| Encryption | No native encryption — layer LUKS (Demo M04-06) underneath, same as ext4/xfs | Native, per-dataset encryption built in |
 | Send/receive (replicating snapshots to another host) | Supported | Supported, and generally considered more polished/mature |
 
 ### 1.7 When to reach for which — a decision framework
 
-- **Stay with ext4/xfs + LVM (Demos 14/15)** when: the workload doesn't
+- **Stay with ext4/xfs + LVM (Demos M04-01/15)** when: the workload doesn't
   need frequent snapshots or built-in corruption detection, the host is
   Rocky/RHEL-family (where Btrfs isn't an option at all), or simplicity
   and broad tooling compatibility matter more than CoW's specific benefits.
@@ -250,7 +250,7 @@ Is Btrfs on the table?
 
 No — per §1.4, Btrfs is not supported on Rocky Linux/RHEL at all,
 removed since RHEL 7.4. This isn't a "harder to install" situation, it's
-"not an available option" on this distro family. LVM snapshots (Demo 15)
+"not an available option" on this distro family. LVM snapshots (Demo M04-04)
 remain the available mechanism on Rocky, with the trade-offs already
 covered there (reserved space allocated upfront, copy-on-write happening
 at the block layer rather than being inherent to the filesystem).
@@ -263,7 +263,7 @@ properties and can accept the DKMS/out-of-tree maintenance overhead.
 ### Scenario 2
 A storage team needs maximum usable capacity from an 8-disk array while
 tolerating up to two simultaneous disk failures — the RAID6-equivalent
-trade-off from Demo 15a's comparison table. They're deciding between
+trade-off from Demo M04-05's comparison table. They're deciding between
 Btrfs's native RAID6 mode and ZFS's RAID-Z2.
 
 <details>
@@ -275,7 +275,7 @@ unresolved write-hole problem, while ZFS's RAID-Z implementations are
 mature and well-regarded specifically for this use case. If Btrfs is
 still preferred for other reasons (in-kernel simplicity, an existing
 Fedora/openSUSE/Ubuntu deployment), the alternative is layering Btrfs on
-top of a separate mdadm RAID6 array (Demo 15a) rather than using Btrfs's
+top of a separate mdadm RAID6 array (Demo M04-05) rather than using Btrfs's
 own native parity RAID mode.
 
 </details>
@@ -354,9 +354,9 @@ detail.
 1. ✅ Explained what copy-on-write actually changes about how a write
    happens, in contrast to ext4/xfs's in-place overwrite model
 2. ✅ Explained why CoW makes snapshots effectively instant and cheap,
-   in contrast to LVM's snapshot mechanism (Demo 15)
+   in contrast to LVM's snapshot mechanism (Demo M04-04)
 3. ✅ Explained built-in checksumming and self-healing, and how it
-   differs from relying on RAID (Demo 15a) or hardware alone
+   differs from relying on RAID (Demo M04-05) or hardware alone
 4. ✅ Stated the Btrfs vs. ZFS licensing situation precisely, including
    its current, real practical consequence for distro defaults and support
 5. ✅ Stated the current production-readiness status of Btrfs parity
@@ -393,7 +393,7 @@ distributed on Linux, not a flaw in ZFS's own engineering.
 
 **Q3. What's the actual mechanical difference that makes a Btrfs or ZFS snapshot cheaper than an LVM snapshot?**
 
-LVM (Demo 15) bolts copy-on-write onto a filesystem that has no native
+LVM (Demo M04-04) bolts copy-on-write onto a filesystem that has no native
 concept of it — creating a snapshot means reserving space upfront and
 then copying original blocks into that reserved space the moment the
 live volume changes. Btrfs and ZFS are copy-on-write by design for every
@@ -408,8 +408,8 @@ consequence of how these filesystems already handle every write.
 ---
 
 1. **Copy-on-write means a write never overwrites data in place — it writes to a new block and atomically repoints to it, leaving the old block untouched until nothing references it.** This single mechanical difference is the root cause of both filesystems' most distinctive capabilities, not a separate feature bolted on top.
-2. **Btrfs/ZFS snapshots are nearly free because CoW is how these filesystems always write — a snapshot is just a pointer to a metadata state.** LVM snapshots (Demo 15) achieve something similar by bolting copy-on-write onto a filesystem that doesn't have it natively, requiring reserved space allocated upfront.
-3. **Both filesystems checksum data at write time and verify it on every read, self-healing from a redundant copy if a mismatch is found — a capability RAID alone (Demo 15a) doesn't provide.** RAID protects against a disk failing entirely; CoW filesystem checksumming catches silent corruption on a disk that's still nominally working.
+2. **Btrfs/ZFS snapshots are nearly free because CoW is how these filesystems always write — a snapshot is just a pointer to a metadata state.** LVM snapshots (Demo M04-04) achieve something similar by bolting copy-on-write onto a filesystem that doesn't have it natively, requiring reserved space allocated upfront.
+3. **Both filesystems checksum data at write time and verify it on every read, self-healing from a redundant copy if a mismatch is found — a capability RAID alone (Demo M04-05) doesn't provide.** RAID protects against a disk failing entirely; CoW filesystem checksumming catches silent corruption on a disk that's still nominally working.
 4. **Btrfs is GPL and in-tree; ZFS is CDDL and must ship as an out-of-tree DKMS module, because the FSF has stated CDDL and GPL code can't be linked in the same binary.** This is the specific reason every ZFS-based host carries ongoing kernel-upgrade risk that a Btrfs-based host doesn't.
 5. **Btrfs is not supported on Rocky Linux/RHEL at all — removed since RHEL 7.4 — while it's the default filesystem on Fedora, openSUSE, and Ubuntu Desktop as of 2026.** This is a hard availability constraint, not a difficulty-of-setup consideration, and it should be checked before any Btrfs-based plan for a Rocky/RHEL fleet.
 6. **Btrfs's parity RAID (5/6) is still not considered production-ready as of 2026 due to the unresolved write-hole problem; ZFS's RAID-Z1/2/3 is mature and trusted for exactly this use case.** This is a specific, persistent gap — not a general "Btrfs is less mature" claim — and matters specifically when parity-level redundancy is a real requirement.
@@ -417,7 +417,7 @@ consequence of how these filesystems already handle every write.
 
 > **Demo scope:** Primary concept: copy-on-write as the mechanism behind
 > Btrfs/ZFS's snapshot and self-healing capabilities, contrasted with the
-> ext4/xfs+LVM stack from Demos 14/15.
+> ext4/xfs+LVM stack from Demos M04-01/15.
 > Supporting concepts: checksumming/self-healing, licensing and distro
 > support status, RAID mode maturity, a concrete decision framework.
 > Estimated completion time: 20 minutes (reading + decision-framework
@@ -442,30 +442,30 @@ consequence of how these filesystems already handle every write.
 
 ## Appendix A — Anki Cards
 
-**`16b-btrfs-zfs-overview-anki.csv`:**
+**`m04-09-btrfs-zfs-overview-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 4 - Storage::Demo 16b - Btrfs/ZFS Conceptual Overview
+#deck:Linux Mastery::Module 4 - Storage::Demo M04-09 - Btrfs/ZFS Conceptual Overview
 #separator:Comma
 #columns:Front,Back,Tags
 "What does copy-on-write (CoW) actually change about how a write happens, compared to ext4/xfs?","A write never overwrites existing data in place. It writes to a NEW block, then atomically updates a pointer to reference the new location. The old block isn't touched or freed until nothing references it anymore.","demo16b,cow,fundamentals"
-"Why are Btrfs/ZFS snapshots nearly free, compared to LVM snapshots (Demo 15)?","Because CoW is how these filesystems ALWAYS write, a snapshot is just a pointer to the current metadata tree at that moment — no data is copied upfront. LVM bolts copy-on-write onto a filesystem that doesn't have it natively, requiring reserved space allocated in advance.","demo16b,snapshots,cow,cross-demo"
-"Does RAID (Demo 15a) alone protect against silent data corruption on a disk that's still working?","No — RAID protects against a disk failing ENTIRELY. It doesn't checksum data or detect a bit flip / firmware bug on a disk that's still nominally functioning. Btrfs and ZFS both checksum data at write time and verify on every read, catching this class of corruption RAID alone misses.","demo16b,checksumming,raid,cross-demo"
+"Why are Btrfs/ZFS snapshots nearly free, compared to LVM snapshots (Demo M04-04)?","Because CoW is how these filesystems ALWAYS write, a snapshot is just a pointer to the current metadata tree at that moment — no data is copied upfront. LVM bolts copy-on-write onto a filesystem that doesn't have it natively, requiring reserved space allocated in advance.","demo16b,snapshots,cow,cross-demo"
+"Does RAID (Demo M04-05) alone protect against silent data corruption on a disk that's still working?","No — RAID protects against a disk failing ENTIRELY. It doesn't checksum data or detect a bit flip / firmware bug on a disk that's still nominally functioning. Btrfs and ZFS both checksum data at write time and verify on every read, catching this class of corruption RAID alone misses.","demo16b,checksumming,raid,cross-demo"
 "Why can't ZFS ship as part of the Linux kernel itself, the way Btrfs does?","ZFS (OpenZFS) is licensed under the CDDL; the FSF has stated CDDL and GPL code cannot be linked in the same binary. Since the Linux kernel is GPLv2, ZFS must always ship as a separate, out-of-tree module (via DKMS), rebuilt against each new kernel — unlike Btrfs, which lives directly in the kernel tree.","demo16b,zfs,licensing,fundamentals"
 "Is Btrfs supported on Rocky Linux / RHEL?","No — Btrfs was removed from RHEL starting at version 7.4, and Rocky Linux tracks RHEL compatibility exactly on this point. There is no supported path to Btrfs on Rocky/RHEL, unlike Fedora, openSUSE, and Ubuntu Desktop, where it's the default filesystem as of 2026.","demo16b,btrfs,rocky,distros"
 "Is Btrfs's native RAID5/6 mode considered production-ready as of 2026?","No — Btrfs's parity RAID modes (5/6) are still not considered production-ready due to the unresolved 'write hole' problem. Btrfs's RAID0/1/10 modes are solid. ZFS's RAID-Z1/Z2/Z3 is mature and well-regarded for exactly this parity-RAID use case.","demo16b,btrfs,raid,write-hole"
 "Why did a routine kernel security update break ZFS mounts on a Ubuntu server fleet, and was this a ZFS bug?","This is a predictable consequence of ZFS's out-of-tree, DKMS-based distribution (per its CDDL licensing) — the DKMS module has to rebuild against each new kernel, and a kernel API change can break that rebuild. This is a known, recurring risk category for out-of-tree kernel modules generally, not a defect specific to that ZFS release.","demo16b,zfs,dkms,break-fix"
 "A workstation on Fedora needs frequent cheap snapshots before package upgrades, with limited RAM. Which filesystem fits better, Btrfs or ZFS, and why?","Btrfs — it's Fedora's actual default (already in-kernel, no DKMS overhead), its snapshots are cheap for exactly this pre-upgrade use case, and its RAM footprint is much lighter than ZFS's ARC cache, which suits resource-constrained hardware better.","demo16b,btrfs,decision,scenario"
-"A team needs RAID6-equivalent redundancy (tolerate 2 simultaneous disk failures) at maximum usable capacity. Should they use Btrfs's native RAID6 or ZFS's RAID-Z2?","ZFS's RAID-Z2 — Btrfs's native parity RAID modes are still not production-ready as of 2026. If Btrfs is still preferred for other reasons, the alternative is layering Btrfs on top of a separate mdadm RAID6 array (Demo 15a) rather than using Btrfs's own parity RAID mode.","demo16b,raid,decision,scenario"
-"Does ZFS have native encryption? Does Btrfs?","ZFS has native, per-dataset encryption built in. Btrfs does not — it needs LUKS (Demo 15b) layered underneath, the same approach used for ext4/xfs.","demo16b,zfs,btrfs,encryption,cross-demo"
+"A team needs RAID6-equivalent redundancy (tolerate 2 simultaneous disk failures) at maximum usable capacity. Should they use Btrfs's native RAID6 or ZFS's RAID-Z2?","ZFS's RAID-Z2 — Btrfs's native parity RAID modes are still not production-ready as of 2026. If Btrfs is still preferred for other reasons, the alternative is layering Btrfs on top of a separate mdadm RAID6 array (Demo M04-05) rather than using Btrfs's own parity RAID mode.","demo16b,raid,decision,scenario"
+"Does ZFS have native encryption? Does Btrfs?","ZFS has native, per-dataset encryption built in. Btrfs does not — it needs LUKS (Demo M04-06) layered underneath, the same approach used for ext4/xfs.","demo16b,zfs,btrfs,encryption,cross-demo"
 ```
 
 ## Appendix B — Quiz
 
-**`16b-btrfs-zfs-overview-quiz.md`:**
+**`m04-09-btrfs-zfs-overview-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 16b: Btrfs/ZFS Conceptual Overview
+# Quiz — Demo M04-09: Btrfs/ZFS Conceptual Overview
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to the next demo.
@@ -490,7 +490,7 @@ Trap: A invents an unrelated compression behavior; C confuses CoW with RAID mirr
 
 ---
 
-**Q2.** Why are Btrfs/ZFS snapshots dramatically cheaper to create than LVM snapshots (Demo 15)?
+**Q2.** Why are Btrfs/ZFS snapshots dramatically cheaper to create than LVM snapshots (Demo M04-04)?
 
 - A) Btrfs/ZFS snapshots only capture metadata, never the actual file contents
 - B) Because CoW is how these filesystems always write, a snapshot is just a pointer to the current metadata state — no data is copied upfront, unlike LVM's reserved-space, copy-on-first-write approach
@@ -508,7 +508,7 @@ Trap: A wrongly claims snapshots never reflect actual data, which would make the
 
 ---
 
-**Q3.** Does RAID alone (Demo 15a) protect against a bit flip or firmware bug that silently corrupts data on a disk that's still functioning normally?
+**Q3.** Does RAID alone (Demo M04-05) protect against a bit flip or firmware bug that silently corrupts data on a disk that's still functioning normally?
 
 - A) Yes — any RAID level detects and corrects silent corruption automatically
 - B) No — RAID protects against a disk failing entirely; it doesn't checksum data, so silent corruption on a still-functioning disk can go completely undetected. Btrfs/ZFS's built-in checksumming addresses exactly this gap
@@ -518,7 +518,7 @@ Trap: A wrongly claims snapshots never reflect actual data, which would make the
 <details>
 <summary>Answer</summary>
 
-**B** — This is the specific gap Btrfs/ZFS's checksumming-and-self-healing feature addresses, distinct from what RAID (Demo 15a) does. RAID's failure detection is about a disk being gone, not about verifying the correctness of data on a disk that's still responding normally.
+**B** — This is the specific gap Btrfs/ZFS's checksumming-and-self-healing feature addresses, distinct from what RAID (Demo M04-05) does. RAID's failure detection is about a disk being gone, not about verifying the correctness of data on a disk that's still responding normally.
 
 Trap: A and C both wrongly attribute checksumming capability to RAID levels that don't have it; D invents an unrelated hot-spare requirement.
 

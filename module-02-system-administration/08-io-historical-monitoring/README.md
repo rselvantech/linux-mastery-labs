@@ -1,8 +1,8 @@
-# Demo 10 — I/O & Historical Performance Monitoring
+# Demo M02-08 — I/O & Historical Performance Monitoring
 
 ## Overview
 
-Demo 09 covered what a machine is doing *right now*. This demo covers two
+Demo M02-07 covered what a machine is doing *right now*. This demo covers two
 things live tools can't give you: per-device disk throughput detail, and what
 happened an hour — or a week — ago. `iostat` and `iotop` show you which disk
 and which process are responsible for I/O load; `sar`, backed by the
@@ -27,10 +27,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-10-io-historical-monitoring/
-├── README.md                              # this file
-├── 10-io-historical-monitoring-anki.csv    # Anki flashcard deck
-└── 10-io-historical-monitoring-quiz.md     # standalone quiz
+08-io-historical-monitoring/
+├── README.md                                 # this file
+├── m02-08-io-historical-monitoring-anki.csv  # Anki flashcard deck
+└── m02-08-io-historical-monitoring-quiz.md   # standalone quiz
 ```
 
 ---
@@ -47,7 +47,7 @@ By the end of this demo you will be able to:
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 09.
+> Answer from memory before reading further. From Demo M02-07.
 
 1. `free -h` shows low `free` but high `available`. Is the machine
    actually low on memory? Why or why not?
@@ -141,7 +141,7 @@ replacement for it.
 ### 1.3 sysstat, sar, and what sa1/sa2 actually do
 
 `sar` (System Activity Reporter) is part of the `sysstat` package, and unlike
-every tool in Demo 09, it doesn't just show you the present — it queries
+every tool in Demo M02-07, it doesn't just show you the present — it queries
 *historical* data collected automatically in the background.
 
 ```bash
@@ -150,7 +150,7 @@ sudo dnf install sysstat   # Rocky9
 ```
 
 That historical data doesn't collect itself — two small programs, `sa1` and
-`sa2`, do the work, and how they're scheduled is a direct callback to Demo 08:
+`sa2`, do the work, and how they're scheduled is a direct callback to Demo M02-05:
 
 ```bash
 # Ubuntu:
@@ -163,7 +163,7 @@ systemctl list-timers | grep sysstat
 `sa1` runs frequently (traditionally every 10 minutes) and appends a compact
 binary sample to the day's data file; `sa2` runs once daily and produces a
 human-readable summary report. Whether your distro wires this up via cron or
-via a systemd timer, the underlying mechanism is exactly what Demo 08 covered
+via a systemd timer, the underlying mechanism is exactly what Demo M02-05 covered
 — a scheduled job invoking a oneshot collector. Enabling `sysstat`'s own
 collection service is the same `enable --now` pattern:
 
@@ -195,7 +195,7 @@ happened before you thought to look.
 sar -u -f /var/log/sysstat/saXX   # Replace XX with the day-of-month file name
 # Without -f, sar reads today's live-collected data; -f points it at a
 # specific saved day's file — this is how you answer "what did CPU usage
-# look like yesterday at 3 AM," which none of Demo 09's live tools can do.
+# look like yesterday at 3 AM," which none of Demo M02-07's live tools can do.
 ```
 
 This is the entire point of `sar` relative to `top`/`vmstat`/`free`: those
@@ -323,7 +323,7 @@ sar -u -f /var/log/sysstat/sa$(date +%d)
 - ✅ Configured and inspected `sysstat` data retention
 - ✅ Learned what `sadf` is for, at a high level
 
-**Key Takeaway:** Every tool in this demo splits into "what's happening" versus "what already happened" — `iostat`/`iotop` are the live, per-device/per-process view Demo 09's tools didn't cover; `sar` is the only tool so far that can answer a question about the past, but only because `sa1`/`sa2` were already quietly collecting before you needed them. None of these tools fix anything themselves — they identify where to look next.
+**Key Takeaway:** Every tool in this demo splits into "what's happening" versus "what already happened" — `iostat`/`iotop` are the live, per-device/per-process view Demo M02-07's tools didn't cover; `sar` is the only tool so far that can answer a question about the past, but only because `sa1`/`sa2` were already quietly collecting before you needed them. None of these tools fix anything themselves — they identify where to look next.
 
 ---
 
@@ -457,12 +457,12 @@ packaged default.
    translates into application-visible latency. High `%util` with `aqu-sz`
    near zero means busy but keeping up — a different, healthier situation.
 3. **`sar` is the only tool covered so far that answers questions about the
-   past, not just right now.** `top`/`vmstat`/`free` (Demo 09) are
+   past, not just right now.** `top`/`vmstat`/`free` (Demo M02-07) are
    fundamentally live-only; `sar`'s value is entirely in querying data that
    was collected while nobody was watching.
 4. **`sa1`/`sa2` are scheduled the same way any periodic job is — cron or a
    systemd timer, depending on the distro.** This is a direct application of
-   Demo 08's timer concepts, not a new scheduling mechanism to learn.
+   Demo M02-05's timer concepts, not a new scheduling mechanism to learn.
 5. **Default `sysstat` retention is often too short for real postmortems.**
    `HISTORY=` in `/etc/sysstat/sysstat` should be set based on how long
    incidents realistically take to get investigated, not left at the
@@ -507,10 +507,10 @@ packaged default.
 
 ## Appendix A — Anki Cards
 
-**`10-io-historical-monitoring-anki.csv`:**
+**`m02-08-io-historical-monitoring-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 2 - System Administration::Demo 10 - I/O and Historical Performance Monitoring
+#deck:Linux Mastery::Module 2 - System Administration::Demo M02-08 - I/O and Historical Performance Monitoring
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -520,7 +520,7 @@ packaged default.
 
 "Why does sar exist when top/vmstat/free already cover CPU, memory, and I/O?","Those tools only show the current instant with no history. sar, backed by sysstat's background collection (sa1/sa2), is the only tool covered so far that can answer a question about the past on demand.","demo10,sar,fundamentals"
 
-"What do sa1 and sa2 actually do, and how are they scheduled?","sa1 runs frequently (traditionally every 10 min) and appends a compact data sample; sa2 runs once daily and produces a summary report. They're scheduled via cron or a systemd timer depending on the distro — the same scheduling mechanisms covered in Demo 08, not a new one.","demo10,sar,sysstat,cross-demo"
+"What do sa1 and sa2 actually do, and how are they scheduled?","sa1 runs frequently (traditionally every 10 min) and appends a compact data sample; sa2 runs once daily and produces a summary report. They're scheduled via cron or a systemd timer depending on the distro — the same scheduling mechanisms covered in Demo M02-05, not a new one.","demo10,sar,sysstat,cross-demo"
 
 "A team's sysstat retention (HISTORY=) is left at the packaged default. What's the practical risk?","If an incident isn't investigated until after the retention window passes (common, since postmortems often happen days or weeks later), the historical data needed to investigate it will already be deleted, even though collection was running the whole time.","demo10,sysstat,retention,common-mistake"
 
@@ -532,20 +532,20 @@ packaged default.
 
 "Which sar flag queries historical memory usage, and which queries historical per-device I/O?","sar -r for memory, sar -d for per-device I/O (the historical counterpart to iostat). sar -u covers CPU, sar -n DEV covers network.","demo10,sar,basics"
 
-"iostat and top both show system activity — what's the key structural difference in what each one can report?","top (Demo 09) is a live-only, primarily process/CPU/memory-oriented view. iostat is specifically device-level I/O detail (per-disk throughput, utilization, queue depth) — the two are complementary, not overlapping, since top doesn't break down per-device I/O this way.","demo10,iostat,cross-demo"
+"iostat and top both show system activity — what's the key structural difference in what each one can report?","top (Demo M02-07) is a live-only, primarily process/CPU/memory-oriented view. iostat is specifically device-level I/O detail (per-disk throughput, utilization, queue depth) — the two are complementary, not overlapping, since top doesn't break down per-device I/O this way.","demo10,iostat,cross-demo"
 ```
 
 ---
 
 ## Appendix B — Quiz
 
-**`10-io-historical-monitoring-quiz.md`:**
+**`m02-08-io-historical-monitoring-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 10: I/O & Historical Performance Monitoring
+# Quiz — Demo M02-08: I/O & Historical Performance Monitoring
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 11.
+> Target: 80% or above before moving to Demo M03-01.
 
 ---
 
@@ -733,7 +733,7 @@ unremarkable.
 
 | Score | Action |
 |---|---|
-| 8/8 | Import Anki cards, move to Demo 11 |
+| 8/8 | Import Anki cards, move to Demo M03-01 |
 | 6-7/8 | Review the wrong answers, then proceed |
 | 4-5/8 | Re-read the relevant sections, retry those questions |
 | Below 4/8 | Re-read the full demo and redo the walkthrough before proceeding |

@@ -1,8 +1,8 @@
-# Demo 18 — grep Search
+# Demo M05-05 — grep Search
 
 ## Overview
 
-Demo 17 built the regex vocabulary; this demo is about wielding `grep`
+Demo M05-01 built the regex vocabulary; this demo is about wielding `grep`
 itself as a fast, practical search tool — not just matching patterns, but
 searching efficiently across directory trees, getting the surrounding
 context that turns a match into a diagnosis, and building the kind of
@@ -13,7 +13,7 @@ pipe to."
 ## Demo Objectives
 
 1. Choose the right matching mode deliberately — `-E`/`-P` for regex
-   power, `-F` for literal strings — building on Demo 17, and search for
+   power, `-F` for literal strings — building on Demo M05-01, and search for
    multiple patterns at once with `-e`/`-f`
 2. Use context flags (`-A`/`-B`/`-C`) to see what surrounds a match
 3. Search recursively across a directory tree efficiently, with correct
@@ -22,15 +22,15 @@ pipe to."
    investigative purposes, including what `-c`'s output means for exit status
 5. Build practical multi-step log-searching workflows, including correct
    filter-then-extract pipeline ordering
-6. Recognize when `grep` is the wrong tool and something else (Demo 19/20/21) fits better
+6. Recognize when `grep` is the wrong tool and something else (Demo M05-06/20/21) fits better
 
 ## Directory Structure
 
 ```
-18-grep-search/
-├── README.md                     # this file
-├── 18-grep-search-anki.csv       # Anki flashcard deck
-└── 18-grep-search-quiz.md        # standalone quiz
+05-grep-search/
+├── README.md                    # this file
+├── m05-05-grep-search-anki.csv  # Anki flashcard deck
+└── m05-05-grep-search-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -39,9 +39,9 @@ pipe to."
 |---|---|---|---|
 | All lab tasks | ✅ | ✅ | Not required |
 
-## Recall Check — 17-regular-expressions
+## Recall Check — 01-regular-expressions
 
-Answer these from memory before continuing — no looking back at Demo 17.
+Answer these from memory before continuing — no looking back at Demo M05-01.
 
 1. `grep 'error|warning' file.log` returns 0 matches; `grep -E
    'error|warning' file.log` returns 14. Why?
@@ -71,7 +71,7 @@ Answer these from memory before continuing — no looking back at Demo 17.
 
 ### 1.1 Choosing the matching mode deliberately
 
-Demo 17 covered *why* flavor matters; here's the practical habit: decide the
+Demo M05-01 covered *why* flavor matters; here's the practical habit: decide the
 mode before writing the pattern, not after it silently doesn't match.
 
 ```bash
@@ -84,7 +84,7 @@ grep -P '(?<=user=)\w+' app.log    # PCRE — lookbehind, a feature BRE/ERE
 
 `-P` isn't just "ERE with different escaping" — PCRE adds real capability
 BRE/ERE lack entirely: lookaheads/lookbehinds, non-greedy quantifiers (Demo
-17 §1.5's greedy trap), and named groups. Reach for `-P` specifically when
+M05-01 §1.5's greedy trap), and named groups. Reach for `-P` specifically when
 the pattern needs one of those, not as a general "stronger" default —
 plain `-E` remains more portable (PCRE support is GNU-grep-specific, not
 guaranteed on every system).
@@ -106,7 +106,7 @@ grep -F '192.168' /tmp/grep-lab0.txt   # literal string — only the real IP
 -- grep -F '192.168' --
 192.168.1.1
 ```
-> Live-verified. This is the practical alternative to Demo 17 §1.1's
+> Live-verified. This is the practical alternative to Demo M05-01 §1.1's
 > manual escaping (`192\.168`) — for a search term that's already a plain
 > string with no intentional regex metacharacters in it (a version
 > number, a literal filename, a price), `-F` is both simpler to write and
@@ -276,7 +276,7 @@ exit code: 1
 > count back out of text output.
 
 **`-x` — whole-line match, distinct from `-w`'s whole-word match (Demo
-17 §1.3):**
+M05-01 §1.3):**
 
 ```bash
 printf 'root\nrooter\nthe root user\n' > /tmp/grep-lab5.txt
@@ -296,7 +296,7 @@ root
 > word); `-x` matched only the line that is *exactly* "root" and nothing
 > else — "the root user" fails `-x` even though "root" appears as a
 > clean whole word within it. `-x PATTERN` is functionally equivalent to
-> anchoring the pattern with `^PATTERN$` (Demo 17 §1.3), just without
+> anchoring the pattern with `^PATTERN$` (Demo M05-01 §1.3), just without
 > writing the anchors explicitly — useful for exact-value checks like "is
 > this config value set to precisely `enabled`, not `enabled-partial` or
 > similar."
@@ -342,7 +342,7 @@ grep -A 5 -B 5 'connection refused' app.log | head -20
 
 # Step 4: is this isolated to one backend, or widespread?
 grep 'connection refused' app.log | grep -o 'backend=[a-z0-9-]*' | sort | uniq -c
-# sort | uniq -c here is a preview of Demo 19 (Text Processing Utilities) —
+# sort | uniq -c here is a preview of Demo M05-06 (Text Processing Utilities) —
 # grep found the relevant lines and extracted a field; counting/grouping
 # unique values is a different tool's job, not grep's.
 ```
@@ -369,9 +369,9 @@ investigation needs to *change* text (not just find it), or needs
 field-aware processing (column N of a structured line, not just "does this
 line match"), `grep` isn't the right tool anymore:
 
-- **Need to replace text, not just find it?** That's `sed` (Demo 20).
+- **Need to replace text, not just find it?** That's `sed` (Demo M05-07).
 - **Need to process specific fields/columns, do arithmetic, or aggregate
-  across many lines?** That's `awk` (Demo 21).
+  across many lines?** That's `awk` (Demo M05-08).
 
 Recognizing this boundary early avoids the common anti-pattern of building
 an increasingly elaborate `grep`+`sed`+manual-parsing pipeline for something
@@ -506,9 +506,9 @@ grep 'connection refused' /tmp/app.log | grep -o 'backend=[a-z0-9-]*' | sort | u
 ```bash
 grep 'ERROR' /tmp/app.log
 # grep finds it. Now: replace ERROR with CRITICAL in the file — grep alone
-# cannot do this (no replace capability); this is what Demo 20 (sed) is for.
+# cannot do this (no replace capability); this is what Demo M05-07 (sed) is for.
 # Extract and sum a numeric field across matching lines — grep alone can
-# extract the field (-o) but not do arithmetic on it; that's Demo 21 (awk).
+# extract the field (-o) but not do arithmetic on it; that's Demo M05-08 (awk).
 ```
 
 ## What You Learned
@@ -664,7 +664,7 @@ different tool expresses more directly.
 4. **Context flags (`-A`/`-B`/`-C`) turn a bare match into something you can actually diagnose from.** Asymmetric context (`-A 5 -B 2`) is often more useful than symmetric `-C N` when the relevant information isn't evenly distributed around the match.
 5. **Recursive search needs scoping (`--include`/`--exclude`/`--exclude-dir`) to stay fast and clean, and filename-prefix display (`-H`/`-h`) can be pinned deliberately** rather than left to vary silently based on how many files a glob happens to expand to at runtime.
 6. **`-c` counts matching lines, not total occurrences, and its printed count is a separate signal from its exit status.** A line with multiple matches still counts once; a `0` count still comes with a non-zero exit code — `grep -q` is the correct, more direct idiom for a shell conditional, not parsing `-c`'s text output back into a comparison.
-7. **`-x` requires the whole line to equal the pattern; `-w` (Demo 17) only requires a whole word within the line.** `-x PATTERN` behaves like `^PATTERN$` without writing the anchors explicitly — the right tool for exact-value checks, not substring-within-a-word checks.
+7. **`-x` requires the whole line to equal the pattern; `-w` (Demo M05-01) only requires a whole word within the line.** `-x PATTERN` behaves like `^PATTERN$` without writing the anchors explicitly — the right tool for exact-value checks, not substring-within-a-word checks.
 8. **A real log investigation is usually a short sequence of narrowing `grep` calls, not one command.** Count → locate → contextualize → break down by dimension is a repeatable shape worth defaulting to — and within that shape, filter to the relevant lines *before* extracting a field from them, not after.
 9. **`grep` finds and filters; it doesn't transform, and it isn't field-aware.** The moment a task needs replacement (`sed`) or column/field logic and aggregation (`awk`), reach for the right tool rather than stretching `grep` past what it's built for.
 
@@ -715,15 +715,15 @@ different tool expresses more directly.
 | `-l` | List matching filenames only (fast — stops at first match per file) |
 | `-o` | Print only the matched text |
 | `-o \| wc -l` | True occurrence count |
-| `-w` / `-x` | Whole word (Demo 17) / whole line — different scopes |
+| `-w` / `-x` | Whole word (Demo M05-01) / whole line — different scopes |
 | `-q` | Silent yes/no test via exit status, for shell conditionals |
 
 ## Appendix A — Anki Cards
 
-**`18-grep-search-anki.csv`:**
+**`m05-05-grep-search-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo 18 - grep Search
+#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-05 - grep Search
 #separator:Comma
 #columns:Front,Back,Tags
 "What does grep -F do differently from plain grep, and when is it the better choice?","-F (fixed strings) disables regex interpretation entirely — every character is matched literally. It's the better choice for a search term with no intentional regex meaning (a version number, a price), avoiding the need to manually escape every metacharacter and the risk of an accidentally-unescaped one overmatching.","demo18,grep,fixed-string,cross-demo"
@@ -732,24 +732,24 @@ different tool expresses more directly.
 "When should you reach for grep -P instead of grep -E?","When the pattern needs a capability BRE/ERE don't have at all — lookaheads/lookbehinds, non-greedy quantifiers, named groups — not as a general stronger default. -P is a GNU extension, less portable than -E.","demo18,grep,pcre"
 "grep -c 'ERROR' file.log gives 42, but a manual count of every ERROR occurrence gives 47. Is grep -c broken?","No — -c counts matching lines, not total occurrences. A single line with ERROR appearing twice still counts once. grep -o 'ERROR' file.log | wc -l gives the true occurrence count.","demo18,grep,count,common-mistake"
 "grep -c 'PATTERN' file prints 0 (no matches). What is grep's exit status in this case?","1 (no match found) — the printed count and the exit status are two separate signals. This matters for scripting: grep -q PATTERN file is the correct, more direct idiom for a conditional, not parsing -c's text output back into a numeric comparison.","demo18,grep,exit-status,count"
-"What's the difference between grep -w and grep -x?","-w (Demo 17) matches a whole WORD anywhere within the line. -x requires the ENTIRE LINE to equal the pattern exactly — 'the root user' matches -w 'root' but not -x 'root'.","demo18,grep,whole-line,cross-demo"
+"What's the difference between grep -w and grep -x?","-w (Demo M05-01) matches a whole WORD anywhere within the line. -x requires the ENTIRE LINE to equal the pattern exactly — 'the root user' matches -w 'root' but not -x 'root'.","demo18,grep,whole-line,cross-demo"
 "A recursive grep across a directory prints 'Binary file X matches' and runs slowly. What's the fix?","Scope the search with --exclude (by file pattern, e.g. --exclude='*.gz') for specific file types, or --exclude-dir for entire directories like .git — this avoids grep wasting time on binary/compressed files.","demo18,grep,recursive,troubleshooting"
 "What's the difference between --include and --exclude-dir in a recursive grep?","--include scopes the search TO files matching a glob pattern (e.g. '*.conf'); --exclude-dir skips ENTIRE directories by name (e.g. .git) regardless of what's inside them.","demo18,grep,recursive,fundamentals"
 "Does grep show a filename prefix when searching a single file? What controls this independent of file count?","No filename prefix by default for a single file; it appears automatically once multiple files are given. -H forces the prefix even for one file; -h suppresses it even for many — useful when a script's file count varies at runtime (e.g. via a glob) and consistent output format matters.","demo18,grep,filename-prefix"
 "What does grep -o actually change about grep's output?","It prints only the matched text itself, not the whole line containing the match — turning grep from a line-filter into a text-extraction tool.","demo18,grep,extraction"
 "What's a repeatable four-step shape for a grep-based log investigation?","1) Count matches (-c) to gauge scope. 2) Locate the first occurrence (-n | head). 3) Get surrounding context (-A/-B/-C). 4) Break down by a relevant dimension (extract a field with -o, then sort | uniq -c).","demo18,grep,workflow"
-"grep finds every line matching a pattern. Is grep alone sufficient to also replace that pattern's text across the file?","No — grep has no replace/transform capability at all. Finding is grep's job; replacing text is sed's job (Demo 20).","demo18,grep,tool-boundary"
+"grep finds every line matching a pattern. Is grep alone sufficient to also replace that pattern's text across the file?","No — grep has no replace/transform capability at all. Finding is grep's job; replacing text is sed's job (Demo M05-07).","demo18,grep,tool-boundary"
 ```
 
 ## Appendix B — Quiz
 
-**`18-grep-search-quiz.md`:**
+**`m05-05-grep-search-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 18: grep Search
+# Quiz — Demo M05-05: grep Search
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 19.
+> Target: 80% or above before moving to Demo M05-06.
 
 ---
 
@@ -901,7 +901,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 19 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M05-06 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

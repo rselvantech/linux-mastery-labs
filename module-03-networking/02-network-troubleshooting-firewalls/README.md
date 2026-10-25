@@ -1,8 +1,8 @@
-# Demo 12 — Network Troubleshooting & Firewalls
+# Demo M03-02 — Network Troubleshooting & Firewalls
 
 ## Overview
 
-Demo 11 got a machine addressed, routed, resolvable, and reachable over SSH.
+Demo M03-01 got a machine addressed, routed, resolvable, and reachable over SSH.
 This demo covers the other half of networking: watching what's actually
 happening on the wire, finding out which process owns which socket, and
 controlling what traffic is allowed in and out in the first place. By the
@@ -28,10 +28,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-12-network-troubleshooting-firewalls/
+02-network-troubleshooting-firewalls/
 ├── README.md                                          # this file
-├── 12-network-troubleshooting-firewalls-anki.csv      # Anki flashcard deck
-└── 12-network-troubleshooting-firewalls-quiz.md       # standalone quiz
+├── m03-02-network-troubleshooting-firewalls-anki.csv  # Anki flashcard deck
+└── m03-02-network-troubleshooting-firewalls-quiz.md   # standalone quiz
 ```
 
 ---
@@ -47,7 +47,7 @@ By the end of this demo you will be able to:
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 11.
+> Answer from memory before reading further. From Demo M03-01.
 
 1. A name resolves correctly via `dig` but a user's machine connects to
    a different, stale server. What's the first thing to check, and why does
@@ -121,12 +121,12 @@ ss -tan state established
 ```
 
 `ss` replaces the older `netstat` (deprecated, sometimes not installed by
-default) the same way `ip` replaced `ifconfig`/`route` in Demo 11 — same
+default) the same way `ip` replaced `ifconfig`/`route` in Demo M03-01 — same
 underlying kernel data, faster and more capable tool.
 
 ### 1.2 lsof — full network investigation
 
-Demo 02 and Demo 06 used `lsof | grep deleted` for a narrow purpose. Here's
+Demo M01-08 and Demo M02-03 used `lsof | grep deleted` for a narrow purpose. Here's
 the network side of `lsof`, in full:
 
 ```bash
@@ -189,7 +189,7 @@ first place. If `tcpdump` *does* show the traffic arriving but the
 connection still fails, the problem is local — the firewall, or the
 application itself.
 
-> ⚠️ [VERIFY] Confirmed directly (in this same session's Demo 13b/13d
+> ⚠️ [VERIFY] Confirmed directly (in this same session's Demo M03-06/13d
 > work): a `tcpdump` capture to a file and filtered read-back showed a
 > real TCP handshake byte-for-byte, confirming captured traffic reflects
 > genuine on-wire packets, not an approximation.
@@ -218,7 +218,7 @@ sudo firewall-cmd --reload
 **`--permanent` is not optional if you want the rule to survive a reload or
 reboot** — without it, a rule applies only to the current runtime
 configuration and vanishes on `--reload` or restart. This is the firewalld
-equivalent of the `ip addr add` persistence trap from Demo 11: live changes
+equivalent of the `ip addr add` persistence trap from Demo M03-01: live changes
 and permanent changes are separate, and forgetting `--permanent` is a
 frequent source of "the rule worked, then mysteriously disappeared."
 
@@ -263,7 +263,7 @@ indistinguishable from "nothing at this address at all."
 > --list-rich-rules` during this session's testing. The client-facing
 > RST-vs-silent-timeout distinction between `reject` and `drop` is
 > standard, documented `nftables`/`netfilter` behavior (and the same
-> mechanism Demo 12a confirmed directly for plain `nftables` rules) rather
+> mechanism Demo M03-03 confirmed directly for plain `nftables` rules) rather
 > than something separately re-tested against `firewalld` specifically in
 > this pass.
 
@@ -701,10 +701,10 @@ address.
 
 ## Appendix A — Anki Cards
 
-**`12-network-troubleshooting-firewalls-anki.csv`:**
+**`m03-02-network-troubleshooting-firewalls-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 3 - Networking::Demo 12 - Network Troubleshooting & Firewalls
+#deck:Linux Mastery::Module 3 - Networking::Demo M03-02 - Network Troubleshooting & Firewalls
 #separator:Comma
 #columns:Front,Back,Tags
 "A firewall rule allows port 9200, but the service on that port is still unreachable from another machine. What's the most likely cause?","The service is bound to 127.0.0.1 instead of 0.0.0.0 — check with ss -tulpn. A service bound to localhost is unreachable from any other host regardless of what the firewall allows.","demo12,ss,troubleshooting"
@@ -723,13 +723,13 @@ address.
 
 ## Appendix B — Quiz
 
-**`12-network-troubleshooting-firewalls-quiz.md`:**
+**`m03-02-network-troubleshooting-firewalls-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 12: Network Troubleshooting & Firewalls
+# Quiz — Demo M03-02: Network Troubleshooting & Firewalls
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 13.
+> Target: 80% or above before moving to Demo M03-04.
 
 ---
 
@@ -877,7 +877,7 @@ Trap: A dismisses a real, practical reason (visibility/intent and controlling cl
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 13 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M03-04 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

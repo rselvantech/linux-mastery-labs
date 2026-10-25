@@ -1,4 +1,4 @@
-# Demo 34c — Script Debugging
+# Demo M09-04 — Script Debugging
 
 ## Overview
 
@@ -26,10 +26,10 @@ when tracing alone isn't enough.
 ## Directory Structure
 
 ```
-34c-script-debugging/
-├── README.md                          # this file
-├── 34c-script-debugging-anki.csv      # Anki flashcard deck
-└── 34c-script-debugging-quiz.md       # standalone quiz
+04-script-debugging/
+├── README.md                         # this file
+├── m09-04-script-debugging-anki.csv  # Anki flashcard deck
+└── m09-04-script-debugging-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -45,9 +45,9 @@ when tracing alone isn't enough.
 > here (no network) and §1.4 is doc-sourced; recommend confirming its
 > exact command set on a real machine.
 
-## Recall Check — 34b-signal-trap-handling
+## Recall Check — 03-signal-trap-handling
 
-Answer these from memory before continuing — no looking back at Demo 34b.
+Answer these from memory before continuing — no looking back at Demo M09-03.
 
 **Q1.** Why is `/tmp/myapp-$$` a genuine security risk as a temp
 filename, and what does `mktemp` do differently?
@@ -468,10 +468,10 @@ from output.
 
 ## Appendix A — Anki Cards
 
-**`34c-script-debugging-anki.csv`:**
+**`m09-04-script-debugging-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 9 - Shell Scripting::Demo 34c - Script Debugging
+#deck:Linux Mastery::Module 9 - Shell Scripting::Demo M09-04 - Script Debugging
 #separator:Comma
 #columns:Front,Back,Tags
 "Does set -x show a line's literal source text or its value after expansion?","After expansion/evaluation — e.g. y=$((x+3)) shows as y=8 in the trace, not the literal arithmetic expression. It shows what the shell actually did.","demo34c,set-x,fundamentals"
@@ -485,13 +485,13 @@ from output.
 
 ## Appendix B — Quiz
 
-**`34c-script-debugging-quiz.md`:**
+**`m09-04-script-debugging-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 34c: Script Debugging
+# Quiz — Demo M09-04: Script Debugging
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 34d.
+> Target: 80% or above before moving to Demo M09-05.
 
 **Q1. Does `set -x`'s trace output show a command's literal source text or its value after shell expansion?**
 
@@ -618,7 +618,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 34d |
+| 7/7 | Import Anki cards, move to Demo M09-05 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

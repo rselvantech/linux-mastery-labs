@@ -1,4 +1,4 @@
-# Demo 00b — I/O Redirection, File Descriptors & Exit Status
+# Demo M01-02 — I/O Redirection, File Descriptors & Exit Status
 
 ## Overview
 
@@ -50,21 +50,21 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-00b-redirection-exit-codes/
-├── README.md                              # this file
-├── 00b-redirection-exit-codes-anki.csv    # Anki flashcard deck (Appendix A)
-├── 00b-redirection-exit-codes-quiz.md     # standalone quiz (Appendix B)
-└── src/                                   # lab working directories (git-ignored)
-    ├── redir-lab/                         # Tasks 1-4 and the break-fix repro
-    └── xargs-lab/                         # Tasks 5-9
+02-redirection-exit-codes/
+├── README.md                               # this file
+├── m01-02-redirection-exit-codes-anki.csv  # Anki flashcard deck (Appendix A)
+├── m01-02-redirection-exit-codes-quiz.md   # standalone quiz (Appendix B)
+└── src/                                    # lab working directories (git-ignored)
+    ├── redir-lab/                          # Tasks 1-4 and the break-fix repro
+    └── xargs-lab/                          # Tasks 5-9
 ```
 
 All lab work happens inside `src/`. The lab commands create the
 folders (`mkdir -p`), so you only need to be in the demo directory
-(`00b-redirection-exit-codes/`) when you start.
+(`02-redirection-exit-codes/`) when you start.
 
 > **Note:** `src/` must be in the repository's root `.gitignore`. If
-> you did not add it in Demo 00a, add this line once:
+> you did not add it in Demo M01-01, add this line once:
 >
 > ```
 > src/
@@ -87,7 +87,7 @@ reminders:
 
 ---
 
-## Recall Check — Demo 00a
+## Recall Check — Demo M01-01
 
 Before starting, answer from memory:
 
@@ -118,7 +118,7 @@ This demo uses a handful of terms. Here they are once, in plain words.
 | **Process** | A running copy of a program. Every command you run creates one |
 | **Command** | What you type: a command name followed by arguments, for example `ls -l /etc` |
 | **Argument** | A word after the command name that says what to work on or how, for example `-l` and `/etc`. Also called a command-line argument |
-| **Shell** | The program (here, bash) that reads what you type, performs the expansions from Demo 00a, and starts the process |
+| **Shell** | The program (here, bash) that reads what you type, performs the expansions from Demo M01-01, and starts the process |
 | **Terminal** | The window or console where you type commands and see their output. By default your keyboard supplies a process's input and your screen shows its output |
 | **Stream** | A flow of bytes into or out of a process |
 | **File descriptor (FD)** | The number the operating system uses to identify one of a process's open streams or files |
@@ -131,7 +131,7 @@ How the pieces fit together when you run a command:
  You type:     ls -l /etc
                  |
                  v
-          +-------------+   1. expands the line (Demo 00a)
+          +-------------+   1. expands the line (Demo M01-01)
           |    shell    |   2. finds the program
           +------+------+   3. starts a process
                  |
@@ -680,7 +680,7 @@ Use `-r` whenever the input might be empty.
 #### The whitespace footgun and `-print0`
 
 By default `xargs` splits on whitespace. This is the same mechanism
-as an unquoted variable in Demo 00a: a filename that contains a space
+as an unquoted variable in Demo M01-01: a filename that contains a space
 is torn into two items.
 
 ```bash
@@ -780,7 +780,7 @@ return to your normal shell.
 ### Task 1 — Streams and redirection (Concepts §1.2 and §1.3)
 
 ```bash
-# from the demo directory: 00b-redirection-exit-codes/
+# from the demo directory: 02-redirection-exit-codes/
 mkdir -p src/redir-lab && cd src/redir-lab
 touch real.txt
 printf 'banana\napple\ncherry\n' > fruit.txt
@@ -1146,7 +1146,7 @@ printf "ok\nbad\nok2\n" | xargs -I{} sh -c 'if [ "{}" = "bad" ]; then echo "FAIL
 **Clean up and leave bash (optional, since `src/` is git-ignored):**
 
 ```bash
-cd ../..                  # back to 00b-redirection-exit-codes/
+cd ../..                  # back to 02-redirection-exit-codes/
 rm -rf src/redir-lab src/xargs-lab
 exit                      # only if you started bash from zsh in Step 0
 ```
@@ -1376,10 +1376,10 @@ level. Make the sub-command report it before exiting, for example
 
 ## Appendix A — Anki Cards
 
-**`00b-redirection-exit-codes-anki.csv`:**
+**`m01-02-redirection-exit-codes-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 00b - Redirection & Exit Status
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo M01-02 - Redirection & Exit Status
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -1428,12 +1428,12 @@ level. Make the sub-command report it before exiting, for example
 
 ## Appendix B — Quiz
 
-**`00b-redirection-exit-codes-quiz.md`:**
+**`m01-02-redirection-exit-codes-quiz.md`:**
 
 ```
-# Quiz — Demo 00b: I/O Redirection, File Descriptors & Exit Status
+# Quiz — Demo M01-02: I/O Redirection, File Descriptors & Exit Status
 
-> One correct answer per question. Target: 80% (10/12) before Demo 00c.
+> One correct answer per question. Target: 80% (10/12) before Demo M01-03.
 > Assume bash.
 
 ---
@@ -1653,7 +1653,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 12/12 | Import Anki cards, move to Demo 00c |
+| 12/12 | Import Anki cards, move to Demo M01-03 |
 | 11/12 | Review the wrong answer, then proceed |
 | 9-10/12 | Re-read the relevant section, retry those questions |
 | Below 9/12 | Re-read the full demo and redo the lab |

@@ -1,8 +1,8 @@
-# Demo 33 — Shell Scripting Fundamentals
+# Demo M09-01 — Shell Scripting Fundamentals
 
 ## Overview
 
-Everything from Demo 04 through Demo 23 has been commands typed
+Everything from Demo M02-01 through Demo M06-01 has been commands typed
 interactively. This demo turns that into scripts — repeatable, shareable
 automation instead of remembered command sequences. Bash scripting has a
 reputation for being full of sharp edges (unquoted variables, silent
@@ -23,10 +23,10 @@ functions, with the common pitfalls called out explicitly as they come up.
 ## Directory Structure
 
 ```
-33-shell-scripting-fundamentals/
-├── README.md                                      # this file
-├── 33-shell-scripting-fundamentals-anki.csv       # Anki flashcard deck
-└── 33-shell-scripting-fundamentals-quiz.md        # standalone quiz
+01-shell-scripting-fundamentals/
+├── README.md                                     # this file
+├── m09-01-shell-scripting-fundamentals-anki.csv  # Anki flashcard deck
+└── m09-01-shell-scripting-fundamentals-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -40,9 +40,9 @@ functions, with the common pitfalls called out explicitly as they come up.
 > was produced. No `[Unverified]` markers are needed anywhere in this
 > demo.
 
-## Recall Check — 27c-security-auditing
+## Recall Check — 04-security-auditing
 
-Answer these from memory before continuing — no looking back at Demo 27c.
+Answer these from memory before continuing — no looking back at Demo M08-04.
 
 **Q1.** What's the fundamental difference between `lynis` and OpenSCAP?
 
@@ -114,7 +114,7 @@ readonly max_retries=3
 filename="my file.txt"
 touch $filename
 # Creates TWO files: "my" and "file.txt" — the unquoted variable undergoes
-# word splitting, exactly the same xargs mechanism from Demo 19 §1.6,
+# word splitting, exactly the same xargs mechanism from Demo M05-06 §1.6,
 # treating the space inside the value as an argument separator.
 
 touch "$filename"
@@ -170,7 +170,7 @@ if [[ "$filename" == *.log ]]; then
 fi
 
 if [[ "$line" =~ ^ERROR ]]; then
-    echo "Error line — regex match, Demo 17 knowledge applies directly"
+    echo "Error line — regex match, Demo M05-01 knowledge applies directly"
 fi
 ```
 
@@ -229,7 +229,7 @@ done < file.txt
 # < file.txt : redirect the file as the loop's input, rather than piping
 ```
 
-This mirrors the exact `xargs`/word-splitting lesson from Demo 19 §1.6 —
+This mirrors the exact `xargs`/word-splitting lesson from Demo M05-06 §1.6 —
 unquoted, unprotected iteration over text silently splits on whitespace in
 ways that break on realistic input, and the fix is the same category of
 fix: be deliberate about delimiters rather than relying on the naive
@@ -411,7 +411,7 @@ bash /tmp/lab33-5.sh
 ```bash
 cat > /tmp/lab33-6.sh << 'SCRIPT'
 #!/bin/bash
-set -euo pipefail   # forward-reference: Demo 34 covers this properly
+set -euo pipefail   # forward-reference: Demo M09-02 covers this properly
 
 log_dir="/tmp/lab33-logs"
 mkdir -p "$log_dir"
@@ -587,7 +587,7 @@ that might run under `sh`, not just `bash`).
 ## Key Takeaways
 
 1. **Unquoted variables undergo word splitting — the same mechanism as
-   Demo 19's unquoted `xargs` filenames, applied to any variable
+   Demo M05-06's unquoted `xargs` filenames, applied to any variable
    expansion.** Quote every variable expansion by default; treat not
    doing so as a deliberate, understood exception, not the norm.
 2. **`${var:?}` turns an unset/empty variable into a loud failure instead
@@ -653,13 +653,13 @@ that might run under `sh`, not just `bash`).
 
 ## Appendix A — Anki Cards
 
-**`33-shell-scripting-fundamentals-anki.csv`:**
+**`m09-01-shell-scripting-fundamentals-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 9 - Shell Scripting::Demo 33 - Shell Scripting Fundamentals
+#deck:Linux Mastery::Module 9 - Shell Scripting::Demo M09-01 - Shell Scripting Fundamentals
 #separator:Comma
 #columns:Front,Back,Tags
-"touch $filename creates two files ('my' and 'file.txt') instead of one ('my file.txt') when filename='my file.txt'. Why?","The unquoted variable undergoes word splitting — the same mechanism as unquoted xargs input (Demo 19) — treating the space inside the value as an argument separator. Quoting ('touch \"$filename\"') prevents this.","demo33,quoting,word-splitting,common-mistake"
+"touch $filename creates two files ('my' and 'file.txt') instead of one ('my file.txt') when filename='my file.txt'. Why?","The unquoted variable undergoes word splitting — the same mechanism as unquoted xargs input (Demo M05-06) — treating the space inside the value as an argument separator. Quoting ('touch \"$filename\"') prevents this.","demo33,quoting,word-splitting,common-mistake"
 "rm $target_dir/*.tmp deletes files from the root filesystem when target_dir is empty/unset. Why, and what's the fix?","With target_dir empty, the expansion collapses to just /*.tmp — a dangerously different path than intended. ${target_dir:?} makes the script fail loudly with an error if the variable is unset/empty, instead of silently constructing a dangerous command.","demo33,quoting,safety,common-mistake"
 "What's the actual difference between [ ] and [[ ]] in bash, beyond syntax style?","[ ] is the external/builtin test command, more vulnerable to word-splitting issues with unquoted variables. [[ ]] is bash's own extended construct — handles unquoted variables more safely and adds glob (==) and regex (=~) matching directly.","demo33,conditionals,test,fundamentals"
 "Why does [ \"5\" == \"05\" ] return false while [ \"5\" -eq \"05\" ] returns true?","== is STRING comparison (the strings '5' and '05' are different character sequences); -eq is NUMERIC comparison (both represent the number 5). Using the wrong comparison type for the data produces silently different, valid-looking results.","demo33,conditionals,numeric-vs-string,common-mistake"
@@ -673,13 +673,13 @@ that might run under `sh`, not just `bash`).
 
 ## Appendix B — Quiz
 
-**`33-shell-scripting-fundamentals-quiz.md`:**
+**`m09-01-shell-scripting-fundamentals-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 33: Shell Scripting Fundamentals
+# Quiz — Demo M09-01: Shell Scripting Fundamentals
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 34.
+> Target: 80% or above before moving to Demo M09-02.
 
 **Q1. `touch $filename` creates two files instead of one when `filename="my file.txt"`. Why?**
 

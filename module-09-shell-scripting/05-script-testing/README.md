@@ -1,8 +1,8 @@
-# Demo 34d — Script Testing
+# Demo M09-05 — Script Testing
 
 ## Overview
 
-Demo 34c gave you tools to debug a script after something already went
+Demo M09-04 gave you tools to debug a script after something already went
 wrong. This demo closes Module 9 with the tools that catch a problem
 *before* it ships — a lightweight assert-based testing pattern you can
 write in pure bash with no framework, `bats` as the structured framework
@@ -28,10 +28,10 @@ deploy, a re-triggered automation, a human running a setup script again
 ## Directory Structure
 
 ```
-34d-script-testing/
-├── README.md                          # this file
-├── 34d-script-testing-anki.csv        # Anki flashcard deck
-└── 34d-script-testing-quiz.md         # standalone quiz
+05-script-testing/
+├── README.md                       # this file
+├── m09-05-script-testing-anki.csv  # Anki flashcard deck
+└── m09-05-script-testing-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -48,9 +48,9 @@ deploy, a re-triggered automation, a human running a setup script again
 > (no network) and §1.2 is doc-sourced; recommend confirming its exact
 > syntax on a real machine.
 
-## Recall Check — 34c-script-debugging
+## Recall Check — 04-script-debugging
 
-Answer these from memory before continuing — no looking back at Demo 34c.
+Answer these from memory before continuing — no looking back at Demo M09-04.
 
 **Q1.** Does `set -x` show a command's literal source text or its value
 after expansion?
@@ -119,7 +119,7 @@ FAIL: add bug check (expected [10], got [9])
 **The exit code at the end matters as much as the printed output** — `[
 "$fail" -eq 0 ]` as the script's final statement means the test script
 itself exits non-zero when anything failed, which is what lets this be
-wired into CI or a pre-deploy check (Demo 34's `set -e`-style "stop the
+wired into CI or a pre-deploy check (Demo M09-02's `set -e`-style "stop the
 pipeline on failure" pattern) rather than needing a human to read the
 output and notice a `FAIL` line.
 
@@ -219,7 +219,7 @@ touch file`, `id user >/dev/null 2>&1 || useradd user`. The specific
 check differs by what the script is actually doing, but the underlying
 discipline — "check existing state before acting, not just act
 unconditionally" — is the same pattern every time. This is also exactly
-the Demo 26b lesson applied at script-authoring time instead of
+the Demo M07-02 lesson applied at script-authoring time instead of
 infrastructure-config time: check first, then act, rather than acting
 blindly and hoping it was the first time.
 
@@ -401,7 +401,7 @@ orchestrator retry ever happened in production.
 A non-zero exit code when any assertion fails is what lets the test be
 wired into an automated pipeline (CI, a pre-deploy check) that stops on
 failure — the same `set -e`-style "fail loudly, don't continue" pattern
-from Demo 34, applied to testing specifically. Printed `PASS`/`FAIL`
+from Demo M09-02, applied to testing specifically. Printed `PASS`/`FAIL`
 text alone only helps a human reading it in real time; the exit code is
 what a machine acts on.
 
@@ -453,7 +453,7 @@ is the same pattern every time.
    states is a bug, catchable before it ever reaches production.
 6. **The standard idempotency fix is always "check existing state before
    acting"** — `grep -q ... || action`, applied to whatever the script is
-   actually provisioning — the same discipline Demo 26b applied to
+   actually provisioning — the same discipline Demo M07-02 applied to
    infrastructure config, here applied to script authoring.
 
 > **Demo scope:** Primary concept: testing bash scripts for correctness
@@ -474,10 +474,10 @@ is the same pattern every time.
 
 ## Appendix A — Anki Cards
 
-**`34d-script-testing-anki.csv`:**
+**`m09-05-script-testing-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 9 - Shell Scripting::Demo 34d - Script Testing
+#deck:Linux Mastery::Module 9 - Shell Scripting::Demo M09-05 - Script Testing
 #separator:Comma
 #columns:Front,Back,Tags
 "Why does a test script's own exit code matter, beyond just printing PASS/FAIL text?","A non-zero exit code when any assertion fails is what lets the test be wired into an automated pipeline (CI, pre-deploy check) that stops on failure — printed text alone only helps a human reading it live; the exit code is what a machine acts on.","demo34d,testing,exit-code,fundamentals"
@@ -492,10 +492,10 @@ is the same pattern every time.
 
 ## Appendix B — Quiz
 
-**`34d-script-testing-quiz.md`:**
+**`m09-05-script-testing-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 34d: Script Testing
+# Quiz — Demo M09-05: Script Testing
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above — this is the final quiz in Module 9.

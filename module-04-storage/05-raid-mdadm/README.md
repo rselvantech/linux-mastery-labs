@@ -1,4 +1,4 @@
-# Demo 15a — RAID with `mdadm`
+# Demo M04-05 — RAID with `mdadm`
 
 > **A note on how this demo was built:**
 > This is the most constrained demo in the series so far. `mdadm` is not
@@ -23,7 +23,7 @@
 A single disk is a single point of failure — RAID (Redundant Array of
 Independent Disks) combines multiple physical devices into one logical
 device that can survive some degree of disk failure, depending on the
-RAID level chosen. Demo 14/14a/14b covered a single volume's lifecycle;
+RAID level chosen. Demo M04-01/14a/14b covered a single volume's lifecycle;
 this demo covers what happens when that volume is actually *several*
 disks acting as one, what happens when one of those disks fails, and the
 one risk — "split-brain," where two copies of the same mirrored data
@@ -55,10 +55,10 @@ so you know which to reach for when.
 ## Directory Structure
 
 ```
-15a-raid-mdadm/
-├── README.md                              # this file
-├── 15a-raid-mdadm-anki.csv                # Anki flashcard deck
-└── 15a-raid-mdadm-quiz.md                 # standalone quiz
+05-raid-mdadm/
+├── README.md                   # this file
+├── m04-05-raid-mdadm-anki.csv  # Anki flashcard deck
+└── m04-05-raid-mdadm-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -67,9 +67,9 @@ so you know which to reach for when.
 |---|---|---|---|
 | All lab tasks | ⚠️ [VERIFY] — `mdadm` is available via `apt` (candidate 4.3-1ubuntu2.1 confirmed via `apt-cache policy` in this session) but neither installed nor executed; this session's container additionally lacks the `md` kernel module entirely, which a normal Ubuntu install does not lack | ⚠️ [VERIFY] — not checked this session; `mdadm` ships in Rocky9's default repos as a standard package | Not required |
 
-## Recall Check — 14b-rsync-backup
+## Recall Check — 03-rsync-backup
 
-Answer these from memory before continuing — no looking back at Demo 14b.
+Answer these from memory before continuing — no looking back at Demo M04-03.
 
 1. `rsync -a src dst` and `rsync -a src/ dst` are run against the same destination. What's the difference?
 
@@ -111,7 +111,7 @@ did is a common, costly mistake:
   typically in the same physical machine.
 
 RAID is an *availability* tool (keep the system running through a disk
-failure), not a *data-protection* tool. Backups (Demo 14a/14b) are the
+failure), not a *data-protection* tool. Backups (Demo M04-02/14b) are the
 data-protection tool. The two are complementary, and a common production
 mistake is treating a RAID array as if it were also a backup.
 
@@ -534,7 +534,7 @@ resolved the inconsistency correctly.
 
 ---
 
-1. **RAID protects against physical disk failure and nothing else — it is not a backup.** It faithfully mirrors accidental deletion, corruption, or ransomware across every member disk exactly as reliably as it mirrors legitimate writes. Backups (Demo 14a/14b) are the complementary, distinct tool for those failure modes.
+1. **RAID protects against physical disk failure and nothing else — it is not a backup.** It faithfully mirrors accidental deletion, corruption, or ransomware across every member disk exactly as reliably as it mirrors legitimate writes. Backups (Demo M04-02/14b) are the complementary, distinct tool for those failure modes.
 2. **`[2/2] [UU]` in `/proc/mdstat` reads as configured/active member counts, then one letter per slot — `U` for up, `_` for missing.** The position of the underscore identifies which array *slot* is down, not necessarily which physical disk, since slot assignment happens at creation time.
 3. **A degraded RAID1 array (one failed member) keeps serving reads and writes normally — "degraded" is not "down."** This is the entire point of mirroring, but it also means a degraded array's real risk is invisible from the application's perspective: zero remaining redundancy, with a second failure at any point meaning total data loss.
 4. **`--fail` marks a member down without detaching it; `--remove` actually detaches it; `--add` attaches a replacement and triggers a full rebuild.** These are three deliberately separate operations, not one combined step, so a failing-but-not-dead disk can be investigated before being physically removed.
@@ -582,10 +582,10 @@ resolved the inconsistency correctly.
 
 ## Appendix A — Anki Cards
 
-**`15a-raid-mdadm-anki.csv`:**
+**`m04-05-raid-mdadm-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 4 - Storage::Demo 15a - RAID with mdadm
+#deck:Linux Mastery::Module 4 - Storage::Demo M04-05 - RAID with mdadm
 #separator:Comma
 #columns:Front,Back,Tags
 "Does RAID protect against accidental file deletion or ransomware encrypting your files?","No — RAID has no concept of correct vs incorrect data. It faithfully mirrors or stripes a deletion or a ransomware pass across every member disk just as reliably as legitimate writes. RAID protects against physical disk failure only; backups are the tool for accidental deletion or corruption.","demo15a,raid,fundamentals"
@@ -603,10 +603,10 @@ resolved the inconsistency correctly.
 
 ## Appendix B — Quiz
 
-**`15a-raid-mdadm-quiz.md`:**
+**`m04-05-raid-mdadm-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 15a: RAID with mdadm
+# Quiz — Demo M04-05: RAID with mdadm
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to the next demo.

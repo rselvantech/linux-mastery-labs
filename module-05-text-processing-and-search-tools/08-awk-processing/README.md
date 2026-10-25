@@ -1,10 +1,10 @@
-# Demo 21 — awk Processing
+# Demo M05-08 — awk Processing
 
 ## Overview
 
 `grep` finds, `sed` transforms line-by-line — `awk` is the tool that thinks
 in fields and can do arithmetic, conditionals, and aggregation across an
-entire file in one pass. This is the tool Demo 18's log investigation
+entire file in one pass. This is the tool Demo M05-05's log investigation
 gestured toward with `sort | uniq -c` — `awk` can do that kind of
 field-aware summarization directly, often replacing a multi-command
 pipeline with one `awk` program. By the end, you'll read and write `awk`
@@ -29,10 +29,10 @@ the right fit.
 ## Directory Structure
 
 ```
-21-awk-processing/
-├── README.md                     # this file
-├── 21-awk-processing-anki.csv    # Anki flashcard deck
-└── 21-awk-processing-quiz.md     # standalone quiz
+08-awk-processing/
+├── README.md                       # this file
+├── m05-08-awk-processing-anki.csv  # Anki flashcard deck
+└── m05-08-awk-processing-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -41,9 +41,9 @@ the right fit.
 |---|---|---|---|
 | All lab tasks | ✅ (gawk) | ✅ (gawk) | Not required |
 
-## Recall Check — 20-sed-editing
+## Recall Check — 07-sed-editing
 
-Answer these from memory before continuing — no looking back at Demo 20.
+Answer these from memory before continuing — no looking back at Demo M05-07.
 
 1. `sed 's/a/b/'` on input `"aaa"` produces `"baa"`, not `"bbb"`. Why?
 
@@ -83,7 +83,7 @@ printf 'alice 30 nyc\nbob 25 la\n' | awk '{print $1}'
 ```
 
 **This whitespace-splitting is automatic and collapses repeated
-whitespace** — directly solving the Demo 19 problem where `cut -d' '`
+whitespace** — directly solving the Demo M05-06 problem where `cut -d' '`
 produced spurious empty fields on irregularly-spaced output:
 
 ```bash
@@ -172,7 +172,7 @@ number** — these are two different default behaviors, not one:
 awk 'BEGIN{ if ("10" > "9") print "string: TRUE"; else print "string: FALSE" }'
 # string: FALSE — "10" and "9" here are literal string constants written
 # directly in the program; awk compares them character-by-character,
-# same lexical logic as Demo 19's plain sort without -n, and '1' < '9'.
+# same lexical logic as Demo M05-06's plain sort without -n, and '1' < '9'.
 
 printf '9\n10\n' | awk '$1 > 9 {print $1, "matched"}'
 # 10 matched — $1 here is a FIELD read from actual input. awk detects
@@ -265,7 +265,7 @@ bob        $ 9000.00
 > add a trailing newline automatically — a `\n` has to be written
 > explicitly, easy to forget when switching from `print` to `printf` for
 > the first time. This is the tool for genuinely aligned, report-style
-> output — the kind `column` (Demo 19) formats after the fact, but
+> output — the kind `column` (Demo M05-06) formats after the fact, but
 > `printf` produces directly, with numeric precision control `column`
 > doesn't have at all.
 
@@ -331,7 +331,7 @@ echo "hello world" | awk '{print substr($0, 1, 5)}'
 
 echo "hello" | awk '{print toupper($0)}'
 # HELLO — toupper()/tolower() convert case, the awk-native equivalent of
-# tr 'a-z' 'A-Z' (Demo 19), scoped to a single value rather than a stream.
+# tr 'a-z' 'A-Z' (Demo M05-06), scoped to a single value rather than a stream.
 
 echo "a:b:c:d" | awk '{n = split($0, parts, ":"); print n, parts[1], parts[3]}'
 ```
@@ -352,7 +352,7 @@ functions, arrays — and it's tempting to keep extending an `awk` one-liner
 indefinitely. The practical line: once a transformation needs external
 program calls, complex control flow across many conditions, robust error
 handling, or state that spans multiple distinct files in a non-trivial way,
-a proper shell script (Demo 23/24) — possibly calling `awk` for the parts
+a proper shell script (Demo M06-01/24) — possibly calling `awk` for the parts
 it's genuinely good at — is more maintainable than one increasingly dense
 `awk` program. `awk` shines at "process this stream of records, field by
 field, with some aggregation" — it's not meant to replace general-purpose
@@ -436,7 +436,7 @@ awk -F',' '{printf "%-10s $%8.2f\n", $1, $2}' /tmp/sales.csv
 ```bash
 printf 'app-01 ERROR\napp-02 ERROR\napp-01 ERROR\napp-03 INFO\napp-01 ERROR\n' > /tmp/awk-lab3.txt
 awk '$2=="ERROR" {count[$1]++} END {for (k in count) print k, count[k]}' /tmp/awk-lab3.txt
-# Compare mentally against the Demo 18/19 equivalent:
+# Compare mentally against the Demo M05-05/19 equivalent:
 grep 'ERROR' /tmp/awk-lab3.txt | awk '{print $1}' | sort | uniq -c
 ```
 
@@ -630,7 +630,7 @@ input fields and hardcoded string literals compare the same way.
 ## Key Takeaways
 
 1. **`awk` splits fields on whitespace by default, collapsing repeated
-   whitespace automatically.** This directly solves the Demo 19 problem
+   whitespace automatically.** This directly solves the Demo M05-06 problem
    where `cut -d' '` produced spurious empty fields on irregular
    command-output spacing. A field beyond `NF` (e.g. `$10` on a 3-field
    line) is an empty string, not an error.
@@ -724,10 +724,10 @@ input fields and hardcoded string literals compare the same way.
 
 ## Appendix A — Anki Cards
 
-**`21-awk-processing-anki.csv`:**
+**`m05-08-awk-processing-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo 21 - awk Processing
+#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-08 - awk Processing
 #separator:Comma
 #columns:Front,Back,Tags
 "Why does awk '{print $2}' handle irregularly-spaced command output (like ps) correctly, while cut -d' ' -f2 produces garbage on the same input?","awk splits fields on whitespace by default and automatically collapses repeated whitespace into a single separator; cut treats every single space as a separate field boundary, producing many spurious empty fields on irregular spacing.","demo21,awk,cut,comparison"
@@ -746,13 +746,13 @@ input fields and hardcoded string literals compare the same way.
 
 ## Appendix B — Quiz
 
-**`21-awk-processing-quiz.md`:**
+**`m05-08-awk-processing-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 21: awk Processing
+# Quiz — Demo M05-08: awk Processing
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 22.
+> Target: 80% or above before moving to Demo M05-10.
 
 ---
 
@@ -802,7 +802,7 @@ Trap: A invents an syntax error that doesn't exist; C misreads what "runs on eve
 <details>
 <summary>Answer</summary>
 
-**B** — String constants written directly into an `awk` program are compared lexically unless explicitly converted to numbers — this is the same lexical-vs-numeric distinction Demo 19 covered for `sort`, just with `awk`'s own default applying to hardcoded string literals specifically.
+**B** — String constants written directly into an `awk` program are compared lexically unless explicitly converted to numbers — this is the same lexical-vs-numeric distinction Demo M05-06 covered for `sort`, just with `awk`'s own default applying to hardcoded string literals specifically.
 
 Trap: A misdiagnoses correct, documented behavior as a bug; C invents an arbitrary digit-count limitation; D invents an unrelated restriction on `BEGIN` blocks.
 
@@ -904,7 +904,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 22 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M05-10 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

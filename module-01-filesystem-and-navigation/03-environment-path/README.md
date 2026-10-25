@@ -1,4 +1,4 @@
-# Demo 00c — Environment & PATH
+# Demo M01-03 — Environment & PATH
 
 ## Overview
 
@@ -40,25 +40,25 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-00c-environment-path/
-├── README.md                      # this file
-├── 00c-environment-path-anki.csv  # Anki flashcard deck (Appendix A)
-├── 00c-environment-path-quiz.md   # standalone quiz (Appendix B)
-└── src/                           # lab working directories (git-ignored)
-    ├── pathlab/                   # Tasks 2 and 5: PATH priority, which vs. type
+03-environment-path/
+├── README.md                         # this file
+├── m01-03-environment-path-anki.csv  # Anki flashcard deck (Appendix A)
+├── m01-03-environment-path-quiz.md   # standalone quiz (Appendix B)
+└── src/                              # lab working directories (git-ignored)
+    ├── pathlab/                      # Tasks 2 and 5: PATH priority, which vs. type
     │   ├── dir1/
     │   └── dir2/
-    └── hashlab/                   # Tasks 6 and 7: command hashing
+    └── hashlab/                      # Tasks 6 and 7: command hashing
         ├── dir1/
         └── dir2/
 ```
 
 All lab work happens inside `src/`. The lab commands create the
 folders (`mkdir -p`), so you only need to be in the demo directory
-(`00c-environment-path/`) when you start.
+(`03-environment-path/`) when you start.
 
 > **Note:** `src/` must be in the repository's root `.gitignore`. If
-> you did not add it in Demo 00a, add this line once:
+> you did not add it in Demo M01-01, add this line once:
 >
 > ```
 > src/
@@ -82,7 +82,7 @@ distros. Some practical points:
 
 ---
 
-## Recall Check — Demo 00b
+## Recall Check — Demo M01-02
 
 Before starting, answer from memory:
 
@@ -166,7 +166,7 @@ same name; a directory at the back is used only when nothing earlier
 has that name.
 
 A `PATH` change like this lasts only for the current shell session.
-Making it permanent is the job of the shell startup files (Demo 00d).
+Making it permanent is the job of the shell startup files (Demo M01-04).
 
 ### 1.3 The command-resolution order
 
@@ -470,7 +470,7 @@ bash -c 'echo after unset: [$myvar2]'
 ### Task 2 — PATH priority: prepend vs. append (Concepts §1.2)
 
 ```bash
-# from the demo directory: 00c-environment-path/
+# from the demo directory: 03-environment-path/
 mkdir -p src/pathlab/dir1 src/pathlab/dir2 && cd src/pathlab
 ORIG_PATH="$PATH"
 
@@ -677,7 +677,7 @@ hash                      # hash: hash table empty
 **Clean up and leave the child shell (optional, since `src/` is git-ignored):**
 
 ```bash
-cd ../..                  # from src/hashlab back to 00c-environment-path/
+cd ../..                  # from src/hashlab back to 03-environment-path/
 rm -rf src/pathlab src/hashlab
 exit                      # leaves the child bash; aliases, functions and PATH changes vanish
 ```
@@ -810,7 +810,7 @@ matches, and `unalias cmd` (or `unset -f cmd`) removes the shadow.
 ## Key Takeaways
 
 1. **Only exported variables are copied into child processes, and the copy cannot change the parent.** `VAR=value cmd` gives one command a variable for a single run.
-2. **`PATH` is searched left to right; the first match wins.** Prepending gives override priority; appending makes a directory a fallback. A change lasts only for the session (Demo 00d covers making it permanent).
+2. **`PATH` is searched left to right; the first match wins.** Prepending gives override priority; appending makes a directory a fallback. A change lasts only for the session (Demo M01-04 covers making it permanent).
 3. **Resolution order is alias → function → builtin → hashed location → `PATH` search.** Verify it with `type -a`, and remember keywords like `if` are handled by the parser.
 4. **An alias works in a terminal but not in a script, and a function works in both.** `shopt -s expand_aliases` enables aliases in a script, and an alias applies from the next line, not the same one. Define a function before an alias of the same name.
 5. **`\cmd`, `command cmd`, `unalias` and `unset -f` are how you get past a shadowing alias or function.**
@@ -862,10 +862,10 @@ matches, and `unalias cmd` (or `unset -f cmd`) removes the shadow.
 
 ## Appendix A — Anki Cards
 
-**`00c-environment-path-anki.csv`:**
+**`m01-03-environment-path-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 00c - Environment & PATH
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo M01-03 - Environment & PATH
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -900,12 +900,12 @@ matches, and `unalias cmd` (or `unset -f cmd`) removes the shadow.
 
 ## Appendix B — Quiz
 
-**`00c-environment-path-quiz.md`:**
+**`m01-03-environment-path-quiz.md`:**
 
 ```
-# Quiz — Demo 00c: Environment & PATH
+# Quiz — Demo M01-03: Environment & PATH
 
-> One correct answer per question. Target: 80% (8/10) before Demo 00d.
+> One correct answer per question. Target: 80% (8/10) before Demo M01-04.
 > Assume bash.
 
 ---
@@ -1099,7 +1099,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 10/10 | Import Anki cards, move to Demo 00d |
+| 10/10 | Import Anki cards, move to Demo M01-04 |
 | 9/10 | Review the wrong answer, then proceed |
 | 7-8/10 | Re-read the relevant section, retry those questions |
 | Below 7/10 | Re-read the full demo and redo the lab |

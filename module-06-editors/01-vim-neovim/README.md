@@ -1,4 +1,4 @@
-# Demo 23 — Vim/Neovim — the DevOps/Cloud Editor
+# Demo M06-01 — Vim/Neovim — the DevOps/Cloud Editor
 
 ## Overview
 
@@ -26,10 +26,10 @@ able to save and quit.
 ## Directory Structure
 
 ```
-23-vim-neovim/
-├── README.md                    # this file
-├── 23-vim-neovim-anki.csv       # Anki flashcard deck
-└── 23-vim-neovim-quiz.md        # standalone quiz
+01-vim-neovim/
+├── README.md                   # this file
+├── m06-01-vim-neovim-anki.csv  # Anki flashcard deck
+└── m06-01-vim-neovim-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -41,13 +41,13 @@ able to save and quit.
 > **Verification note:** This demo's Vim/Neovim behavior claims are built
 > from established, stable tool knowledge — this sandbox has no network
 > access to install Vim and capture a live session, the same constraint
-> already flagged in `08a-cron-log-rotation`. Recommend a real
+> already flagged in `06-cron-log-rotation`. Recommend a real
 > verification pass on an actual Ubuntu/Rocky9 machine before treating
 > register and macro edge-case behavior (§1.5, §1.6) as fully confirmed.
 
-## Recall Check — 22-diff-comparison
+## Recall Check — 10-diff-comparison
 
-Answer these from memory before continuing — no looking back at Demo 22.
+Answer these from memory before continuing — no looking back at Demo M05-10.
 
 1. In a unified diff hunk header `@@ -1,3 +1,4 @@`, what do the two
    number pairs mean?
@@ -131,7 +131,7 @@ $          # end of the line
 gg         # start of the file
 G          # end of the file
 5G         # go to line 5, specifically
-/pattern   # search forward for a pattern (uses regex — Demo 17's
+/pattern   # search forward for a pattern (uses regex — Demo M05-01's
            # knowledge applies directly here)
 n          # repeat the last search, forward
 ```
@@ -376,7 +376,7 @@ printf 'apple\nbanana\ncherry\napricot\n' > /tmp/vim-lab3.txt
 vim /tmp/vim-lab3.txt
 ```
 
-Use `/^a` to search for lines starting with "a" (Demo 17's anchor
+Use `/^a` to search for lines starting with "a" (Demo M05-01's anchor
 knowledge applies directly), then `n` to jump to the next match.
 
 ### Task 7 — Recognize the Vim-vs-sed boundary
@@ -638,10 +638,10 @@ line-by-line human judgment that a fixed pattern-based tool can't express.
 
 ## Appendix A — Anki Cards
 
-**`23-vim-neovim-anki.csv`:**
+**`m06-01-vim-neovim-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 6 - Editors::Demo 23 - Vim/Neovim
+#deck:Linux Mastery::Module 6 - Editors::Demo M06-01 - Vim/Neovim
 #separator:Comma
 #columns:Front,Back,Tags
 "Why does Vim separate Normal mode and Insert mode instead of one unified typing mode?","So Normal-mode keys can be short, single-character commands (d, y, w) without ever colliding with typing text — Normal mode never needs those keys to insert characters, enabling a dense composable command vocabulary.","demo23,vim,modal-editing,fundamentals"
@@ -652,16 +652,16 @@ line-by-line human judgment that a fixed pattern-based tool can't express.
 "A macro that worked on the first 12 lines of a 50-line replay starts producing wrong results afterward. Is this a Vim bug?","No — the macro faithfully replays the exact recorded keystrokes every time. The problem is the macro's implicit assumption that every targeted line has the same structure, which breaks down once a line doesn't match that assumption.","demo23,vim,macros,troubleshooting"
 "What should you do before trusting a macro across a large number of lines (e.g. N@a with a high N)?","Test it on a representative sample of the target lines first, including any that look structurally different, rather than assuming uniformity across all of them just because the first few worked.","demo23,vim,macros,best-practice"
 "When is a Vim macro a worse choice than a sed/awk one-liner for the same repetitive edit?","When the change is fully mechanical, well-defined, and doesn't need human judgment per line — sed/awk expresses it reproducibly and rerunnably, while a macro lives only in that editing session's memory unless deliberately saved.","demo23,vim,sed,awk,tool-boundary"
-"What does the search command /^a followed by n actually do in Vim?","/^a searches forward for lines starting with 'a' (using the same regex anchor knowledge from Demo 17), landing the cursor on the first match; n repeats that search, jumping to the next match.","demo23,vim,search,cross-demo"
+"What does the search command /^a followed by n actually do in Vim?","/^a searches forward for lines starting with 'a' (using the same regex anchor knowledge from Demo M05-01), landing the cursor on the first match; n repeats that search, jumping to the next match.","demo23,vim,search,cross-demo"
 "Why is Vim/vi fluency practically valuable even given more full-featured editors exist?","vi/vim is close to universally available on Linux systems by default, and is frequently the only editor guaranteed present on a minimal server accessed over SSH.","demo23,vim,practical-value"
 ```
 
 ## Appendix B — Quiz
 
-**`23-vim-neovim-quiz.md`:**
+**`m06-01-vim-neovim-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 23: Vim/Neovim — the DevOps/Cloud Editor
+# Quiz — Demo M06-01: Vim/Neovim — the DevOps/Cloud Editor
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to Demo 24.

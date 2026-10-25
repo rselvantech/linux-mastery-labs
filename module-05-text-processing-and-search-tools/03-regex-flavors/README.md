@@ -1,4 +1,4 @@
-# Demo 17b — Regex Flavor Differences Across Tools
+# Demo M05-03 — Regex Flavor Differences Across Tools
 
 ## Overview
 
@@ -31,10 +31,10 @@ can predict what a pattern will do in each tool before it ships.
 ## Directory Structure
 
 ```
-17b-regex-flavors/
-├── README.md                          # this file
-├── 17b-regex-flavors-anki.csv         # Anki flashcard deck
-└── 17b-regex-flavors-quiz.md          # standalone quiz
+03-regex-flavors/
+├── README.md                      # this file
+├── m05-03-regex-flavors-anki.csv  # Anki flashcard deck
+└── m05-03-regex-flavors-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -54,9 +54,9 @@ can predict what a pattern will do in each tool before it ships.
 > macOS/BSD tools (not covered by this demo). Those are marked
 > `[Unverified — test before use]` where they appear.
 
-## Recall Check — 17a-pcre-regex
+## Recall Check — 02-pcre-regex
 
-Answer these from memory before continuing — no looking back at Demo 17a.
+Answer these from memory before continuing — no looking back at Demo M05-02.
 
 **Q1.** What does a lookahead or lookbehind do that an ordinary group
 cannot?
@@ -194,7 +194,7 @@ which at least gives a script something to react to. `sed -n '/pat/p'`
 exits `0` whether or not anything matched — and so does `awk '/pat/'` —
 because both are *processing* tools that succeeded at processing, not
 *search* tools reporting whether they found something. This has a direct
-consequence for Demo 34: **`set -e` and `pipefail` cannot catch this bug**,
+consequence for Demo M09-02: **`set -e` and `pipefail` cannot catch this bug**,
 because from the shell's point of view nothing failed. Even the
 `sed -n '/zzz/{p;q}'` form still exits `0` on no match.
 
@@ -294,7 +294,7 @@ pattern must run on both, use POSIX classes.
 
 ### 1.7 Vim's dialect
 
-Vim's `/` search and `:s` substitute (Demo 23b) use Vim's own regex
+Vim's `/` search and `:s` substitute (Demo M06-03) use Vim's own regex
 dialect, not `sed`'s. By default (Vim calls this "magic" mode) it behaves
 like BRE: `+`, `?`, `|`, and `( )` need a backslash to be operators.
 Prefixing the pattern with `\v` ("very magic") flips most of them to
@@ -631,10 +631,10 @@ interval       \{n\}        {n}     {n}
 
 ## Appendix A — Anki Cards
 
-**`17b-regex-flavors-anki.csv`:**
+**`m05-03-regex-flavors-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo 17b - Regex Flavor Differences
+#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-03 - Regex Flavor Differences
 #separator:Comma
 #columns:Front,Back,Tags
 "Which regex flavor does plain sed use by default?","BRE (Basic Regular Expressions). sed -E switches it to ERE.","demo17b,flavors,sed"
@@ -651,13 +651,13 @@ interval       \{n\}        {n}     {n}
 
 ## Appendix B — Quiz
 
-**`17b-regex-flavors-quiz.md`:**
+**`m05-03-regex-flavors-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 17b: Regex Flavor Differences Across Tools
+# Quiz — Demo M05-03: Regex Flavor Differences Across Tools
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 18.
+> Target: 80% or above before moving to Demo M05-05.
 
 ---
 
@@ -794,7 +794,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 18 |
+| 7/7 | Import Anki cards, move to Demo M05-05 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

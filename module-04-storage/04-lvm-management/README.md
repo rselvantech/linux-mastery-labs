@@ -1,8 +1,8 @@
-# Demo 15 — LVM Management
+# Demo M04-04 — LVM Management
 
 ## Overview
 
-Demo 14 partitioned and mounted storage the direct way — one partition, one
+Demo M04-01 partitioned and mounted storage the direct way — one partition, one
 filesystem, fixed size. LVM adds a flexible layer between raw disks and
 filesystems: volumes that can grow, shrink, span multiple physical disks, and
 be snapshotted, all without unmounting or reformatting. This is how
@@ -23,10 +23,10 @@ down.
 ## Directory Structure
 
 ```
-15-lvm-management/
-├── README.md                          # this file
-├── 15-lvm-management-anki.csv         # Anki flashcard deck
-└── 15-lvm-management-quiz.md          # standalone quiz
+04-lvm-management/
+├── README.md                       # this file
+├── m04-04-lvm-management-anki.csv  # Anki flashcard deck
+└── m04-04-lvm-management-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -35,9 +35,9 @@ down.
 |---|---|---|---|
 | All lab tasks | ✅ (use scratch/lab disks) | ✅ (Rocky9's default install already uses LVM for root — extra caution) | Not required |
 
-## Recall Check — 14-storage-fundamentals
+## Recall Check — 01-storage-fundamentals
 
-Answer these from memory before continuing — no looking back at Demo 14.
+Answer these from memory before continuing — no looking back at Demo M04-01.
 
 1. `df` shows a partition at 95% used; `du -sh` accounts for only half
    that. What's the most likely cause, and what tool identifies the specific
@@ -83,7 +83,7 @@ A **Physical Volume** is a raw disk or partition, marked for LVM use. A
 **Volume Group** pools one or more PVs into a single space — this is the
 layer that lets storage span multiple physical disks transparently. A
 **Logical Volume** is a slice of a VG's pooled space, and it's the LV that
-actually gets a filesystem and a mount point — everything from Demo 14
+actually gets a filesystem and a mount point — everything from Demo M04-01
 (`mkfs`, `mount`, `/etc/fstab`) applies to an LV exactly the same way it
 applies to a raw partition.
 
@@ -127,8 +127,8 @@ future LVs or extension.
 **A safety note before running `pvcreate` on anything:** it writes LVM
 metadata to the start of the target device, destroying any existing
 filesystem signature there — exactly like `mkfs` or `parted mklabel` (Demo
-14), this is a destructive, no-confirmation operation on whatever device you
-point it at. Always confirm with `lsblk -f` (Demo 14 §1.1) that the device
+M04-01), this is a destructive, no-confirmation operation on whatever device you
+point it at. Always confirm with `lsblk -f` (Demo M04-01 §1.1) that the device
 is actually your intended scratch disk, with no existing filesystem or data
 you need, before running `pvcreate`.
 
@@ -262,7 +262,7 @@ data currently living in the blocks that are about to be removed — and only
 filesystem, or reducing it to a size smaller than the filesystem was
 actually shrunk to, risks destroying data that the filesystem hadn't
 finished relocating out of the truncated space. `xfs` cannot be shrunk at
-all (per Demo 14 §1.3) — reducing an `xfs`-backed LV requires backing up,
+all (per Demo M04-01 §1.3) — reducing an `xfs`-backed LV requires backing up,
 recreating the filesystem at the smaller size, and restoring, not an
 in-place shrink.
 
@@ -429,7 +429,7 @@ Tasks:
 `lvextend` grew the logical volume itself, but the filesystem sitting on top
 doesn't automatically grow into that new space; it needs to be told to via
 `resize2fs` (or `xfs_growfs` for xfs). This looks like the extend failed at
-a glance because the person checking `df` (filesystem-level, per Demo 14)
+a glance because the person checking `df` (filesystem-level, per Demo M04-01)
 rather than `lvs` (LV-level) sees no change at all — the two tools are
 reporting on two different layers, and only one of them reflects what
 actually happened. Fix: `sudo resize2fs /dev/data-vg/app-data`. The
@@ -514,14 +514,14 @@ not a "set it and forget it" safety net for genuinely heavy-write scenarios.
    more dangerous failure mode than a single full filesystem, since it can
    affect multiple volumes simultaneously. Watch the pool's `Data%`, not any
    individual volume's declared size.
-6. **`xfs` cannot be shrunk in place at all**, consistent with Demo 14's
+6. **`xfs` cannot be shrunk in place at all**, consistent with Demo M04-01's
    comparison — reducing an xfs-backed LV means backup, recreate smaller,
    restore, not a live shrink like ext4 supports.
 7. **`pvcreate` is a destructive, no-confirmation operation, exactly like
-   `mkfs` or `parted mklabel` (Demo 14).** It overwrites any existing
+   `mkfs` or `parted mklabel` (Demo M04-01).** It overwrites any existing
    filesystem signature on the target device — always confirm the target
    with `lsblk -f` first, the same safety habit carried forward from
-   Demo 14.
+   Demo M04-01.
 
 > **Demo scope:** Primary concept: flexible logical volume management with
 > LVM. Supporting concepts: PV/VG/LV hierarchy, live extension (two-step and
@@ -564,10 +564,10 @@ not a "set it and forget it" safety net for genuinely heavy-write scenarios.
 
 ## Appendix A — Anki Cards
 
-**`15-lvm-management-anki.csv`:**
+**`m04-04-lvm-management-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 4 - Storage::Demo 15 - LVM Management
+#deck:Linux Mastery::Module 4 - Storage::Demo M04-04 - LVM Management
 #separator:Comma
 #columns:Front,Back,Tags
 "lvextend grows an LV, but df on the mounted filesystem still shows the old size. What was missed?","The filesystem resize step. lvextend only grows the logical volume itself — the filesystem needs resize2fs (ext4) or xfs_growfs (xfs) to actually expand into the new space, unless lvextend was run with -r to do both at once.","demo15,lvm,lvextend,common-mistake"
@@ -584,13 +584,13 @@ not a "set it and forget it" safety net for genuinely heavy-write scenarios.
 
 ## Appendix B — Quiz
 
-**`15-lvm-management-quiz.md`:**
+**`m04-04-lvm-management-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 15: LVM Management
+# Quiz — Demo M04-04: LVM Management
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 16.
+> Target: 80% or above before moving to Demo M04-07.
 
 ---
 
@@ -694,7 +694,7 @@ Trap: A wrongly claims equivalence; C and D both invent restrictions/deprecation
 <details>
 <summary>Answer</summary>
 
-**B** — `pvcreate` immediately overwrites whatever was at the start of the device with LVM metadata, with no confirmation step — the same safety concern as other destructive, silent operations covered in Demo 14. Confirming the target device first with `lsblk -f` is the same cheap habit that prevents accidentally destroying the wrong disk's data.
+**B** — `pvcreate` immediately overwrites whatever was at the start of the device with LVM metadata, with no confirmation step — the same safety concern as other destructive, silent operations covered in Demo M04-01. Confirming the target device first with `lsblk -f` is the same cheap habit that prevents accidentally destroying the wrong disk's data.
 
 Trap: A and C both invent requirements that don't exist; D wrongly limits a universal safety concern to one distro's default configuration.
 
@@ -705,14 +705,14 @@ Trap: A and C both invent requirements that don't exist; D wrongly limits a univ
 **Q7.** Does formatting a logical volume with `mkfs.ext4 /dev/data-vg/app-data` work any differently than formatting a raw partition like `/dev/sdb1`?
 
 - A) Yes — LVs require a special `mkfs.lvm` command instead of standard `mkfs` tools
-- B) No — `mkfs`, and everything else from Demo 14 (`mount`, `/etc/fstab`), applies to an LV exactly the same way it applies to a raw partition; the LV is simply the thing being formatted and mounted
+- B) No — `mkfs`, and everything else from Demo M04-01 (`mount`, `/etc/fstab`), applies to an LV exactly the same way it applies to a raw partition; the LV is simply the thing being formatted and mounted
 - C) Yes — LVs can only be formatted as `xfs`, never `ext4`
 - D) No, but LVs require a separate `--lvm` flag on `mkfs` to work correctly
 
 <details>
 <summary>Answer</summary>
 
-**B** — Once you have a logical volume, it's treated exactly like any other block device for filesystem purposes — the same `mkfs` tools, the same `mount` command, the same `/etc/fstab` entry pattern from Demo 14 all apply unchanged. LVM's flexibility lives entirely at the PV/VG/LV layer below this.
+**B** — Once you have a logical volume, it's treated exactly like any other block device for filesystem purposes — the same `mkfs` tools, the same `mount` command, the same `/etc/fstab` entry pattern from Demo M04-01 all apply unchanged. LVM's flexibility lives entirely at the PV/VG/LV layer below this.
 
 Trap: A, C, and D all invent LVM-specific requirements or restrictions on filesystem creation that don't actually exist.
 
@@ -742,7 +742,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 16 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M04-07 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

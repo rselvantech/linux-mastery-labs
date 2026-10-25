@@ -1,4 +1,4 @@
-# Demo 03 — File Permissions, Ownership & Access Control
+# Demo M01-10 — File Permissions, Ownership & Access Control
 
 ## Overview
 
@@ -41,10 +41,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-03-file-permissions/
-├── README.md                            # this file
-├── 03-file-permissions-anki.csv         # Anki flashcard deck
-└── 03-file-permissions-quiz.md          # standalone quiz
+10-file-permissions/
+├── README.md                         # this file
+├── m01-10-file-permissions-anki.csv  # Anki flashcard deck
+└── m01-10-file-permissions-quiz.md   # standalone quiz
 ```
 
 ---
@@ -60,7 +60,7 @@ By the end of this demo you will be able to:
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 02a.
+> Answer from memory before reading further. From Demo M01-09.
 
 1. `find . -name "*.txt" -exec echo {} \;` vs `find . -name "*.txt"
    -exec echo {} +` — what's the actual difference in behavior?
@@ -171,7 +171,7 @@ usermod -aG docker wadmin   # add to docker
 
 The full details of `useradd`, `usermod`, group management,
 and the `/etc/passwd` / `/etc/group` / `/etc/shadow` files are
-covered in **Demo 05 — Users, Groups & Authentication**.
+covered in **Demo M02-02 — Users, Groups & Authentication**.
 
 ---
 
@@ -335,7 +335,7 @@ find /var/www/html -type d -exec chmod 755 {} \;
 find /var/www/html -type f -exec chmod 644 {} \;
 ```
 
-Full dedicated `find` coverage lives in Demo 02a (`find` in Depth)
+Full dedicated `find` coverage lives in Demo M01-09 (`find` in Depth)
 — the pattern above is a direct application of the `-type` and
 `-exec` mechanics covered there, not `chmod -R 755 /var/www/html`,
 which makes all files executable.
@@ -1521,10 +1521,10 @@ find / -nouser -type f 2>/dev/null       # orphaned files (no owner)
 
 ## Appendix A — Anki Cards
 
-**`03-file-permissions-anki.csv`:**
+**`m01-10-file-permissions-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 03 - File Permissions
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo M01-10 - File Permissions
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -1549,12 +1549,12 @@ find / -nouser -type f 2>/dev/null       # orphaned files (no owner)
 
 ## Appendix B — Quiz
 
-**`03-file-permissions-quiz.md`:**
+**`m01-10-file-permissions-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 03: File Permissions, Ownership & Access Control
+# Quiz — Demo M01-10: File Permissions, Ownership & Access Control
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 04.
+> Target: 80% or above before moving to Demo M02-01.
 
 ---
 
@@ -1752,7 +1752,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 04 |
+| 7/7 | Import Anki cards, move to Demo M02-01 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

@@ -1,4 +1,4 @@
-# Demo 22 — diff Comparison
+# Demo M05-10 — diff Comparison
 
 ## Overview
 
@@ -28,10 +28,10 @@ loop from "what's different" to "make it match."
 ## Directory Structure
 
 ```
-22-diff-comparison/
-├── README.md                      # this file
-├── 22-diff-comparison-anki.csv    # Anki flashcard deck
-└── 22-diff-comparison-quiz.md     # standalone quiz
+10-diff-comparison/
+├── README.md                        # this file
+├── m05-10-diff-comparison-anki.csv  # Anki flashcard deck
+└── m05-10-diff-comparison-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -40,9 +40,9 @@ loop from "what's different" to "make it match."
 |---|---|---|---|
 | All lab tasks | ✅ | ✅ | Not required |
 
-## Recall Check — 21-awk-processing
+## Recall Check — 08-awk-processing
 
-Answer these from memory before continuing — no looking back at Demo 21.
+Answer these from memory before continuing — no looking back at Demo M05-08.
 
 1. Why does `awk '{print $2}'` handle `ps aux` output correctly while
    `cut -d' ' -f2` often doesn't?
@@ -105,7 +105,7 @@ merges the old-content and new-content views into one interleaved block,
 rather than showing them as two separate, harder-to-correlate sections.
 
 **`diff`'s exit status is meaningful and worth building scripts around,
-the same way `grep`'s and `xargs`'s are (Demos 18/19):**
+the same way `grep`'s and `xargs`'s are (Demos M05-05/19):**
 
 ```bash
 diff /tmp/file-a.txt /tmp/file-a.txt; echo "identical: $?"
@@ -137,7 +137,7 @@ fi
 > (exit `0`); on two different files it prints one line, `Files X and Y
 > differ` (exit `1`) — either way, `diff -q ... > /dev/null` followed by
 > checking `$?` is the standard "are these two files the same?" test,
-> the same shape as `grep -q` from Demo 18.
+> the same shape as `grep -q` from Demo M05-05.
 
 ### 1.2 Context diff, side-by-side, and reducing noise
 
@@ -401,7 +401,7 @@ patching file tracked.txt
 > cases — but relying on that guess rather than specifying `-p1`
 > explicitly for a known git-style patch is exactly the kind of "worked
 > by luck" habit worth avoiding, the same reasoning as always testing a
-> `sed -i` without `-i` first (Demo 20) rather than trusting a command to
+> `sed -i` without `-i` first (Demo M05-07) rather than trusting a command to
 > behave as hoped.
 
 ### 1.6 git diff — the same underlying format, different context
@@ -836,15 +836,15 @@ ambiguity about which version's change should win.
 
 ## Appendix A — Anki Cards
 
-**`22-diff-comparison-anki.csv`:**
+**`m05-10-diff-comparison-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo 22 - diff Comparison
+#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-10 - diff Comparison
 #separator:Comma
 #columns:Front,Back,Tags
 "In a unified diff hunk header @@ -1,3 +1,4 @@, what do the two number pairs mean?","-1,3 means the first file's shown section starts at line 1 and spans 3 lines; +1,4 means the second file's shown section starts at line 1 and spans 4 lines.","demo22,diff,unified,hunk-header"
 "What are diff's three possible exit codes, and what does each mean?","0 = files identical, 1 = files differ, 2 = an error occurred (e.g. a missing file) and diff couldn't complete the comparison — three distinct outcomes, not just success/failure.","demo22,diff,exit-codes,fundamentals"
-"What's the standard scripting idiom for 'are these two files identical?' using diff?","diff -q file1 file2 > /dev/null; then check $? — -q prints nothing for identical files (exit 0) or one 'Files X and Y differ' line for different ones (exit 1). Same shape as grep -q from Demo 18.","demo22,diff,scripting,cross-demo"
+"What's the standard scripting idiom for 'are these two files identical?' using diff?","diff -q file1 file2 > /dev/null; then check $? — -q prints nothing for identical files (exit 0) or one 'Files X and Y differ' line for different ones (exit 1). Same shape as grep -q from Demo M05-05.","demo22,diff,scripting,cross-demo"
 "What do -i and -w do when comparing two files with diff?","-i ignores case differences; -w ignores whitespace differences. Both filter out formatting-only noise before the comparison happens, useful when a real difference is being drowned out by an irrelevant formatting change.","demo22,diff,noise-reduction"
 "What does diff -y produce that's different from both -u (unified) and -c (context)?","Two literal side-by-side columns — the two files' complete content shown next to each other, with | marking a changed line and </> marking a line present only on one side. A third, distinct presentation from interleaved (unified) or block-separated (context).","demo22,diff,side-by-side"
 "diff -r shows a content change for file2.txt as < old-line / > new-line, but the actual difference is that file3.txt exists in only one of the two directories. What output signals that?","'Only in DIR: file3.txt' — a distinct signal from the </> content-change markers, easy to miss if only scanning for content diffs.","demo22,diff,directory,fundamentals"
@@ -858,13 +858,13 @@ ambiguity about which version's change should win.
 
 ## Appendix B — Quiz
 
-**`22-diff-comparison-quiz.md`:**
+**`m05-10-diff-comparison-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 22: diff Comparison
+# Quiz — Demo M05-10: diff Comparison
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 23.
+> Target: 80% or above before moving to Demo M06-01.
 
 ---
 
@@ -1016,7 +1016,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 23 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M06-01 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

@@ -1,4 +1,4 @@
-# Demo 14b — `rsync` for Sync & Backup
+# Demo M04-03 — `rsync` for Sync & Backup
 
 > **A note on how this demo was built, unlike the others in this series:**
 > `rsync` is not installed in the environment used to build this demo, and
@@ -14,7 +14,7 @@
 
 ## Overview
 
-Demo 14a covered `tar`+compressor: bundle everything, ship the whole
+Demo M04-02 covered `tar`+compressor: bundle everything, ship the whole
 archive, every time. That's fine for a one-off transfer or a cold backup,
 but it's wasteful for the same reason re-sending a whole book to fix one
 typo would be. `rsync` solves a different problem — keeping two directory
@@ -26,12 +26,12 @@ touches the same destination repeatedly rather than once.
 This demo covers `rsync`'s core flags, the one safety habit that prevents
 its most common real-world disasters (`--dry-run`, always run first), the
 trailing-slash rule that trips up nearly everyone the first time, and when
-to reach for `rsync` instead of Demo 14a's `tar`+`scp` pattern.
+to reach for `rsync` instead of Demo M04-02's `tar`+`scp` pattern.
 
 ## Demo Objectives
 
 1. Explain what makes `rsync`'s delta-transfer approach different from
-   `tar`+`scp` (Demo 14a), and when that difference actually matters
+   `tar`+`scp` (Demo M04-02), and when that difference actually matters
 2. Use `-a` for an archive-preserving sync and state precisely what its
    flag bundle does and does not preserve
 3. Always run `--dry-run` before a real sync, and read its output correctly
@@ -44,10 +44,10 @@ to reach for `rsync` instead of Demo 14a's `tar`+`scp` pattern.
 ## Directory Structure
 
 ```
-14b-rsync-backup/
-├── README.md                              # this file
-├── 14b-rsync-backup-anki.csv              # Anki flashcard deck
-└── 14b-rsync-backup-quiz.md               # standalone quiz
+03-rsync-backup/
+├── README.md                     # this file
+├── m04-03-rsync-backup-anki.csv  # Anki flashcard deck
+└── m04-03-rsync-backup-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -56,9 +56,9 @@ to reach for `rsync` instead of Demo 14a's `tar`+`scp` pattern.
 |---|---|---|---|
 | All lab tasks | ⚠️ [VERIFY] — `rsync` is in Ubuntu 24.04's default `apt` repository (candidate version 3.2.7 confirmed via `apt-cache policy` in this session) but was not installed or executed here | ⚠️ [VERIFY] — not checked this session; `rsync` ships in Rocky9's default AppStream repos as a standard package | Not required |
 
-## Recall Check — 14a-archiving-compression
+## Recall Check — 02-archiving-compression
 
-Answer these from memory before continuing — no looking back at Demo 14a.
+Answer these from memory before continuing — no looking back at Demo M04-02.
 
 1. `tar -czf -C src app` is run, intending to create an archive from `src/app`. What actually goes wrong?
 
@@ -83,7 +83,7 @@ Answer these from memory before continuing — no looking back at Demo 14a.
 
 ### 1.1 Delta-transfer — the difference from `tar`+`scp`
 
-`tar`+`scp` (Demo 14a) always moves the whole archive, every time, regardless
+`tar`+`scp` (Demo M04-02) always moves the whole archive, every time, regardless
 of how much actually changed since the last transfer. `rsync` instead
 compares the source and destination and transfers only the pieces of a
 file that differ, using a checksum-based block comparison — its own
@@ -120,7 +120,7 @@ server) — both sides run the comparison protocol.
 **not** include `-H` (hard-link preservation) — hard-link detection is
 expensive, so it's deliberately left out of the "preserve almost
 everything" bundle and must be requested explicitly if you need it. This
-is the same category of precision as Demo 14's note that `parted`'s
+is the same category of precision as Demo M04-01's note that `parted`'s
 filesystem-type argument is a hint, not an action — knowing exactly what
 a bundled flag does and doesn't cover prevents a false sense of "archive
 mode preserves everything."
@@ -183,7 +183,7 @@ transfer; a pattern ending in `/` matches directories only. Multiple
 `--exclude` flags accumulate — each adds to the exclude list rather than
 replacing it — and `--exclude-from` reads one pattern per line from a
 file, useful once the list gets long enough to be unwieldy on the command
-line (the same idea as `tar`'s `--exclude` from Demo 14a, applied to
+line (the same idea as `tar`'s `--exclude` from Demo M04-02, applied to
 `rsync`'s own matching syntax rather than being identical syntax).
 
 ### 1.6 `--bwlimit` — throttling transfer speed
@@ -216,11 +216,11 @@ remote sync (a `:` separator triggers the remote-shell transport). Both
 ends need `rsync` installed for the remote case, since the comparison
 protocol runs on both sides, not just one.
 
-| | `rsync` | `tar` + `scp` (Demo 14a) |
+| | `rsync` | `tar` + `scp` (Demo M04-02) |
 |---|---|---|
 | Repeated syncs to the same destination | Transfers only changed data — fast after the first run | Re-sends the whole archive every time |
 | One-off transfer, destination doesn't exist yet | No meaningful advantage — first run transfers everything either way | Simple, no extra tool needed if `scp`/SSH access exists |
-| Precise control over what's included/excluded per-run | `--exclude`/`--include` rules, evaluated per file at transfer time | Exclusions baked into the archive at creation time (Demo 14a §1.5) — can't be changed after the fact |
+| Precise control over what's included/excluded per-run | `--exclude`/`--include` rules, evaluated per file at transfer time | Exclusions baked into the archive at creation time (Demo M04-02 §1.5) — can't be changed after the fact |
 | Bandwidth-constrained links | `--bwlimit`, plus delta-transfer means less data moves in the first place | No native throttling; whole archive size is what's sent |
 | Typical use in this series | Nightly backups, ongoing mirrors, anything synced more than once | One-off backups, log shipping to cold storage, vendor package transfer |
 
@@ -446,7 +446,7 @@ against a typo'd path is the actual root cause here, not the typo itself.
 
 ## Interview Prep
 
-**Q1. A teammate asks why you'd reach for `rsync` instead of just `tar`-ing a directory and `scp`-ing it over, the way Demo 14a's pattern works. When do you actually recommend `rsync` instead?**
+**Q1. A teammate asks why you'd reach for `rsync` instead of just `tar`-ing a directory and `scp`-ing it over, the way Demo M04-02's pattern works. When do you actually recommend `rsync` instead?**
 
 When the same destination gets synced more than once — a nightly backup,
 an ongoing mirror, a deploy that updates the same remote directory
@@ -481,16 +481,16 @@ directory structure (a common pattern in some backup tools) needs to add
 
 ---
 
-1. **`rsync`'s core advantage over `tar`+`scp` (Demo 14a) is delta-transfer: only the changed portions of files move on a repeat sync, not the whole tree.** This makes it the right tool specifically for anything synced more than once — nightly backups, ongoing mirrors — and gives no meaningful advantage for a genuine one-off transfer.
+1. **`rsync`'s core advantage over `tar`+`scp` (Demo M04-02) is delta-transfer: only the changed portions of files move on a repeat sync, not the whole tree.** This makes it the right tool specifically for anything synced more than once — nightly backups, ongoing mirrors — and gives no meaningful advantage for a genuine one-off transfer.
 2. **The trailing slash on the *source* path changes the result; the trailing slash on the destination never matters.** No slash copies the directory itself (by name) into the destination; a trailing slash copies only its contents. Getting this backwards on a repeated sync produces a nested duplicate directory on the second run — not the first, which is exactly why it's easy to miss until it's already happened more than once.
-3. **`-a` (archive mode) is `-rlptgoD` — and deliberately does *not* include `-H` (hard links).** Knowing precisely what a bundled flag covers, rather than assuming "archive mode preserves everything," matters the same way it did for `tar -czf` in Demo 14a.
+3. **`-a` (archive mode) is `-rlptgoD` — and deliberately does *not* include `-H` (hard links).** Knowing precisely what a bundled flag covers, rather than assuming "archive mode preserves everything," matters the same way it did for `tar -czf` in Demo M04-02.
 4. **Always run the exact same command with `--dry-run` before any real run that includes `--delete`.** This is stated as explicit guidance in `rsync`'s own manual page, not just general caution — a typo'd or wrong source path combined with `--delete` doesn't error out, it silently deletes real destination files that no longer appear to exist in the (wrong) source.
-5. **`--exclude`/`--exclude-from` patterns are evaluated per-file at sync time, unlike `tar`'s `--exclude` (Demo 14a), which is baked in at archive creation.** This means exclusion rules can change between runs without rebuilding anything, which is part of what makes `rsync` better suited to ongoing, evolving sync jobs.
+5. **`--exclude`/`--exclude-from` patterns are evaluated per-file at sync time, unlike `tar`'s `--exclude` (Demo M04-02), which is baked in at archive creation.** This means exclusion rules can change between runs without rebuilding anything, which is part of what makes `rsync` better suited to ongoing, evolving sync jobs.
 6. **`--bwlimit` throttles by pausing between data blocks to average out to roughly the requested rate — it's most effective on larger files, per the tool's own documentation.** The exact behavior on many small files versus few large ones wasn't independently measured for this demo and is worth confirming on your own workload before relying on it for a hard bandwidth ceiling.
 7. **`rsync` needs itself installed on both ends of a remote sync, unlike `scp`, which only needs a plain SSH server.** This is a direct consequence of delta-transfer requiring a comparison protocol that runs on both sides — the one meaningful deployment prerequisite `tar`+`scp` doesn't share.
 
 > **Demo scope:** Primary concept: rsync's delta-transfer sync model and
-> its safe operation, in contrast to Demo 14a's archive-and-send pattern.
+> its safe operation, in contrast to Demo M04-02's archive-and-send pattern.
 > Supporting concepts: -a flag bundle, --dry-run safety, trailing-slash
 > semantics, --exclude patterns, --bwlimit, local vs. SSH transport.
 > Estimated completion time: 35 minutes (reading + hands-on + verification),
@@ -528,10 +528,10 @@ directory structure (a common pattern in some backup tools) needs to add
 
 ## Appendix A — Anki Cards
 
-**`14b-rsync-backup-anki.csv`:**
+**`m04-03-rsync-backup-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 4 - Storage::Demo 14b - rsync for Sync & Backup
+#deck:Linux Mastery::Module 4 - Storage::Demo M04-03 - rsync for Sync & Backup
 #separator:Comma
 #columns:Front,Back,Tags
 "What is rsync's core advantage over tar+scp for a directory that gets synced to the same destination repeatedly?","rsync uses delta-transfer — it compares source and destination and transfers only the changed portions of files, not the whole tree every time. tar+scp re-sends the entire archive on every run regardless of how much actually changed.","demo14b,rsync,fundamentals"
@@ -540,18 +540,18 @@ directory structure (a common pattern in some backup tools) needs to add
 "Does rsync's -a (archive mode) preserve hard links?","No — -a expands to -rlptgoD, which deliberately does NOT include -H (hard-link preservation). Hard-link detection is comparatively expensive, so it's left out of the bundle on purpose and must be requested explicitly with -H if needed.","demo14b,rsync,archive-mode,common-mistake"
 "What should always precede a real rsync run that includes --delete?","The exact same command with --dry-run (-n) added, so the file list rsync intends to delete can be reviewed first. rsync's own manual page explicitly recommends this — --delete is documented as dangerous if used incorrectly, since a wrong source path doesn't error, it silently deletes real destination files.","demo14b,rsync,delete,safety"
 "A script runs rsync -a --delete against a typo'd source path (e.g. /data/ap-source instead of /data/app-source). What does rsync actually do, and why doesn't it fail with an error?","rsync has no way to know the path is a typo — it treats /data/ap-source as the intended source and brings the destination in line with it, deleting any destination files that don't exist in that (wrong, likely empty or unrelated) source. This is exactly why a dry-run step matters: it surfaces the unexpected file list before real deletion happens.","demo14b,rsync,delete,break-fix"
-"How does rsync's --exclude differ from tar's --exclude (Demo 14a) in terms of WHEN it's applied?","rsync's --exclude is evaluated per-file at sync time, on every run — the rules can change between runs without rebuilding anything. tar's --exclude is baked into the archive permanently at creation time and can't be changed afterward for that archive.","demo14b,rsync,tar,exclude,comparison"
+"How does rsync's --exclude differ from tar's --exclude (Demo M04-02) in terms of WHEN it's applied?","rsync's --exclude is evaluated per-file at sync time, on every run — the rules can change between runs without rebuilding anything. tar's --exclude is baked into the archive permanently at creation time and can't be changed afterward for that archive.","demo14b,rsync,tar,exclude,comparison"
 "Why does rsync need to be installed on BOTH ends of a remote (SSH) transfer, unlike scp which only needs a plain SSH server on the remote end?","rsync's delta-transfer relies on a comparison protocol that runs on both sides — both the sending and receiving rsync processes participate in figuring out which blocks actually changed. scp has no such comparison; it just copies bytes, so it only needs SSH access, not rsync itself, on the remote end.","demo14b,rsync,ssh,fundamentals"
-"When would tar+scp (Demo 14a) still be the better choice over rsync?","For a genuine one-off transfer to a destination that doesn't exist yet and won't be synced again — delta-transfer's advantage only shows up on repeat syncs to the same destination. For a single transfer, tar+scp is simpler with no meaningful disadvantage.","demo14b,rsync,tar,comparison"
+"When would tar+scp (Demo M04-02) still be the better choice over rsync?","For a genuine one-off transfer to a destination that doesn't exist yet and won't be synced again — delta-transfer's advantage only shows up on repeat syncs to the same destination. For a single transfer, tar+scp is simpler with no meaningful disadvantage.","demo14b,rsync,tar,comparison"
 "What does --bwlimit=500 do, per rsync's own documentation, and what's its documented mechanism?","Throttles the transfer to roughly 500 KB/s. Per the manual page, rsync sends a block of data, then pauses if the transfer is running faster than the specified limit — the result averages out to approximately the requested rate over time, most effective on larger files.","demo14b,rsync,bwlimit,fundamentals"
 ```
 
 ## Appendix B — Quiz
 
-**`14b-rsync-backup-quiz.md`:**
+**`m04-03-rsync-backup-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 14b: rsync for Sync & Backup
+# Quiz — Demo M04-03: rsync for Sync & Backup
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to the next demo.
@@ -666,7 +666,7 @@ Trap: A, C, and D all invent protective behaviors `rsync` doesn't actually have 
 
 ---
 
-**Q7.** How does the timing of `rsync --exclude` pattern evaluation differ from `tar --exclude` (Demo 14a)?
+**Q7.** How does the timing of `rsync --exclude` pattern evaluation differ from `tar --exclude` (Demo M04-02)?
 
 - A) They're identical — both are evaluated once, at creation/first-sync time, and can't change afterward
 - B) `rsync --exclude` is evaluated per-file on every sync run, meaning exclusion rules can change between runs without rebuilding anything; `tar --exclude` is baked into the archive permanently at creation

@@ -1,7 +1,7 @@
-# Demo 16a — Disk Quotas
+# Demo M04-08 — Disk Quotas
 
 > **A note on how this demo was built:**
-> Same constraint as Demos 15a and 15b: the `quota` package is not
+> Same constraint as Demos M04-05 and 15b: the `quota` package is not
 > installed and can't be installed (no network access), and this
 > container has no quota kernel subsystem available either (no
 > `/lib/modules/.../kernel/fs/quota/` tree). Every command and behavior
@@ -14,7 +14,7 @@
 
 ## Overview
 
-Demo 14 covered provisioning a volume; Demos 15a and 15b covered
+Demo M04-01 covered provisioning a volume; Demos M04-05 and 15b covered
 protecting it from disk failure and unauthorized physical access. This
 demo covers a different problem entirely: what happens when the people
 or processes *using* a shared volume don't fail or misbehave, but simply
@@ -27,8 +27,8 @@ clean up before they're actually locked out.
 ## Demo Objectives
 
 1. Explain what disk quotas actually solve (fair-share capacity
-   enforcement) and how that's distinct from RAID (Demo 15a) or backups
-   (Demo 14a/14b) — none of which prevent one user from filling a shared disk
+   enforcement) and how that's distinct from RAID (Demo M04-05) or backups
+   (Demo M04-02/14b) — none of which prevent one user from filling a shared disk
 2. Enable quotas on a filesystem via `/etc/fstab` and initialize them
    with `quotacheck`
 3. Set user quota limits with `setquota`/`edquota`, understanding the
@@ -43,10 +43,10 @@ clean up before they're actually locked out.
 ## Directory Structure
 
 ```
-16a-disk-quotas/
-├── README.md                              # this file
-├── 16a-disk-quotas-anki.csv               # Anki flashcard deck
-└── 16a-disk-quotas-quiz.md                # standalone quiz
+08-disk-quotas/
+├── README.md                    # this file
+├── m04-08-disk-quotas-anki.csv  # Anki flashcard deck
+└── m04-08-disk-quotas-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -55,9 +55,9 @@ clean up before they're actually locked out.
 |---|---|---|---|
 | All lab tasks | ⚠️ [VERIFY] — the `quota` package is in Ubuntu 24.04's default `apt` repository (candidate 4.06-1build6 confirmed via `apt-cache policy` in this session) but neither installed nor executed; this session's container has no quota kernel subsystem available at all | ⚠️ [VERIFY] — not checked this session; `quota` ships in Rocky9's default repos as a standard package | Not required |
 
-## Recall Check — 15b-luks-encryption
+## Recall Check — 06-luks-encryption
 
-Answer these from memory before continuing — no looking back at Demo 15b.
+Answer these from memory before continuing — no looking back at Demo M04-06.
 
 1. Does LUKS protect data on a volume that's already unlocked and mounted on a running system?
 
@@ -83,7 +83,7 @@ Answer these from memory before continuing — no looking back at Demo 15b.
 ### 1.1 What quotas solve — and what they don't
 
 Quotas are a *fair-share* mechanism, not a durability or security one.
-None of Demo 14a/14b's backups, Demo 15a's RAID, or Demo 15b's LUKS
+None of Demo M04-02/14b's backups, Demo M04-05's RAID, or Demo M04-06's LUKS
 encryption prevent a single user or group from filling a shared
 filesystem — a runaway log directory, a forgotten dataset, or simple
 carelessness on a shared `/home` can take down every other user's
@@ -105,7 +105,7 @@ UUID=xxxx  /home  ext4  defaults,usrquota,grpquota  0  2
 
 `usrquota` enables per-user quotas; `grpquota` enables per-group quotas;
 both can be present together, as shown here. This is the same fstab
-persistence pattern Demo 14 covered for mount options generally — the
+persistence pattern Demo M04-01 covered for mount options generally — the
 option only takes effect once the filesystem is actually remounted (or
 the system rebooted) with that line in place:
 
@@ -256,7 +256,7 @@ first attempt. This lab was not run in the environment that authored it
 ### Task 1 — Enable quotas on a test filesystem
 
 ```bash
-# Assumes a dedicated test mount already exists, e.g. from Demo 14's lab
+# Assumes a dedicated test mount already exists, e.g. from Demo M04-01's lab
 grep /mnt/labdata /etc/fstab
 # Add usrquota,grpquota to the options field for that line, e.g.:
 # LABEL=lab-data  /mnt/labdata  ext4  defaults,usrquota,grpquota  0  2
@@ -319,7 +319,7 @@ sudo quotaoff -avu
 ## What You Learned
 
 1. ✅ Explained what disk quotas solve (fair-share capacity enforcement)
-   and how that's distinct from RAID (Demo 15a) and backups (Demo 14a/14b)
+   and how that's distinct from RAID (Demo M04-05) and backups (Demo M04-02/14b)
 2. ✅ Enabled quotas via `/etc/fstab` and initialized accounting with
    `quotacheck`
 3. ✅ Set user quota limits with `setquota`/`edquota`, distinguishing
@@ -440,7 +440,7 @@ completed.
 
 ---
 
-1. **Quotas are a fair-share mechanism, not a durability or security one — they solve a problem RAID (Demo 15a), backups (Demo 14a/14b), and LUKS (Demo 15b) don't touch.** None of those protections stop one user from filling a shared disk; quotas cap per-user/per-group consumption specifically to prevent that.
+1. **Quotas are a fair-share mechanism, not a durability or security one — they solve a problem RAID (Demo M04-05), backups (Demo M04-02/14b), and LUKS (Demo M04-06) don't touch.** None of those protections stop one user from filling a shared disk; quotas cap per-user/per-group consumption specifically to prevent that.
 2. **Enabling quotas is a three-step process, and skipping the last step is the most common real-world mistake: mark `/etc/fstab` (`usrquota`/`grpquota`), remount, then separately run `quotacheck` to build the accounting database.** The fstab edit and remount alone create no `aquota.user`/`aquota.group` files and enforce nothing.
 3. **Block limits (space) and inode limits (file count) are genuinely separate constraints.** A user with many small files can exhaust their inode limit while barely touching their block limit — a distinct failure mode from "ran out of space," worth setting deliberately rather than defaulting to unlimited.
 4. **The soft/hard/grace model has a specific, easy-to-misread behavior: once a grace period on the soft limit expires, the soft limit is enforced as a hard stop — even while usage remains well under the actual hard limit.** This produces the exact confusing symptom of "I'm blocked but not even close to my hard limit," which is working as designed, not a malfunction.
@@ -481,10 +481,10 @@ completed.
 
 ## Appendix A — Anki Cards
 
-**`16a-disk-quotas-anki.csv`:**
+**`m04-08-disk-quotas-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 4 - Storage::Demo 16a - Disk Quotas
+#deck:Linux Mastery::Module 4 - Storage::Demo M04-08 - Disk Quotas
 #separator:Comma
 #columns:Front,Back,Tags
 "Do RAID and backups prevent one user from filling a shared disk?","No — RAID protects against disk failure and backups protect against data loss, but neither stops a single user's excessive usage from taking down write access for everyone else sharing that filesystem. Quotas are the specific tool for that fair-share problem.","demo16a,quota,fundamentals"
@@ -501,10 +501,10 @@ completed.
 
 ## Appendix B — Quiz
 
-**`16a-disk-quotas-quiz.md`:**
+**`m04-08-disk-quotas-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 16a: Disk Quotas
+# Quiz — Demo M04-08: Disk Quotas
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to the next demo.

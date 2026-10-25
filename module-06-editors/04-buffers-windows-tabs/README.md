@@ -1,10 +1,10 @@
-# Demo 23c — Buffers, Windows, Tabs & Multi-File Editing
+# Demo M06-04 — Buffers, Windows, Tabs & Multi-File Editing
 
 ## Overview
 
-Demo 23a asked you to work with multiple synchronized windows without
+Demo M06-02 asked you to work with multiple synchronized windows without
 this series ever teaching what a "window" actually is in Vim, or how it
-differs from a buffer or a tab — that gap gets closed here. Demo 23b's
+differs from a buffer or a tab — that gap gets closed here. Demo M06-03's
 `:g` command edits patterns *within* one file; this demo extends the same
 idea *across* many files at once with `:argdo`/`:bufdo` — the natural
 multi-file follow-through 23b left open. Along the way this demo also
@@ -29,10 +29,10 @@ write permission, without closing and reopening it as root.
 ## Directory Structure
 
 ```
-23c-buffers-windows-tabs/
-├── README.md                              # this file
-├── 23c-buffers-windows-tabs-anki.csv      # Anki flashcard deck
-└── 23c-buffers-windows-tabs-quiz.md       # standalone quiz
+04-buffers-windows-tabs/
+├── README.md                             # this file
+├── m06-04-buffers-windows-tabs-anki.csv  # Anki flashcard deck
+└── m06-04-buffers-windows-tabs-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -41,7 +41,7 @@ write permission, without closing and reopening it as root.
 |---|---|---|---|
 | All lab tasks | ✅ (`vim` preinstalled or `sudo apt install vim`) | ✅ (`vi`/`vim` preinstalled or `sudo dnf install vim`) | Not required |
 
-> **Verification note:** As with Demos 23/23a/23b, this sandbox has no
+> **Verification note:** As with Demos M06-01/23a/23b, this sandbox has no
 > network access to install Vim, so nothing here could be captured from a
 > live session. Window/buffer/tab mechanics and the sudo-tee write trick
 > are long-stable, widely-documented behavior. Two specifics are marked
@@ -50,9 +50,9 @@ write permission, without closing and reopening it as root.
 > unlisted/hidden buffers by default — and should be confirmed on a real
 > machine before being treated as fully settled.
 
-## Recall Check — 23b-vim-ex-mode
+## Recall Check — 03-vim-ex-mode
 
-Answer these from memory before continuing — no looking back at Demo 23b.
+Answer these from memory before continuing — no looking back at Demo M06-03.
 
 1. What's the difference between `:s/old/new/` and `:%s/old/new/`, and
    why is mixing them up dangerous?
@@ -101,7 +101,7 @@ Tab      A saved WINDOW LAYOUT — not "another file," and not a
 
 The relationship: buffers are the actual data (files in memory); windows
 are how you view a buffer; tabs are how you group different window
-arrangements. Demo 23a's two- and three-window `vimdiff` sessions were
+arrangements. Demo M06-02's two- and three-window `vimdiff` sessions were
 always working with multiple buffers shown in multiple windows — this
 section is the general-purpose version of that same mechanism.
 
@@ -115,7 +115,7 @@ vim /tmp/file1.txt
 :split /tmp/file2.txt     # or :sp — horizontal split, new window above,
                           # showing file2.txt
 :vsplit /tmp/file2.txt    # or :vsp — vertical split, side by side
-                          # (this is exactly what Demo 23a's
+                          # (this is exactly what Demo M06-02's
                           # :vertical diffsplit did)
 ```
 
@@ -123,7 +123,7 @@ vim /tmp/file1.txt
 
 ```
 Ctrl-w h/j/k/l   # move focus left/down/up/right, same directional
-                 # letters as Demo 23's h/j/k/l motions
+                 # letters as Demo M06-01's h/j/k/l motions
 Ctrl-w w         # cycle to the next window
 Ctrl-w =         # equalize all window sizes
 :q               # close the CURRENT window (not the whole session,
@@ -193,7 +193,7 @@ Broken down:
                               # to every .conf file matching the glob
 :argdo %s/ERROR/WARN/g | update
                               # for EACH file in the argument list:
-                              # run Demo 23b's whole-file substitution
+                              # run Demo M06-03's whole-file substitution
                               # against it, then | update saves it —
                               # but ONLY if that specific file was
                               # actually modified by the substitution
@@ -613,10 +613,10 @@ no re-typing or copy-pasting.
 
 ## Appendix A — Anki Cards
 
-**`23c-buffers-windows-tabs-anki.csv`:**
+**`m06-04-buffers-windows-tabs-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 6 - Editors::Demo 23c - Buffers, Windows & Tabs
+#deck:Linux Mastery::Module 6 - Editors::Demo M06-04 - Buffers, Windows & Tabs
 #separator:Comma
 #columns:Front,Back,Tags
 "What's the difference between a Vim buffer, a window, and a tab?","A buffer is a file loaded into memory, whether or not it's currently visible. A window is a viewport showing some buffer's content. A tab is a saved window layout, not a separate copy of any file — buffers are shared across the whole session.","demo23c,buffers,windows,tabs,fundamentals"
@@ -632,10 +632,10 @@ no re-typing or copy-pasting.
 
 ## Appendix B — Quiz
 
-**`23c-buffers-windows-tabs-quiz.md`:**
+**`m06-04-buffers-windows-tabs-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 23c: Buffers, Windows, Tabs & Multi-File Editing
+# Quiz — Demo M06-04: Buffers, Windows, Tabs & Multi-File Editing
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to Demo 24.

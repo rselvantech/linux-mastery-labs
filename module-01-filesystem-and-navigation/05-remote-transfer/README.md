@@ -1,11 +1,11 @@
-# Demo 00e — Remote Transfer & Verification
+# Demo M01-05 — Remote Transfer & Verification
 
 ## Overview
 
 Moving a file to or from another machine is one command. Knowing
 *which* command, and whether what arrived is actually the right file,
 is where real incidents happen. `scp` is the quick one-off copy,
-`sftp` is a session you can script, `rsync` (Demo 14b) is for keeping
+`sftp` is a session you can script, `rsync` (Demo M04-03) is for keeping
 folders in sync, and `curl` and `wget` pull from a URL with no SSH at
 all. None of them tell you the file you got is the file you meant to
 get. That is a separate step, a checksum, and it is easy to skip and
@@ -18,7 +18,7 @@ finished, not that the right file arrived.**
 |---|---|
 | `scp` | A quick, scripted one-off copy over SSH |
 | `sftp` | A session where you browse and move several files, or a scripted batch |
-| `rsync` | Syncing folders and repeated backups (Demo 14b) |
+| `rsync` | Syncing folders and repeated backups (Demo M04-03) |
 | `curl`, `wget` | Downloading from a URL (HTTP/HTTPS), no SSH |
 | `sha256sum`, `md5sum` | Proving what arrived matches what was sent |
 
@@ -42,23 +42,23 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-00e-remote-transfer/
-├── README.md                       # this file
-├── 00e-remote-transfer-anki.csv    # Anki flashcard deck (Appendix A)
-├── 00e-remote-transfer-quiz.md     # standalone quiz (Appendix B)
-└── src/                            # lab working directories (git-ignored)
+05-remote-transfer/
+├── README.md                        # this file
+├── m01-05-remote-transfer-anki.csv  # Anki flashcard deck (Appendix A)
+├── m01-05-remote-transfer-quiz.md   # standalone quiz (Appendix B)
+└── src/                             # lab working directories (git-ignored)
     └── transfer-lab/
-        ├── www/                    # files served by the local web server (Tasks 5-6)
-        ├── source/                 # the "source side" for checksums (Tasks 7-8)
-        └── dest/                   # the "destination side" (Task 7)
+        ├── www/                     # files served by the local web server (Tasks 5-6)
+        ├── source/                  # the "source side" for checksums (Tasks 7-8)
+        └── dest/                    # the "destination side" (Task 7)
 ```
 
 All lab work happens inside `src/`. The lab commands create the
 folders (`mkdir -p`), so you only need to be in the demo directory
-(`00e-remote-transfer/`) when you start.
+(`05-remote-transfer/`) when you start.
 
 > **Note:** `src/` must be in the repository's root `.gitignore`. If
-> you did not add it in Demo 00a, add this line once:
+> you did not add it in Demo M01-01, add this line once:
 >
 > ```
 > src/
@@ -80,7 +80,7 @@ default on both distros. The lab needs two things:
 
 ---
 
-## Recall Check — Demo 00d
+## Recall Check — Demo M01-04
 
 Before starting, answer from memory:
 
@@ -277,7 +277,7 @@ two separate things to confirm.
 | `wget -O` | `O` = output file | Save a download to a specific name |
 | `sha256sum -c` | `c` = check | Verify files against a checksum file |
 | `python3 -m http.server` | n/a | A tiny local web server for the lab |
-| `&` | n/a | Run a command in the background (Demo 00f covers it fully) |
+| `&` | n/a | Run a command in the background (Demo M01-06 covers it fully) |
 
 ### Step 0 — Set up (about a minute)
 
@@ -290,7 +290,7 @@ ssh "$REMOTE" 'echo connected as $(whoami) on $(hostname)'
 ssh "$REMOTE" "mkdir -p $RDIR"
 ```
 
-The two `ssh` lines use different quotes on purpose (Demo 00a): in
+The two `ssh` lines use different quotes on purpose (Demo M01-01): in
 single quotes the **remote** shell runs `$(whoami)`; in double quotes
 **your** shell expands `$RDIR` before sending.
 
@@ -319,7 +319,7 @@ REMOTE=lab
 ### Task 1 — One-off transfer with `scp` (Concepts §1.1)
 
 ```bash
-# from the demo directory: 00e-remote-transfer/
+# from the demo directory: 05-remote-transfer/
 mkdir -p src/transfer-lab && cd src/transfer-lab
 
 echo "test content" > localfile.txt
@@ -422,7 +422,7 @@ sleep 1
 ```
 
 `&` runs the server in the background, `> /dev/null 2>&1` silences its
-log (Demo 00b), and `$!` holds its process ID so you can stop it later.
+log (Demo M01-02), and `$!` holds its process ID so you can stop it later.
 
 ```bash
 curl -sL -o via_curl.txt http://localhost:8000/app.txt
@@ -534,7 +534,7 @@ cd ..
 ```bash
 kill "$SERVER_PID"                   # stop the web server
 ssh "$REMOTE" "rm -rf $RDIR"         # remove the remote working directory
-cd ../..                             # back to 00e-remote-transfer/
+cd ../..                             # back to 05-remote-transfer/
 rm -rf src/transfer-lab
 ```
 
@@ -634,7 +634,7 @@ are the ones you meant to get.
 `sftp` when you want to browse an unfamiliar remote filesystem, move
 several files in one session, or run a scripted batch (`sftp -b`).
 `scp` for a single scripted copy where you already know the source
-and destination. `rsync` (Demo 14b) when you are syncing a folder or
+and destination. `rsync` (Demo M04-03) when you are syncing a folder or
 repeating the transfer, because it sends only what changed.
 
 ---
@@ -661,7 +661,7 @@ get the checksum through a separate trusted channel.
 
 On the first run `/data/backup` did not exist, so it became the copy.
 On later runs it existed, so `scp -r` placed `mydir` *inside* it. For
-repeated syncs use `rsync` (Demo 14b), or copy into an explicit
+repeated syncs use `rsync` (Demo M04-03), or copy into an explicit
 target such as `host:/data/backup/` and keep the layout consistent.
 
 ---
@@ -687,7 +687,7 @@ target such as `host:/data/backup/` and keep the layout consistent.
 |---|---|---|
 | `scp` | Quick scripted one-off copy | `-r` required (nests if the destination exists) |
 | `sftp` | Browsing, multi-file sessions, scripted batches | `put -r` / `get -r` |
-| `rsync` | Syncing and repeated backups (Demo 14b) | Built in |
+| `rsync` | Syncing and repeated backups (Demo M04-03) | Built in |
 | `curl` | Headers, auth, POST, piping; use `-fsSL` in scripts | n/a (HTTP) |
 | `wget` | Saving a URL to disk, mirroring | n/a (HTTP) |
 
@@ -719,10 +719,10 @@ sha256sum -c --quiet file.sha256 # print only failures
 
 ## Appendix A — Anki Cards
 
-**`00e-remote-transfer-anki.csv`:**
+**`m01-05-remote-transfer-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 00e - Remote Transfer & Verification
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo M01-05 - Remote Transfer & Verification
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -732,7 +732,7 @@ sha256sum -c --quiet file.sha256 # print only failures
 
 "What are the port flags for ssh, scp and sftp?","ssh uses lowercase -p; scp and sftp use capital -P. In scp, lowercase -p means preserve times and modes, so scp -p 2222 file host: reads 2222 as a filename and fails.","demo00e,scp,ssh,port"
 
-"What is the practical difference between scp and sftp, and when do you reach for rsync instead?","scp is a single scripted copy. sftp is a session (browse with ls/cd, move several files) or a scripted batch with -b. rsync (Demo 14b) is for syncing folders and repeated transfers because it sends only what changed.","demo00e,scp,sftp,rsync"
+"What is the practical difference between scp and sftp, and when do you reach for rsync instead?","scp is a single scripted copy. sftp is a session (browse with ls/cd, move several files) or a scripted batch with -b. rsync (Demo M04-03) is for syncing folders and repeated transfers because it sends only what changed.","demo00e,scp,sftp,rsync"
 
 "A failing command inside an sftp -b batch file (for example get of a missing file). What happens?","sftp stops and exits non-zero, so a script can detect the failure.","demo00e,sftp,batch,exitcode"
 
@@ -757,12 +757,12 @@ sha256sum -c --quiet file.sha256 # print only failures
 
 ## Appendix B — Quiz
 
-**`00e-remote-transfer-quiz.md`:**
+**`m01-05-remote-transfer-quiz.md`:**
 
 ```
-# Quiz — Demo 00e: Remote Transfer & Verification
+# Quiz — Demo M01-05: Remote Transfer & Verification
 
-> One correct answer per question. Target: 80% (8/10) before Demo 00f.
+> One correct answer per question. Target: 80% (8/10) before Demo M01-06.
 > Assume bash.
 
 ---
@@ -946,7 +946,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 10/10 | Import Anki cards, move to Demo 00f |
+| 10/10 | Import Anki cards, move to Demo M01-06 |
 | 9/10 | Review the wrong answer, then proceed |
 | 7-8/10 | Re-read the relevant section, retry those questions |
 | Below 7/10 | Re-read the full demo and redo the lab |

@@ -1,4 +1,4 @@
-# Demo 00d — Shell Startup Files
+# Demo M01-04 — Shell Startup Files
 
 #### <ins>1.1.1 The terms</ins>
 
@@ -47,21 +47,21 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-00d-shell-startup-files/
-├── README.md                             # this file
-├── 00d-shell-startup-files-anki.csv      # Anki flashcard deck (Appendix A)
-├── 00d-shell-startup-files-quiz.md       # standalone quiz (Appendix B)
-└── src/                                  # lab working directories (git-ignored)
-    └── startup-lab/                      # a fake home directory used by every task
-        └── bin/                          # a fake tool used in Part 4
+04-shell-startup-files/
+├── README.md                            # this file
+├── m01-04-shell-startup-files-anki.csv  # Anki flashcard deck (Appendix A)
+├── m01-04-shell-startup-files-quiz.md   # standalone quiz (Appendix B)
+└── src/                                 # lab working directories (git-ignored)
+    └── startup-lab/                     # a fake home directory used by every task
+        └── bin/                         # a fake tool used in Part 4
 ```
 
 All lab work happens inside `src/`. The lab commands create the
 folders (`mkdir -p`), so you only need to be in the demo directory
-(`00d-shell-startup-files/`) when you start.
+(`04-shell-startup-files/`) when you start.
 
 > **Note:** `src/` must be in the repository's root `.gitignore`. If
-> you did not add it in Demo 00a, add this line once:
+> you did not add it in Demo M01-01, add this line once:
 >
 > ```
 > src/
@@ -91,7 +91,7 @@ bash, so it does not matter which shell your terminal is running.
 
 ---
 
-## Recall Check — Demo 00c
+## Recall Check — Demo M01-03
 
 Before starting, answer from memory:
 
@@ -128,7 +128,7 @@ are in, and the vocabulary used throughout this demo.
 | **Session** | One period of use: from logging in (or connecting by SSH) until you log out |
 | **Login shell** | The first shell of a session, started when you log in |
 | **Non-login shell** | Any shell started later from inside a session, such as a new terminal tab or a script |
-| **Interactive shell** | A shell reading commands you type at a prompt (Demo 00c) |
+| **Interactive shell** | A shell reading commands you type at a prompt (Demo M01-03) |
 | **Non-interactive shell** | A shell running a script or a `bash -c '...'` command, with no prompt |
 | **Startup file** | A file bash reads automatically when it starts, to set up `PATH`, aliases and so on. Also called an init file or **rc file** ("run commands") |
 | **Source** | To run a file's commands **inside the current shell** (§1.1.2) |
@@ -175,7 +175,7 @@ echo "after sourcing: [$X]"
 
 Bash looks for `~/.bashrc` and friends under the directory in
 `$HOME`. In the lab, `HOME=$PWD bash ...` is a one-shot variable
-(Demo 00c): it gives that single child bash a different `HOME`, so it
+(Demo M01-03): it gives that single child bash a different `HOME`, so it
 reads the lab's files and never your real ones.
 
 ```bash
@@ -660,7 +660,7 @@ sourcing and running a file.
 #### Task 1.1 — Which shell am I in? (Concepts §1.2)
 
 ```bash
-# from the demo directory: 00d-shell-startup-files/
+# from the demo directory: 04-shell-startup-files/
 mkdir -p src/startup-lab && cd src/startup-lab
 
 bash -c 'shopt login_shell; echo "flags: $-"'
@@ -719,7 +719,7 @@ shell loads and how to start one with none.
 | `bash --noprofile` | n/a | Do not read the login files |
 | `bash --norc` | n/a | Do not read `~/.bashrc` |
 | `bash --rcfile FILE` | n/a | Read `FILE` instead of `~/.bashrc` |
-| `HOME=$PWD cmd` | n/a | One-shot `HOME` for a single command (Demo 00c) |
+| `HOME=$PWD cmd` | n/a | One-shot `HOME` for a single command (Demo M01-03) |
 
 ---
 
@@ -879,7 +879,7 @@ implement the standard pattern and see the Ubuntu trap.
 | Command | Flag meaning | Purpose |
 |---|---|---|
 | `env -i` | `i` = **i**gnore environment | Simulate cron's empty environment |
-| `command -v NAME` | `v` = describe | Show what a name resolves to (Demo 00c) |
+| `command -v NAME` | `v` = describe | Show what a name resolves to (Demo M01-03) |
 | `.` (dot) | n/a | Source a file into the current shell |
 
 ---
@@ -942,7 +942,7 @@ HOME=$PWD bash -c 'command -v aws-fake; echo "exit status: $?"'
 **Clean up (optional, since `src/` is git-ignored):**
 
 ```bash
-cd ../..                  # back to 00d-shell-startup-files/
+cd ../..                  # back to 04-shell-startup-files/
 rm -rf src/startup-lab
 exit                      # only if you started bash from zsh in Step 0
 ```
@@ -1145,10 +1145,10 @@ fi
 
 ## Appendix A — Anki Cards
 
-**`00d-shell-startup-files-anki.csv`:**
+**`m01-04-shell-startup-files-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 00d - Shell Startup Files
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo M01-04 - Shell Startup Files
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -1189,12 +1189,12 @@ fi
 
 ## Appendix B — Quiz
 
-**`00d-shell-startup-files-quiz.md`:**
+**`m01-04-shell-startup-files-quiz.md`:**
 
 ```
-# Quiz — Demo 00d: Shell Startup Files
+# Quiz — Demo M01-04: Shell Startup Files
 
-> One correct answer per question. Target: 80% (8/10) before Demo 00e.
+> One correct answer per question. Target: 80% (8/10) before Demo M01-05.
 > Assume bash.
 
 ---
@@ -1384,7 +1384,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 10/10 | Import Anki cards, move to Demo 00e |
+| 10/10 | Import Anki cards, move to Demo M01-05 |
 | 9/10 | Review the wrong answer, then proceed |
 | 7-8/10 | Re-read the relevant section, retry those questions |
 | Below 7/10 | Re-read the full demo and redo the lab |

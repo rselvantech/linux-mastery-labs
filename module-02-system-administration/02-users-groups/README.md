@@ -1,10 +1,10 @@
-# Demo 05 — Users, Groups & Authentication
+# Demo M02-02 — Users, Groups & Authentication
 
 ## Overview
 
 Every action on a Linux system happens as some user. Every file has
 an owner. Every process runs with an identity. Getting users and
-groups right is the foundation that permissions (Demo 03) sit on
+groups right is the foundation that permissions (Demo M01-10) sit on
 top of — and getting them wrong causes some of the most disruptive
 incidents in production: a deploy account losing sudo access mid
 pipeline, a service account that can log in interactively when it
@@ -46,10 +46,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-05-users-groups/
-├── README.md                          # this file
-├── 05-users-groups-anki.csv           # Anki flashcard deck
-└── 05-users-groups-quiz.md            # standalone quiz
+02-users-groups/
+├── README.md                     # this file
+├── m02-02-users-groups-anki.csv  # Anki flashcard deck
+└── m02-02-users-groups-quiz.md   # standalone quiz
 ```
 
 ---
@@ -69,7 +69,7 @@ demo — confirmed in Task 4.
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 04.
+> Answer from memory before reading further. From Demo M02-01.
 
 1. `dnf install filebeat` fails with `GPG check FAILED` even though
    the repo file has `gpgcheck=1`. What is the actual cause?
@@ -414,7 +414,7 @@ id deployer
 #                     set as deployer's primary group
 ```
 
-This was covered in Demo 03 (§1.1, "Knowing your identity first")
+This was covered in Demo M01-10 (§1.1, "Knowing your identity first")
 — the same mechanism applies here. UPG means every regular user
 effectively has a private group matching their username, and this
 is the group new files get by default unless a setgid directory
@@ -518,7 +518,7 @@ supplementary groups.
 Primary group:
   - Recorded in /etc/passwd (the GID field)
   - The group assigned to new files the user creates
-    (unless a setgid directory overrides it — Demo 03, section 1.9)
+    (unless a setgid directory overrides it — Demo M01-10, section 1.9)
   - A user always has exactly one
 
 Supplementary groups:
@@ -908,7 +908,7 @@ Capabilities     Fine-grained kernel-   Service processes
 
 Modern best practice: use `sudo` for interactive admin tasks,
 design services to run as dedicated accounts with minimal
-permissions (Demo 05's service account pattern), and avoid
+permissions (Demo M02-02's service account pattern), and avoid
 running anything as root unless there is no alternative.
 
 ### 1.5c su — switching user identity
@@ -1174,7 +1174,7 @@ SSH key, or by any process running with sufficient privilege to `su`
 into it. Setting the shell to `nologin` closes this off entirely:
 the account can still **run** processes (systemd starts the service
 as this user via `User=myapp-svc` in the unit file — covered fully
-in Demo 07) but cannot be used as an interactive login target.
+in Demo M02-04) but cannot be used as an interactive login target.
 
 **No password should be set either** — confirm with:
 
@@ -1940,10 +1940,10 @@ itself is doing.
 
 ## Appendix A — Anki Cards
 
-**`05-users-groups-anki.csv`:**
+**`m02-02-users-groups-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 2 - System Administration::Demo 05 - Users, Groups & Authentication
+#deck:Linux Mastery::Module 2 - System Administration::Demo M02-02 - Users, Groups & Authentication
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -1978,13 +1978,13 @@ itself is doing.
 
 ## Appendix B — Quiz
 
-**`05-users-groups-quiz.md`:**
+**`m02-02-users-groups-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 05: Users, Groups & Authentication
+# Quiz — Demo M02-02: Users, Groups & Authentication
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 06.
+> Target: 80% or above before moving to Demo M02-03.
 
 ---
 
@@ -2164,7 +2164,7 @@ affects other authentication methods (like SSH keys) on its own —
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 06 |
+| 7/7 | Import Anki cards, move to Demo M02-03 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

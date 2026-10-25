@@ -1,4 +1,4 @@
-# Demo 11 — Networking Fundamentals
+# Demo M03-01 — Networking Fundamentals
 
 ## Overview
 
@@ -8,7 +8,7 @@ demo covers the foundational layer: reading and configuring IPv4 addresses
 and routes with the modern `ip` command, recognizing IPv6 address types,
 inspecting the neighbor (ARP) table, how hostname resolution actually works
 before DNS even gets involved, why clock sync matters more than it seems, and
-setting up SSH key authentication correctly. Demo 12 builds on this with
+setting up SSH key authentication correctly. Demo M03-02 builds on this with
 monitoring, firewalls, and troubleshooting — this demo is the "get it
 configured and reachable" half.
 
@@ -37,10 +37,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-11-networking-fundamentals/
-├── README.md                              # this file
-├── 11-networking-fundamentals-anki.csv    # Anki flashcard deck
-└── 11-networking-fundamentals-quiz.md     # standalone quiz
+01-networking-fundamentals/
+├── README.md                                # this file
+├── m03-01-networking-fundamentals-anki.csv  # Anki flashcard deck
+└── m03-01-networking-fundamentals-quiz.md   # standalone quiz
 ```
 
 ---
@@ -57,7 +57,7 @@ By the end of this demo you will be able to:
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 10.
+> Answer from memory before reading further. From Demo M02-08.
 
 1. `iostat` shows a device at high `%util`. What does `iostat` alone NOT
    tell you, and which tool fills that gap?
@@ -78,7 +78,7 @@ By the end of this demo you will be able to:
 2. `sa1` collects a data sample frequently (traditionally every 10
    minutes); `sa2` produces a daily summary report. Both are scheduled via
    cron or a systemd timer depending on the distro — the same scheduling
-   mechanisms covered in Demo 08.
+   mechanisms covered in Demo M02-05.
 
 3. It's already been deleted — 10 days is outside the 7-day retention
    window. This matters because postmortems often happen well after an
@@ -322,7 +322,7 @@ dig @8.8.8.8 novatech.internal      # query a specific server directly,
 Clock drift breaks things that don't look like clock problems: TLS
 certificate validation (certs have time-bounded validity), Kerberos
 authentication, log correlation across servers, and cron/timer scheduling
-accuracy (Demo 08). A machine whose clock has silently drifted can produce
+accuracy (Demo M02-05). A machine whose clock has silently drifted can produce
 confusing, seemingly-unrelated failures.
 
 ```bash
@@ -393,7 +393,7 @@ sudo systemctl status ssh     # Ubuntu (service name differs)
 The server's behavior is controlled by `/etc/ssh/sshd_config`. Two settings
 worth knowing by name even in a "fundamentals" pass: `PasswordAuthentication`
 (whether password login is allowed at all) and `PermitRootLogin` (whether
-`root` can SSH in directly) — both get hardened in Demo 26 (Security), but
+`root` can SSH in directly) — both get hardened in Demo M07-01 (Security), but
 recognizing them now matters for understanding what key-based auth is
 actually replacing.
 
@@ -794,10 +794,10 @@ anyone connects the resulting symptoms back to the actual cause.
 
 ## Appendix A — Anki Cards
 
-**`11-networking-fundamentals-anki.csv`:**
+**`m03-01-networking-fundamentals-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 3 - Networking::Demo 11 - Networking Fundamentals
+#deck:Linux Mastery::Module 3 - Networking::Demo M03-01 - Networking Fundamentals
 #separator:Comma
 #columns:Front,Back,Tags
 "A name resolves correctly via dig, but a user's machine connects to the wrong server. What's the first thing to check?","/etc/hosts on that specific machine — nsswitch.conf's default hosts: files dns order means /etc/hosts is checked before DNS, so a stale local entry silently overrides a correct DNS answer that dig alone (which queries DNS directly) won't reveal.","demo11,hostname-resolution,troubleshooting"
@@ -816,13 +816,13 @@ anyone connects the resulting symptoms back to the actual cause.
 
 ## Appendix B — Quiz
 
-**`11-networking-fundamentals-quiz.md`:**
+**`m03-01-networking-fundamentals-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 11: Networking Fundamentals
+# Quiz — Demo M03-01: Networking Fundamentals
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 12.
+> Target: 80% or above before moving to Demo M03-02.
 
 ---
 
@@ -881,7 +881,7 @@ Trap: A and C invent states unrelated to what `scope` actually indicates; D is u
 <details>
 <summary>Answer</summary>
 
-**B** — `PasswordAuthentication` is the on/off switch for password-based login as a whole (independent of who's logging in); `PermitRootLogin` specifically governs whether `root` can authenticate over SSH at all, regardless of method. Both are commonly hardened together (disable both) but they control different things. Full hardening of these is covered in Demo 26 — this demo only requires recognizing what each setting is for.
+**B** — `PasswordAuthentication` is the on/off switch for password-based login as a whole (independent of who's logging in); `PermitRootLogin` specifically governs whether `root` can authenticate over SSH at all, regardless of method. Both are commonly hardened together (disable both) but they control different things. Full hardening of these is covered in Demo M07-01 — this demo only requires recognizing what each setting is for.
 
 Trap: D swaps the definitions; A invents unrelated meanings for both.
 
@@ -1002,7 +1002,7 @@ Trap: A confuses `STALE` with `FAILED`; C and D invent meanings unrelated to wha
 
 | Score | Action |
 |---|---|
-| 8/9 or 9/9 | Import Anki cards, move to Demo 12 |
+| 8/9 or 9/9 | Import Anki cards, move to Demo M03-02 |
 | 6-7/9 | Review the wrong answers, then proceed |
 | 5/9 | Re-read the relevant sections, retry those questions |
 | Below 5/9 | Re-read the full demo and redo the walkthrough before proceeding |

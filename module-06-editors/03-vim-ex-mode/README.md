@@ -1,13 +1,13 @@
-# Demo 23b — Vim Ex-Mode: Line-Range Command Editing
+# Demo M06-03 — Vim Ex-Mode: Line-Range Command Editing
 
 ## Overview
 
-Everything in Demo 23 operated on wherever the cursor happened to be —
+Everything in Demo M06-01 operated on wherever the cursor happened to be —
 one word, one line, one visual selection at a time. Vim has a second,
 completely different editing model living behind the `:` prompt: **Ex
 mode**, where you address lines by *range* instead of by cursor position,
 and issue a command that operates on that whole range at once. This is
-the same idea Demo 20's `sed` addressing covered at the shell level —
+the same idea Demo M05-07's `sed` addressing covered at the shell level —
 `:%s/pattern/replacement/flags` is Vim's own version of exactly that
 substitution syntax — plus a genuinely distinct capability `sed` doesn't
 have built in the same way: the global command, `:g`, which runs an
@@ -19,21 +19,21 @@ the file.
 1. Address a range of lines explicitly (`:1,5`, `:.,$`, `:'<,'>`) instead
    of relying on cursor position
 2. Use `:%s/pattern/replacement/flags` and explain how it maps onto
-   Demo 20's `sed` substitution syntax
+   Demo M05-07's `sed` substitution syntax
 3. Use the global command `:g/pattern/command` to run an Ex command
    against every matching line in the file
 4. Use `:v` (or `:g!`) to invert a global command to non-matching lines
 5. Use `:normal` from Ex mode to run a Normal-mode command against a range
 6. Explain when Ex-mode range commands are a better fit than a Vim macro
-   (Demo 23) for the same repetitive edit
+   (Demo M06-01) for the same repetitive edit
 
 ## Directory Structure
 
 ```
-23b-vim-ex-mode/
+03-vim-ex-mode/
 ├── README.md                    # this file
-├── 23b-vim-ex-mode-anki.csv      # Anki flashcard deck
-└── 23b-vim-ex-mode-quiz.md       # standalone quiz
+├── m06-03-vim-ex-mode-anki.csv  # Anki flashcard deck
+└── m06-03-vim-ex-mode-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -42,7 +42,7 @@ the file.
 |---|---|---|---|
 | All lab tasks | ✅ (`vim` preinstalled or `sudo apt install vim`) | ✅ (`vi`/`vim` preinstalled or `sudo dnf install vim`) | Not required |
 
-> **Verification note:** As with Demos 23 and 23a, this sandbox has no
+> **Verification note:** As with Demos M06-01 and 23a, this sandbox has no
 > network access to install Vim, so nothing here could be captured from a
 > live session. Range addressing, `:%s`, and `:g`/`:v` are long-stable,
 > extensively-documented Vim behavior. One specific is marked
@@ -51,9 +51,9 @@ the file.
 > count mid-execution — and should be confirmed on a real machine before
 > being treated as fully settled.
 
-## Recall Check — 23a-vimdiff
+## Recall Check — 02-vimdiff
 
-Answer these from memory before continuing — no looking back at Demo 23a.
+Answer these from memory before continuing — no looking back at Demo M06-02.
 
 1. What's the difference between `do` and `dp`, and which direction does
    each one move content?
@@ -84,7 +84,7 @@ Answer these from memory before continuing — no looking back at Demo 23a.
 
 ### 1.1 Addressing lines by range, not by cursor position
 
-Every Normal-mode command from Demo 23 acted on wherever the cursor
+Every Normal-mode command from Demo M06-01 acted on wherever the cursor
 already was. Ex-mode commands work the opposite way: you specify *which
 lines* first, as a range, then a command to run against all of them:
 
@@ -110,7 +110,7 @@ are the range building blocks everything else in this demo composes.
 :%s/old/new/g
 ```
 
-Break this down against Demo 20's `sed -i 's/old/new/g' file`:
+Break this down against Demo M05-07's `sed -i 's/old/new/g' file`:
 
 ```
 %     range = the whole file (equivalent to :1,$)
@@ -123,7 +123,7 @@ g     flag: replace ALL matches per line, not just the first — the exact
 **This isn't a coincidence — Vim's substitute command and `sed`'s `s///`
 command share a common ancestor** (both ultimately derive from the `ed`
 line editor's command language), which is why the syntax, the `g` flag,
-and even backreferences in the replacement (`\1`, `\2` — Demo 20 §1.x)
+and even backreferences in the replacement (`\1`, `\2` — Demo M05-07 §1.x)
 transfer directly between the two without relearning anything.
 
 **Other useful ranges with `:s`:**
@@ -148,7 +148,7 @@ against each one:
 :g/pattern/d          # delete every line matching pattern, anywhere
 :g/pattern/normal Ix   # for every matching line, run the Normal-mode
                        # command "insert x at the start of the line"
-                       # (Demo 23 §1.1's I, not a range — the command
+                       # (Demo M06-01 §1.1's I, not a range — the command
                        # being run per matching line is a Normal-mode
                        # one, invoked via :normal, covered in §1.5)
 :g/pattern/s/x/y/      # for every matching line, ALSO run a substitution
@@ -179,16 +179,16 @@ only lines matching this pattern, delete everything else" — rather than
 ### 1.5 `:normal` — running a Normal-mode command from Ex mode
 
 ```
-:normal Ix        # run "insert x at start of line" (Demo 23's I) as if
+:normal Ix        # run "insert x at start of line" (Demo M06-01's I) as if
                    # typed in Normal mode, against the current line
-:1,5normal A;      # run "append ; at end of line" (Demo 23's A) against
+:1,5normal A;      # run "append ; at end of line" (Demo M06-01's A) against
                    # lines 1 through 5
 :g/pattern/normal A;   # combine with :g — append ; to the end of every
                        # line matching pattern, anywhere in the file
 ```
 
 `:normal` is the bridge between Ex mode's range/pattern addressing and
-Normal mode's operator+motion vocabulary from Demo 23 — anything you
+Normal mode's operator+motion vocabulary from Demo M06-01 — anything you
 already know how to do to one line with ordinary Normal-mode keystrokes,
 `:normal` lets you apply to an entire range or every pattern-matched line
 at once, without recording a macro.
@@ -203,13 +203,13 @@ For straightforward per-line edits that don't change the total line count
 
 ### 1.6 Ex-mode ranges vs. a Vim macro — when to reach for which
 
-Demo 23 covered macros (`qa`...`q`, `N@a`) as the tool for "repeat this
+Demo M06-01 covered macros (`qa`...`q`, `N@a`) as the tool for "repeat this
 exact sequence of keystrokes N times." Ex-mode range commands are a better
 fit whenever the edit can be expressed as "for lines matching X, do Y" —
 which is most repetitive edits — because you state the *rule* once
 (`:g/pattern/command`) rather than recording a specific sequence and
 trusting it to replay correctly against lines that might not all share
-the same structure (the exact failure mode in Demo 23's macro Break-Fix).
+the same structure (the exact failure mode in Demo M06-01's macro Break-Fix).
 A macro remains the better fit only when the edit genuinely can't be
 expressed as a pattern-plus-command rule — e.g., an edit that depends on
 something a pattern can't capture, like "the third occurrence specifically,
@@ -250,7 +250,7 @@ vim /tmp/exmode-b.txt
 ```
 
 Run `:%s/ERROR/WARN/g` and confirm both matching lines change. Undo, then
-compare directly against the shell equivalent from Demo 20:
+compare directly against the shell equivalent from Demo M05-07:
 
 ```bash
 sed -i 's/ERROR/WARN/g' /tmp/exmode-b.txt
@@ -281,7 +281,7 @@ vim /tmp/exmode-d.txt
 
 Run `:g/TODO/s/TODO/DONE/` and confirm only the `TODO` lines change, in
 place, leaving the `keep this` lines untouched. Undo, then run
-`:g/TODO/normal A !!!` (append `!!!`, via `:normal`'s use of Demo 23's `A`)
+`:g/TODO/normal A !!!` (append `!!!`, via `:normal`'s use of Demo M06-01's `A`)
 and confirm `!!!` is appended to the end of every `TODO` line only.
 
 ### Task 5 — Recognize the Ex-range vs. macro boundary
@@ -289,7 +289,7 @@ and confirm `!!!` is appended to the end of every `TODO` line only.
 You need to prefix every line containing the word `WARNING` with `# ` —
 in a file where `WARNING` lines are scattered unpredictably throughout,
 mixed in with many other lines. Per §1.6, would you reach for a Vim macro
-(Demo 23) or an Ex-mode `:g` command here, and what specifically makes
+(Demo M06-01) or an Ex-mode `:g` command here, and what specifically makes
 one a better fit than the other for this particular case?
 
 ## What You Learned
@@ -297,7 +297,7 @@ one a better fit than the other for this particular case?
 - ✅ Addressed a range of lines explicitly instead of relying on cursor
   position
 - ✅ Used `:%s/pattern/replacement/flags` and connected it directly to
-  Demo 20's `sed` substitution syntax
+  Demo M05-07's `sed` substitution syntax
 - ✅ Used `:g/pattern/command` to run an Ex command against every matching
   line, anywhere in the file
 - ✅ Used `:v` to invert a global command to non-matching lines
@@ -376,7 +376,7 @@ before any unwanted changes were made.
 
 **Incident 2:** `:g/pattern/command` matches `pattern` as a substring
 search against each line's full text by default, the same way a bare
-regex without anchors matches anywhere it appears (Demo 17's unanchored
+regex without anchors matches anywhere it appears (Demo M05-01's unanchored
 default matching) — it does not restrict matching to whole words or to
 any particular position on the line. `"tmp"` matched inside `"attempt"`
 because `attempt` literally contains the three characters `t`, `m`, `p`
@@ -387,7 +387,7 @@ example, anchoring to the actual file path it was meant to match
 (`:g/\/tmp\//d` to match only the literal path segment `/tmp/`), or using
 a word-boundary-aware pattern if the intent really was the standalone word
 `tmp` specifically (the same `\<tmp\>`-style boundary concept from Demo
-17/18's whole-word matching). The general lesson: `:g`'s pattern matching
+M05-01/18's whole-word matching). The general lesson: `:g`'s pattern matching
 is exactly as literal and unanchored as any other regex-based tool
 covered in this series — it matches what the pattern actually says, not
 what the person writing it was specifically picturing, and vague patterns
@@ -408,7 +408,7 @@ wrong, or run further Ex/Normal-mode commands against the same buffer
 right after — while `sed -i` edits the file directly from the shell,
 outside any interactive editing session, which is the better fit when the
 change needs to be scripted, unattended, or applied identically across
-many files (Demo 23 §1.7's Vim-vs-sed boundary, applied here to Ex-mode
+many files (Demo M06-01 §1.7's Vim-vs-sed boundary, applied here to Ex-mode
 specifically).
 
 ---
@@ -417,7 +417,7 @@ specifically).
 
 A macro would need to be recorded against one specific line's structure
 and then trusted to replay correctly across all 500 lines — exactly the
-failure mode Demo 23's macro Break-Fix demonstrated, where lines that
+failure mode Demo M06-01's macro Break-Fix demonstrated, where lines that
 don't match the recorded assumption produce silently wrong results.
 `:g/DEBUG/d` instead states the actual rule directly — "for every line
 matching this pattern, delete it" — and Vim finds and acts on every
@@ -434,10 +434,10 @@ match the pattern," the inverse of plain `:g/pattern/command`.
 
 ---
 
-**Q4. Why does `:normal` matter as a bridge between Ex mode and what Demo 23 already taught, rather than being a separate thing to memorize from scratch?**
+**Q4. Why does `:normal` matter as a bridge between Ex mode and what Demo M06-01 already taught, rather than being a separate thing to memorize from scratch?**
 
 `:normal` doesn't introduce new editing capability of its own — it lets
-any Normal-mode keystroke sequence you already know from Demo 23 (motions,
+any Normal-mode keystroke sequence you already know from Demo M06-01 (motions,
 operators, `I`/`A`, etc.) run against an Ex-mode range or every
 pattern-matched line from `:g`, instead of being limited to wherever the
 cursor currently sits. It's the connective piece that makes Ex mode's
@@ -449,7 +449,7 @@ together, rather than being two entirely separate skill sets.
 ## Key Takeaways
 
 1. **Ex-mode commands address lines by explicit range or pattern match,
-   not by cursor position — the opposite model from Demo 23's Normal-mode
+   not by cursor position — the opposite model from Demo M06-01's Normal-mode
    commands.** `:{range}{command}` is the general shape everything else in
    this demo builds on.
 2. **`:%s/old/new/g` is Vim's version of `sed`'s `s///g`, sharing a common
@@ -469,11 +469,11 @@ together, rather than being two entirely separate skill sets.
    matching, opposite selection (non-matching lines instead of matching
    ones).**
 6. **`:normal` bridges Ex-mode range/pattern addressing with Normal-mode's
-   editing vocabulary from Demo 23** — anything you can already do to one
+   editing vocabulary from Demo M06-01** — anything you can already do to one
    line with ordinary keystrokes, `:normal` lets you apply across a whole
    range or every pattern match at once.
 7. **`:g`'s pattern matching is exactly as literal and unanchored as any
-   other regex tool in this series (Demo 17/18) — it matches substrings,
+   other regex tool in this series (Demo M05-01/18) — it matches substrings,
    not intentions.** A pattern like `tmp` matches inside `attempt` just as
    readily as it matches a standalone word; scope patterns as precisely
    as the actual intent requires.
@@ -509,28 +509,28 @@ together, rather than being two entirely separate skill sets.
 
 ## Appendix A — Anki Cards
 
-**`23b-vim-ex-mode-anki.csv`:**
+**`m06-03-vim-ex-mode-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 6 - Editors::Demo 23b - Vim Ex-Mode
+#deck:Linux Mastery::Module 6 - Editors::Demo M06-03 - Vim Ex-Mode
 #separator:Comma
 #columns:Front,Back,Tags
-"What's the general shape of an Ex-mode command, and how does it differ from how Demo 23's Normal-mode commands operate?","{range}{command} — Ex-mode commands address lines by explicit range or pattern match first, then act on all of them at once. Normal-mode commands (Demo 23) instead act on wherever the cursor already is.","demo23b,exmode,fundamentals,cross-demo"
+"What's the general shape of an Ex-mode command, and how does it differ from how Demo M06-01's Normal-mode commands operate?","{range}{command} — Ex-mode commands address lines by explicit range or pattern match first, then act on all of them at once. Normal-mode commands (Demo M06-01) instead act on wherever the cursor already is.","demo23b,exmode,fundamentals,cross-demo"
 "Why does :%s/old/new/g use almost identical syntax to sed's s/old/new/g?","Both descend from the ed line editor's original command language — the s command, the pattern/replacement syntax, the g flag, and even backreferences (\\1, \\2) transfer directly between the two.","demo23b,exmode,sed,cross-demo"
 "What's the difference between :s/old/new/ and :%s/old/new/, and why is mixing them up dangerous?","A bare :s affects only the current line. :%s (% = the whole file, shorthand for :1,$) affects every line. The difference is a single character with a large blast radius — an engineer meaning to fix one line can accidentally change the entire file by typing % out of habit.","demo23b,exmode,substitution,common-mistake"
 "What does the c flag do in :%s/old/new/gc, and when is it worth using?","Forces a per-match y/n/a confirmation prompt before each replacement. Worth using whenever you're not fully confident every match in the file should actually change — it catches an over-broad or accidental whole-file substitution before any unwanted changes are made.","demo23b,exmode,substitution,best-practice"
 "What does :g/pattern/command actually do, mechanically, and how is this different from how a Vim macro works?","It first finds every line matching pattern across the whole file, then runs command against each match. A macro instead replays a fixed recorded keystroke sequence N times, assuming every targeted line shares the same structure — :g has no such assumption, since matching happens before any editing does.","demo23b,exmode,global-command,macros,cross-demo"
 "What is :v, and what's its relationship to :g?",":v is documented shorthand for :g! — both mean 'run this command against every line that does NOT match the pattern,' the inverse of plain :g/pattern/command.","demo23b,exmode,global-command"
-"What does :normal let you do that plain Ex-mode range/pattern commands alone cannot?","It runs an actual Normal-mode keystroke sequence (anything from Demo 23 — motions, operators, I/A, etc.) against an Ex-mode range or every :g pattern match, bridging the two editing models instead of keeping them separate.","demo23b,exmode,normal-command,cross-demo"
+"What does :normal let you do that plain Ex-mode range/pattern commands alone cannot?","It runs an actual Normal-mode keystroke sequence (anything from Demo M06-01 — motions, operators, I/A, etc.) against an Ex-mode range or every :g pattern match, bridging the two editing models instead of keeping them separate.","demo23b,exmode,normal-command,cross-demo"
 "A :g/tmp/d command deletes more lines than intended, including ones containing the word 'attempt.' Why?","Ex-mode pattern matching is unanchored substring matching by default (same as any regex tool in this series) — 'tmp' matches literally anywhere those three characters appear in sequence, including inside 'attempt.' The pattern needs to be made more specific (e.g. anchored to the actual intended text) to avoid this.","demo23b,exmode,pattern-matching,common-mistake,cross-demo"
 ```
 
 ## Appendix B — Quiz
 
-**`23b-vim-ex-mode-quiz.md`:**
+**`m06-03-vim-ex-mode-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 23b: Vim Ex-Mode: Line-Range Command Editing
+# Quiz — Demo M06-03: Vim Ex-Mode: Line-Range Command Editing
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to Demo 24.
@@ -586,7 +586,7 @@ a Vim macro operates?
 <summary>Answer</summary>
 
 **B** — This is the structural reason `:g` avoids the exact failure mode
-Demo 23's macro Break-Fix demonstrated (a macro silently producing wrong
+Demo M06-01's macro Break-Fix demonstrated (a macro silently producing wrong
 results on lines that don't match its recorded assumption).
 
 </details>
@@ -623,7 +623,7 @@ command against every line that does NOT match the pattern."
 
 **A** — Ex-mode pattern matching follows the same unanchored,
 substring-based default as every other regex tool in this series (Demo
-17/18) — the pattern has no way to distinguish a standalone word from any
+M05-01/18) — the pattern has no way to distinguish a standalone word from any
 occurrence of the same characters inside a longer word, unless the
 pattern itself is written to require that.
 
@@ -638,7 +638,7 @@ which it explicitly is not without additional pattern syntax.
 `:1,5normal Ix`?
 
 - A) It only works on line 1, ignoring the rest of the range
-- B) It runs the Normal-mode command "insert x at the start of the line" (Demo 23's `I`) against each line from 1 to 5
+- B) It runs the Normal-mode command "insert x at the start of the line" (Demo M06-01's `I`) against each line from 1 to 5
 - C) It inserts the literal text "Ix" once, at the top of the file
 - D) `:normal` cannot be combined with a range — this syntax is invalid
 

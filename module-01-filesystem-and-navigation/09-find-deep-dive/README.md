@@ -1,4 +1,4 @@
-# Demo 02a — `find` in Depth
+# Demo M01-09 — `find` in Depth
 
 ## Overview
 
@@ -33,10 +33,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-02a-find-deep-dive/
-├── README.md                              # this file
-├── 02a-find-deep-dive-anki.csv        # Anki flashcard deck
-└── 02a-find-deep-dive-quiz.md         # standalone quiz
+09-find-deep-dive/
+├── README.md                       # this file
+├── m01-09-find-deep-dive-anki.csv  # Anki flashcard deck
+└── m01-09-find-deep-dive-quiz.md   # standalone quiz
 ```
 
 ---
@@ -52,7 +52,7 @@ install needed.
 
 ---
 
-## Recall Check — Demo 02
+## Recall Check — Demo M01-08
 
 Before starting, answer from memory:
 
@@ -171,7 +171,7 @@ find . -name "*.txt" -exec echo "batched:" {} +
 
 **Why this matters beyond style:** `\;` spawns a new process per
 match — correct but slow for thousands of files. `+` batches them,
-the same performance idea as `xargs` batching from Demo 00b. For a
+the same performance idea as `xargs` batching from Demo M01-02. For a
 command that can accept multiple filenames at once (`rm`, `chmod`,
 `grep -l`), `+` is almost always the better choice; `\;` is
 necessary only when the command genuinely needs to run once per
@@ -405,7 +405,7 @@ exactly the intended file set, and only then switched to `-delete`.
 
 1. **`find` evaluates a chain of tests combined with implicit AND — it's a small query language, not an independent flag list.** Every test in the expression narrows the match set together.
 2. **`-prune` stops descent into a directory entirely — confirmed directly that pruned content is never visited, not filtered out after the fact.** It must be combined with `-o ... -print` or nothing prints for the rest of the tree.
-3. **`-exec cmd {} \;` runs once per match; `-exec cmd {} +` batches all matches into as few invocations as possible — confirmed directly, and this is the same performance principle behind `xargs` batching from Demo 00b.**
+3. **`-exec cmd {} \;` runs once per match; `-exec cmd {} +` batches all matches into as few invocations as possible — confirmed directly, and this is the same performance principle behind `xargs` batching from Demo M01-02.**
 4. **`-delete` executes exactly what the rest of the expression matched, with no independent judgment — always preview with `-print` before ever swapping to `-delete`,** especially after any edit to the filters.
 5. **`find -exec +` and `find | xargs` solve the same batching problem — reach for `-exec +` when a plain batched command is enough, and `xargs` when you need its extra features (`-P` parallelism, `-I` repositioning).**
 6. **`-mtime` counts in whole days; `-newer` compares directly against another file's actual timestamp** — more precise when the boundary you care about isn't a clean day count.
@@ -437,10 +437,10 @@ exactly the intended file set, and only then switched to `-delete`.
 
 ## Appendix A — Anki Cards
 
-**`02a-find-deep-dive-anki.csv`:**
+**`m01-09-find-deep-dive-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 02a - find in Depth
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo M01-09 - find in Depth
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -469,12 +469,12 @@ exactly the intended file set, and only then switched to `-delete`.
 
 ## Appendix B — Quiz
 
-**`02a-find-deep-dive-quiz.md`:**
+**`m01-09-find-deep-dive-quiz.md`:**
 
 ```
-# Quiz — Demo 02a: find in Depth
+# Quiz — Demo M01-09: find in Depth
 
-> One correct answer per question. Target: 80% before Demo 03.
+> One correct answer per question. Target: 80% before Demo M01-10.
 
 ---
 
@@ -623,7 +623,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 03 |
+| 7/7 | Import Anki cards, move to Demo M01-10 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

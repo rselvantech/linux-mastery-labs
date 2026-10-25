@@ -1,8 +1,8 @@
-# Demo 13 — Topology & Traffic Distribution
+# Demo M03-04 — Topology & Traffic Distribution
 
 ## Overview
 
-Demo 12 covered diagnosing and filtering traffic on a single machine. This
+Demo M03-02 covered diagnosing and filtering traffic on a single machine. This
 demo zooms out: how traffic gets routed across multiple networks, how two
 physical interfaces can act as one for redundancy or bandwidth, and how one
 public-facing address can distribute load across many backend servers. These
@@ -26,10 +26,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-13-topology-traffic-distribution/
-├── README.md                                  # this file
-├── 13-topology-traffic-distribution-anki.csv  # Anki flashcard deck
-└── 13-topology-traffic-distribution-quiz.md   # standalone quiz
+04-topology-traffic-distribution/
+├── README.md                                      # this file
+├── m03-04-topology-traffic-distribution-anki.csv  # Anki flashcard deck
+└── m03-04-topology-traffic-distribution-quiz.md   # standalone quiz
 ```
 
 ---
@@ -45,7 +45,7 @@ By the end of this demo you will be able to:
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 12.
+> Answer from memory before reading further. From Demo M03-02.
 
 1. A firewall rule allows a port, but the service is still unreachable
    from another machine. `ss -tulpn` shows it on `127.0.0.1:PORT`. What's the
@@ -80,7 +80,7 @@ By the end of this demo you will be able to:
 
 ### 1.1 Static routing beyond the default gateway
 
-Demo 11 covered the default gateway — where traffic goes when nothing more
+Demo M03-01 covered the default gateway — where traffic goes when nothing more
 specific matches. Real topologies often need routes to *specific* networks
 that shouldn't go through the default gateway at all:
 
@@ -179,7 +179,7 @@ Once bridged, `eth1` no longer has its own independent IP identity for
 routing purposes — traffic addressed to devices on `eth1`'s segment is
 switched, not routed, through the bridge.
 
-> ⚠️ [VERIFY] Confirmed directly (Demo 13a's full build): bridge creation,
+> ⚠️ [VERIFY] Confirmed directly (Demo M03-05's full build): bridge creation,
 > attachment, and forwarding-state confirmation, exactly as shown here,
 > were built and verified live with a real bridged connection — see Demo
 > 13a for the complete walkthrough, including proof of MAC learning via
@@ -699,10 +699,10 @@ about at scale.
 
 ## Appendix A — Anki Cards
 
-**`13-topology-traffic-distribution-anki.csv`:**
+**`m03-04-topology-traffic-distribution-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 3 - Networking::Demo 13 - Topology & Traffic Distribution
+#deck:Linux Mastery::Module 3 - Networking::Demo M03-04 - Topology & Traffic Distribution
 #separator:Comma
 #columns:Front,Back,Tags
 "Two overlapping static routes exist: a /16 and a more specific /24 for an address within that range. Which route does the kernel use?","The /24 route — the kernel uses longest-prefix match, always preferring the more specific route regardless of which was added first.","demo13,routing,longest-prefix-match"
@@ -721,13 +721,13 @@ about at scale.
 
 ## Appendix B — Quiz
 
-**`13-topology-traffic-distribution-quiz.md`:**
+**`m03-04-topology-traffic-distribution-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 13: Topology & Traffic Distribution
+# Quiz — Demo M03-04: Topology & Traffic Distribution
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 14.
+> Target: 80% or above before moving to Demo M04-01.
 
 ---
 
@@ -869,7 +869,7 @@ Trap: A wrongly claims equivalence; C and D both invent behavior neither header 
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 14 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M04-01 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

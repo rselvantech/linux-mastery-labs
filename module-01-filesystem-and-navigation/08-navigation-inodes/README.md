@@ -1,8 +1,8 @@
-# Demo 02 — Navigation, File Operations & Inodes
+# Demo M01-08 — Navigation, File Operations & Inodes
 
 ## Overview
 
-In Demo 01 you learned the map — what lives where in the Linux
+In Demo M01-07 you learned the map — what lives where in the Linux
 filesystem. In this demo you learn to move through that map and work
 with files confidently. Navigation, file creation, copying, moving,
 deletion, timestamps, and links are actions you perform hundreds of
@@ -40,10 +40,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-02-navigation-inodes/
-├── README.md                            # this file
-├── 02-navigation-inodes-anki.csv        # Anki flashcard deck
-└── 02-navigation-inodes-quiz.md         # standalone quiz
+08-navigation-inodes/
+├── README.md                          # this file
+├── m01-08-navigation-inodes-anki.csv  # Anki flashcard deck
+└── m01-08-navigation-inodes-quiz.md   # standalone quiz
 ```
 
 ---
@@ -65,7 +65,7 @@ output will be identical for these tasks.
 ## Recall Check
 
 > Answer these from memory before reading further.
-> These are from Demo 01.
+> These are from Demo M01-07.
 
 1. A service's socket file is missing after a server reboot.
    The socket lived in `/run/myapp/`. Why is it missing and
@@ -333,7 +333,7 @@ If a process creates millions of tiny files (email servers, caches,
 temp files), you can run out of inodes before running out of disk
 space. `df -i` shows inode usage. `df -h` will show disk space
 available but `df -i` shows 100% — no more files can be created
-even though disk has space. We cover `df` fully in Demo 14
+even though disk has space. We cover `df` fully in Demo M04-01
 (Storage Fundamentals).
 
 ### 1.6 File timestamps — atime, mtime, ctime
@@ -1056,7 +1056,7 @@ Until both are true the kernel keeps the inode and blocks
 allocated. `lsof | grep deleted` finds exactly these files —
 gone at the directory level, still alive at the inode level.
 
-This is covered in full in Demo 14 (Storage Fundamentals).
+This is covered in full in Demo M04-01 (Storage Fundamentals).
 
 **4. Fix:**
 
@@ -1185,10 +1185,10 @@ are removed AND no process has it open.
 
 ## Appendix A — Anki Cards
 
-**`02-navigation-inodes-anki.csv`:**
+**`m01-08-navigation-inodes-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 02 - Navigation & Inodes
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo M01-08 - Navigation & Inodes
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -1221,13 +1221,13 @@ are removed AND no process has it open.
 
 ## Appendix B — Quiz
 
-**`02-navigation-inodes-quiz.md`:**
+**`m01-08-navigation-inodes-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 02: Navigation, File Operations & Inodes
+# Quiz — Demo M01-08: Navigation, File Operations & Inodes
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 03.
+> Target: 80% or above before moving to Demo M01-10.
 
 ---
 
@@ -1401,7 +1401,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 03 |
+| 7/7 | Import Anki cards, move to Demo M01-10 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

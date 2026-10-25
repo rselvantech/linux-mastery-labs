@@ -1,12 +1,12 @@
-# Demo 23a — vimdiff: Visual Diff & Merge Workflows
+# Demo M06-02 — vimdiff: Visual Diff & Merge Workflows
 
 ## Overview
 
-Demo 22 gave you `diff`/`patch` — text-based, read top-to-bottom, and
+Demo M05-10 gave you `diff`/`patch` — text-based, read top-to-bottom, and
 genuinely the right tool for scripted, reproducible transformations. But
 when you're actually deciding *which* change to keep, side-by-side and
 interactive beats reading a unified diff hunk by hunk. `vimdiff` is Vim's
-built-in diff mode: the same file-comparison problem Demo 22 solved with
+built-in diff mode: the same file-comparison problem Demo M05-10 solved with
 text output, now solved with synchronized, colored, interactive windows
 you can act on directly — and it's the same tool `git mergetool` reaches
 for by default. This demo covers reading a diff-mode display, navigating
@@ -22,15 +22,15 @@ a 3-way merge.
    windows, and explain the direction each one moves in
 4. Set up and resolve a simplified 3-way merge (base/local/remote)
 5. Explain when `vimdiff` is the right tool versus `patch`/scripted
-   resolution from Demo 22
+   resolution from Demo M05-10
 
 ## Directory Structure
 
 ```
-23a-vimdiff/
-├── README.md                  # this file
-├── 23a-vimdiff-anki.csv        # Anki flashcard deck
-└── 23a-vimdiff-quiz.md         # standalone quiz
+02-vimdiff/
+├── README.md                # this file
+├── m06-02-vimdiff-anki.csv  # Anki flashcard deck
+└── m06-02-vimdiff-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -39,7 +39,7 @@ a 3-way merge.
 |---|---|---|---|
 | All lab tasks | ✅ (`vim` preinstalled or `sudo apt install vim`) | ✅ (`vi`/`vim` preinstalled or `sudo dnf install vim`) | Not required |
 
-> **Verification note:** As with Demo 23, this sandbox has no network
+> **Verification note:** As with Demo M06-01, this sandbox has no network
 > access to install Vim, so nothing in this demo could be captured from a
 > live session here. Most of what follows (diff-mode highlighting, `]c`/
 > `[c` navigation, the general shape of a 3-way layout) is long-stable,
@@ -50,9 +50,9 @@ a 3-way merge.
 > confirmed on a real Ubuntu/Rocky9 machine before being treated as
 > fully confirmed fact.
 
-## Recall Check — 23-vim-neovim
+## Recall Check — 01-vim-neovim
 
-Answer these from memory before continuing — no looking back at Demo 23.
+Answer these from memory before continuing — no looking back at Demo M06-01.
 
 1. What's the difference between the unnamed register and `"0`, and why
    does that matter after an unrelated `dd`?
@@ -84,9 +84,9 @@ Answer these from memory before continuing — no looking back at Demo 23.
 
 ## Part 1 — Concepts
 
-### 1.1 Why vimdiff, when Demo 22 already covered diff/patch
+### 1.1 Why vimdiff, when Demo M05-10 already covered diff/patch
 
-Unified diff output (Demo 22) is optimized for scripting and for a quick
+Unified diff output (Demo M05-10) is optimized for scripting and for a quick
 read of *what* changed. It's not optimized for *deciding* what to do about
 it when both sides have independently valid changes and a human needs to
 pick, or combine, them. `vimdiff` puts the files side by side as real,
@@ -149,7 +149,7 @@ commands manage this directly:
 [c    # jump to the previous difference (backward)
 ```
 
-This is the diff-mode equivalent of `n`/`N` after a search (Demo 23,
+This is the diff-mode equivalent of `n`/`N` after a search (Demo M06-01,
 §1.2) — a dedicated motion for jumping directly between the things you
 actually care about, instead of scrolling manually past folded, identical
 blocks to find the next real difference.
@@ -166,7 +166,7 @@ dp    # diff put — push the difference FROM the current window
 Think of it from the current window's point of view: `do` brings a change
 *in* (obtain), `dp` sends a change *out* (put). Both operate on whichever
 diff hunk the cursor is currently positioned inside — same "act on what
-the cursor is on" principle as Demo 23's operator+motion commands, just
+the cursor is on" principle as Demo M06-01's operator+motion commands, just
 scoped to a diff hunk instead of a word or line.
 
 Because `do`/`dp` move content in opposite directions and the difference
@@ -198,7 +198,7 @@ choose one (`local.conf`) as the file we'll edit and save as the merged
 result — the underlying `do`/`dp` mechanics are identical either way, just
 without a dedicated fourth "output" window.
 
-Unlike `diff3` (Demo 22), plain `vimdiff` does not automatically detect
+Unlike `diff3` (Demo M05-10), plain `vimdiff` does not automatically detect
 or flag a genuine three-way conflict with a `====`-style marker — it
 shows you all three versions' differences and leaves the judgment of
 what's a real conflict entirely to you.
@@ -207,12 +207,12 @@ what's a real conflict entirely to you.
 
 `vimdiff` earns its place when a human needs to look at competing changes
 and decide — pick one side, combine parts of both, or rewrite something
-neither side got quite right. `patch` (Demo 22) earns its place when the
+neither side got quite right. `patch` (Demo M05-10) earns its place when the
 change is already fully decided and just needs to be applied identically,
 possibly unattended, possibly across many files. Reach for `vimdiff` when
 resolving is a judgment call; reach for `patch`/a scripted diff-apply when
 the resolution is already known and repeatable — the same underlying
-distinction Demo 23 drew between Vim macros and `sed`/`awk`, applied here
+distinction Demo M06-01 drew between Vim macros and `sed`/`awk`, applied here
 to merging instead of editing.
 
 ## Part 2 — Hands-On Lab
@@ -253,7 +253,7 @@ do
 ```
 
 Confirm `vdiff-a.txt`'s window now shows "line TWO changed" too — the
-difference was pulled in from the other window. Undo (`u`, Demo 23 §1.1),
+difference was pulled in from the other window. Undo (`u`, Demo M06-01 §1.1),
 then instead move the cursor to the "new line five" hunk while
 `vdiff-b.txt`'s window is current, and run:
 
@@ -297,7 +297,7 @@ cat /tmp/local.conf
 
 ### Task 4 — Recognize the vimdiff-vs-patch boundary
 
-You have a `.patch` file (Demo 22 format) representing a fully-decided,
+You have a `.patch` file (Demo M05-10 format) representing a fully-decided,
 already-reviewed configuration change that needs to go out identically to
 30 servers overnight, unattended. Separately, you have two engineers'
 independently-modified copies of the same config file, and someone needs
@@ -315,7 +315,7 @@ per §1.6?
 - ✅ Set up and resolved a simplified 3-way merge across base/local/remote
   versions of a file
 - ✅ Explained when `vimdiff` is the right tool versus `patch`/scripted
-  resolution from Demo 22
+  resolution from Demo M05-10
 
 ## Part 3 — Break-Fix Scenario
 
@@ -347,7 +347,7 @@ Tasks:
 2. What should the engineer have confirmed before running either command,
    given that `do` and `dp` move content in opposite directions?
 3. Is the original local content still recoverable using anything covered
-   in Demo 23 or this demo?
+   in Demo M06-01 or this demo?
 
 **Incident 2 — stale diff highlighting after an external edit**
 
@@ -383,9 +383,9 @@ running either command, which window was actually current and which
 direction the specific command they were about to run would move content
 — not assumed based on left/right screen position. If the original edit
 was made recently in the same session and not yet saved over multiple
-times, `u` (undo, Demo 23 §1.1) is the direct recovery path; if it was
+times, `u` (undo, Demo M06-01 §1.1) is the direct recovery path; if it was
 already saved and overwritten, and was yanked into `"0` or a named
-register at some point before the mistake, those registers (Demo 23 §1.5)
+register at some point before the mistake, those registers (Demo M06-01 §1.5)
 could still hold it — but neither is guaranteed once a save has already
 happened and the buffer's undo history has moved past the point of loss.
 
@@ -415,7 +415,7 @@ complex conflict. `vimdiff` presents the same information as synchronized,
 navigable windows with `]c`/`[c` to jump straight to each actual
 difference and `do`/`dp` to transfer content directly, rather than
 retyping a resolution by hand — the same efficiency argument as Vim's
-operator+motion grammar (Demo 23), applied to merging instead of editing.
+operator+motion grammar (Demo M06-01), applied to merging instead of editing.
 
 ---
 
@@ -435,7 +435,7 @@ not `do` from the window they wanted to protect.
 **Q3. Why doesn't `vimdiff` automatically flag a "conflict" the way `diff3` does with its `====` marker, even in a 3-way base/local/remote setup?**
 
 `vimdiff` shows differences between windows — it's a display and
-navigation tool, not a conflict-resolution algorithm. `diff3` (Demo 22)
+navigation tool, not a conflict-resolution algorithm. `diff3` (Demo M05-10)
 specifically computes whether both non-base versions changed the *same*
 content differently from the ancestor, and flags that case explicitly.
 Plain `vim -d` across three files gives you the same three versions
@@ -456,7 +456,7 @@ window's actual current on-disk content.
 
 ## Key Takeaways
 
-1. **`vimdiff` solves the same comparison problem as Demo 22's `diff`, but
+1. **`vimdiff` solves the same comparison problem as Demo M05-10's `diff`, but
    for judgment-based decisions instead of scripted, reproducible ones.**
    Reach for `vimdiff` when a human needs to look at competing changes and
    decide; reach for `patch` when the resolution is already fully decided
@@ -466,7 +466,7 @@ window's actual current on-disk content.
    filler lines keep both windows aligned line-for-line; `:diffupdate`
    forces a recompute when a file changes outside the current session.
 3. **`]c`/`[c` jump directly between actual differences**, the same way
-   `n`/`N` jump between search matches (Demo 23) — no manual scrolling
+   `n`/`N` jump between search matches (Demo M06-01) — no manual scrolling
    through folded, identical content required.
 4. **`do` obtains (pulls in from the other window); `dp` puts (pushes out
    to the other window) — opposite directions, and mixing them up
@@ -512,28 +512,28 @@ window's actual current on-disk content.
 
 ## Appendix A — Anki Cards
 
-**`23a-vimdiff-anki.csv`:**
+**`m06-02-vimdiff-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 6 - Editors::Demo 23a - vimdiff
+#deck:Linux Mastery::Module 6 - Editors::Demo M06-02 - vimdiff
 #separator:Comma
 #columns:Front,Back,Tags
-"What problem does vimdiff solve that Demo 22's unified diff output doesn't?","Unified diff is optimized for scripting and quickly reading what changed. vimdiff puts both files side by side as real, editable, synchronized windows, letting you act on a specific difference directly instead of manually re-typing a resolution based on reading a hunk.","demo23a,vimdiff,fundamentals"
+"What problem does vimdiff solve that Demo M05-10's unified diff output doesn't?","Unified diff is optimized for scripting and quickly reading what changed. vimdiff puts both files side by side as real, editable, synchronized windows, letting you act on a specific difference directly instead of manually re-typing a resolution based on reading a hunk.","demo23a,vimdiff,fundamentals"
 "When is the diff shown by vimdiff actually computed? What does NOT trigger a recompute?","Once, when the windows are set up (or last explicitly refreshed) — not continuously. An external process changing one of the files on disk does NOT trigger an automatic recompute; the highlighting stays stale until :diffupdate is run.","demo23a,vimdiff,diffupdate"
-"What do ]c and [c do, and what's the closest equivalent from Demo 23?","]c jumps to the next difference, [c to the previous one — the diff-mode equivalent of n/N repeating a search (Demo 23, §1.2), letting you jump directly between things you care about instead of scrolling manually.","demo23a,vimdiff,navigation,cross-demo"
+"What do ]c and [c do, and what's the closest equivalent from Demo M06-01?","]c jumps to the next difference, [c to the previous one — the diff-mode equivalent of n/N repeating a search (Demo M06-01, §1.2), letting you jump directly between things you care about instead of scrolling manually.","demo23a,vimdiff,navigation,cross-demo"
 "What's the difference between do and dp, and why does mixing them up cause real damage?","do (obtain) pulls a difference IN from the other window; dp (put) pushes a difference OUT to the other window — opposite directions. Running the wrong one from the wrong window can silently overwrite a good change with stale content from the other side.","demo23a,vimdiff,do-dp,common-mistake"
 "Before running do or dp, what should you always confirm, given that they move content in opposite directions?","Which window is currently active (holds the cursor), and which direction the specific command about to be run actually moves content — not assumed from left/right screen position.","demo23a,vimdiff,do-dp,best-practice"
-"Does plain vim -d across three files (base/local/remote) automatically flag a genuine three-way conflict the way diff3 does?","No — unlike diff3 (Demo 22), which explicitly detects when both non-base versions changed the same content differently and flags it with a ==== marker, plain vimdiff only shows the differences between windows and leaves judging what's a real conflict entirely to the person looking at it.","demo23a,vimdiff,3-way-merge,cross-demo"
+"Does plain vim -d across three files (base/local/remote) automatically flag a genuine three-way conflict the way diff3 does?","No — unlike diff3 (Demo M05-10), which explicitly detects when both non-base versions changed the same content differently and flags it with a ==== marker, plain vimdiff only shows the differences between windows and leaves judging what's a real conflict entirely to the person looking at it.","demo23a,vimdiff,3-way-merge,cross-demo"
 "How does git mergetool's actual vimdiff layout typically differ from a plain three-window vim -d base local remote session?","git mergetool typically adds a fourth window, MERGED, spanning the bottom of the screen — the actual file you edit and save as the resolved result — while LOCAL/BASE/REMOTE stay as read-only references above it.","demo23a,vimdiff,git-mergetool,3-way-merge"
-"When should you reach for vimdiff versus patch/a scripted diff-apply for resolving a difference between two files?","vimdiff when a human needs to look at competing changes and make a judgment call — pick, combine, or rewrite. patch/scripted resolution when the change is already fully decided and just needs applying, possibly unattended, possibly across many files — the same underlying distinction as Vim macros vs sed/awk (Demo 23).","demo23a,vimdiff,tool-boundary,cross-demo"
+"When should you reach for vimdiff versus patch/a scripted diff-apply for resolving a difference between two files?","vimdiff when a human needs to look at competing changes and make a judgment call — pick, combine, or rewrite. patch/scripted resolution when the change is already fully decided and just needs applying, possibly unattended, possibly across many files — the same underlying distinction as Vim macros vs sed/awk (Demo M06-01).","demo23a,vimdiff,tool-boundary,cross-demo"
 ```
 
 ## Appendix B — Quiz
 
-**`23a-vimdiff-quiz.md`:**
+**`m06-02-vimdiff-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 23a: vimdiff — Visual Diff & Merge Workflows
+# Quiz — Demo M06-02: vimdiff — Visual Diff & Merge Workflows
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to Demo 24.

@@ -1,4 +1,4 @@
-# Demo 13d — Network Latency & Packet Loss Diagnosis
+# Demo M03-08 — Network Latency & Packet Loss Diagnosis
 
 ## Overview
 
@@ -29,10 +29,10 @@ the same way Module 7 covered CPU steal time.
 ## Directory Structure
 
 ```
-13d-network-latency-packetloss/
-├── README.md                                      # this file
-├── 13d-network-latency-packetloss-anki.csv        # Anki flashcard deck
-└── 13d-network-latency-packetloss-quiz.md         # standalone quiz
+08-network-latency-packetloss/
+├── README.md                                   # this file
+├── m03-08-network-latency-packetloss-anki.csv  # Anki flashcard deck
+└── m03-08-network-latency-packetloss-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -55,10 +55,10 @@ the same way Module 7 covered CPU steal time.
 > (`time_namelookup`, `time_connect`, etc.) is real, captured output from
 > an actual request in this sandbox — not a documentation paraphrase.
 
-## Recall Check — 13b-dns-resolution
+## Recall Check — 06-dns-resolution
 
 Answer these from memory before continuing — no looking back at Demo
-13b.
+M03-06.
 
 **Q1.** An application fails on the first connection to a hostname,
 then succeeds on every later one. What does this pattern suggest?
@@ -237,8 +237,8 @@ that specific phase's actual duration** — here, `time_namelookup`
 handshake; `time_appconnect - time_connect` (~43ms) is TLS negotiation —
 by far the largest single phase in this particular request. This is the
 direct way to answer "where exactly is the time going" for one specific
-request, cross-referencing cleanly against Demo 13b's DNS-latency
-measurement (`time_namelookup` specifically) and Demo 27b's TLS-chain
+request, cross-referencing cleanly against Demo M03-06's DNS-latency
+measurement (`time_namelookup` specifically) and Demo M08-03's TLS-chain
 material (`time_appconnect`) — the same total-latency-breakdown
 discipline, scoped to whichever phase a specific incident actually
 points at.
@@ -454,8 +454,8 @@ easy-to-forget-about problem affecting real traffic afterward.
    steal time.
 6. **`curl`'s timing breakdown shows exactly which phase of a request
    actually took the time** — DNS, TCP connect, TLS negotiation, or
-   transfer — cross-referencing directly against Demo 13b's DNS timing
-   and Demo 27b's TLS-chain material.
+   transfer — cross-referencing directly against Demo M03-06's DNS timing
+   and Demo M08-03's TLS-chain material.
 
 > **Demo scope:** Primary concept: diagnosing network-layer latency and
 > packet loss end to end. Supporting concepts: `tc netem` injection,
@@ -480,10 +480,10 @@ easy-to-forget-about problem affecting real traffic afterward.
 
 ## Appendix A — Anki Cards
 
-**`13d-network-latency-packetloss-anki.csv`:**
+**`m03-08-network-latency-packetloss-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 3 - Networking::Demo 13d - Network Latency & Packet Loss Diagnosis
+#deck:Linux Mastery::Module 3 - Networking::Demo M03-08 - Network Latency & Packet Loss Diagnosis
 #separator:Comma
 #columns:Front,Back,Tags
 "What does tc qdisc add dev eth0 root netem delay 150ms 50ms loss 5% actually do?","Injects 150ms +/-50ms jittered delay and 5% random packet loss on eth0 — simulating a flaky link or noisy-neighbor hypervisor on demand, without needing a real degraded network to test against.","demo13d,netem,fundamentals"
@@ -498,13 +498,13 @@ easy-to-forget-about problem affecting real traffic afterward.
 
 ## Appendix B — Quiz
 
-**`13d-network-latency-packetloss-quiz.md`:**
+**`m03-08-network-latency-packetloss-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 13d: Network Latency & Packet Loss Diagnosis
+# Quiz — Demo M03-08: Network Latency & Packet Loss Diagnosis
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 17b.
+> Target: 80% or above before moving to Demo M05-03.
 
 **Q1. What does `tc qdisc add dev eth0 root netem delay 150ms loss 5%` accomplish?**
 
@@ -630,7 +630,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 17b |
+| 7/7 | Import Anki cards, move to Demo M05-03 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

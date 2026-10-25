@@ -1,8 +1,8 @@
-# Demo 17c — Practical Regex Debugging
+# Demo M05-04 — Practical Regex Debugging
 
 ## Overview
 
-Demo 17 taught regex syntax, 17a added PCRE, and 17b showed that the same
+Demo M05-01 taught regex syntax, 17a added PCRE, and 17b showed that the same
 pattern means different things in different tools. This demo is about the
 moment after that: the pattern is written, and it is wrong. Regex bugs are
 unusual because they almost never produce an error. A bad pattern matches
@@ -31,10 +31,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-17c-practical-regex-debugging/
-├── README.md                                # this file
-├── 17c-practical-regex-debugging-anki.csv   # Anki flashcard deck
-└── 17c-practical-regex-debugging-quiz.md    # standalone quiz
+04-practical-regex-debugging/
+├── README.md                                  # this file
+├── m05-04-practical-regex-debugging-anki.csv  # Anki flashcard deck
+└── m05-04-practical-regex-debugging-quiz.md   # standalone quiz
 ```
 
 ---
@@ -60,7 +60,7 @@ By the end of this demo you will be able to:
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demos 17, 17a, and 17b.
+> Answer from memory before reading further. From Demos M05-01, 17a, and 17b.
 
 1. `sed -n '/user_id=[0-9]+/p' file` prints nothing, but `grep -E
    'user_id=[0-9]+' file` matches. Why, and what are two ways to fix the
@@ -112,7 +112,7 @@ to notice is to look at what actually matched. So the workflow is the skill:
    get 6, a pattern is silently too strict. If you expect 2 and get 7, it
    is too loose.
 5. **Write down the flavor** (BRE, ERE, PCRE) next to the pattern. Half of
-   all "it worked in my terminal" bugs are flavor bugs (Demo 17b).
+   all "it worked in my terminal" bugs are flavor bugs (Demo M05-03).
 
 **A useful visibility trick** works in any `sed`: wrap the whole match in
 markers using `&`, which stands for "whatever the pattern matched". It
@@ -148,7 +148,7 @@ there is no single character to exclude.
 
 **The silent trap:** `.*?` in `grep -E` or `sed -E` produces no error. It
 runs, and returns the greedy result. In POSIX ERE there is no lazy
-quantifier, so the `?` does not make the `*` lazy. This is the Demo 17b
+quantifier, so the `?` does not make the `*` lazy. This is the Demo M05-03
 lesson again: the pattern is valid in both flavors, with different
 meaning.
 
@@ -378,7 +378,7 @@ grep -oE 'msg=".*?"' app.log | sed -n 4p
 ```
 
 Results #1 and #4 are identical. The `?` in #4 did nothing, and `grep`
-raised no complaint. That is the silent flavor trap from Demo 17b in a new
+raised no complaint. That is the silent flavor trap from Demo M05-03 in a new
 costume.
 
 Now the same bug in a **substitution**, where it destroys data instead of
@@ -558,7 +558,7 @@ esac
 ```
 
 Reference: `grep` exits `0` when it found a match, `1` when it ran fine and
-found none, and `2` on an error. Demo 00b introduced `$?`; this is where
+found none, and `2` on an error. Demo M01-02 introduced `$?`; this is where
 getting it wrong costs something.
 
 ### Task 8 — Clean up
@@ -698,7 +698,7 @@ failing command inside an `if` condition does not trigger it.
 **Q1. A pattern works on your sample data but returns wrong results in production. What is your approach?**
 
 First check the flavor: is the production tool the same engine I tested in
-(BRE versus ERE versus PCRE, Demo 17b)? Then reproduce with the actual
+(BRE versus ERE versus PCRE, Demo M05-03)? Then reproduce with the actual
 production line, not a cleaned-up sample, and print only the matched text
 with `grep -o` or a `sed 's/PAT/<<&>>/'` wrapper to see where the match
 begins and ends. The usual culprits are greedy quantifiers swallowing a
@@ -797,10 +797,10 @@ engine never has to give characters back.
 
 ## Appendix A — Anki Cards
 
-**`17c-practical-regex-debugging-anki.csv`:**
+**`m05-04-practical-regex-debugging-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo 17c - Practical Regex Debugging
+#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-04 - Practical Regex Debugging
 #separator:Comma
 #columns:Front,Back,Tags
 "Does grep -c count matches or lines? How do you count total matches?","Lines. A line with two matches counts once. Use grep -o PATTERN FILE | wc -l to count every match.","demo17c,grep,counting"
@@ -821,13 +821,13 @@ engine never has to give characters back.
 
 ## Appendix B — Quiz
 
-**`17c-practical-regex-debugging-quiz.md`:**
+**`m05-04-practical-regex-debugging-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 17c: Practical Regex Debugging
+# Quiz — Demo M05-04: Practical Regex Debugging
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 18.
+> Target: 80% or above before moving to Demo M05-05.
 
 ---
 
@@ -973,7 +973,7 @@ Trap: A assumes `set -e`-style behavior, which doesn't apply to an `if` conditio
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 18 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M05-05 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

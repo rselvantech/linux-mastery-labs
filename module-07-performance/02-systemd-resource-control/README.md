@@ -1,9 +1,9 @@
-# Demo 26b — systemd Resource Control
+# Demo M07-02 — systemd Resource Control
 
 ## Overview
 
-Demo 08 mentioned that systemd unit files support real resource control
-(`MemoryMax=`, `CPUQuota=`) but never built it. Demo 26 gave you
+Demo M02-05 mentioned that systemd unit files support real resource control
+(`MemoryMax=`, `CPUQuota=`) but never built it. Demo M07-01 gave you
 process-level tracing tools for *why* something is slow — this demo gives
 you the tool for *preventing* a service from taking down a host in the
 first place, entirely through systemd unit directives, no kernel-level
@@ -31,10 +31,10 @@ per-host, and that distinction is usually where the confusion starts.
 ## Directory Structure
 
 ```
-26b-systemd-resource-control/
-├── README.md                                      # this file
-├── 26b-systemd-resource-control-anki.csv          # Anki flashcard deck
-└── 26b-systemd-resource-control-quiz.md           # standalone quiz
+02-systemd-resource-control/
+├── README.md                                 # this file
+├── m07-02-systemd-resource-control-anki.csv  # Anki flashcard deck
+└── m07-02-systemd-resource-control-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -58,9 +58,9 @@ per-host, and that distinction is usually where the confusion starts.
 > `MemorySwapMax=0` and fabricated a specific `systemctl show` output line
 > that was never actually observed.
 
-## Recall Check — 26-performance-troubleshooting
+## Recall Check — 01-performance-troubleshooting
 
-Answer these from memory before continuing — no looking back at Demo 26.
+Answer these from memory before continuing — no looking back at Demo M07-01.
 
 1. Why doesn't a high CPU% in `top` necessarily mean the CPU is doing
    proportionally useful work?
@@ -493,7 +493,7 @@ dependable source for the kill event itself.
 6. **This demo deliberately stays at the systemd-directive level, not
    raw cgroup filesystem mechanics** — the practical level almost all
    real day-to-day resource-limiting work actually happens at, closing
-   the loop Demo 08 left open by mentioning this capability without
+   the loop Demo M02-05 left open by mentioning this capability without
    building it.
 
 > **Demo scope:** Primary concept: systemd-directive-level resource
@@ -528,10 +528,10 @@ dependable source for the kill event itself.
 
 ## Appendix A — Anki Cards
 
-**`26b-systemd-resource-control-anki.csv`:**
+**`m07-02-systemd-resource-control-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 7 - Performance::Demo 26b - systemd Resource Control
+#deck:Linux Mastery::Module 7 - Performance::Demo M07-02 - systemd Resource Control
 #separator:Comma
 #columns:Front,Back,Tags
 "What's the practical difference between MemoryHigh= and MemoryMax=?","MemoryHigh= is documented to trigger reclaim/throttling, without killing. MemoryMax= is the hard limit that results in a cgroup OOM-kill. Whether MemoryHigh='s throttling is visible in ordinary logs isn't guaranteed — confirm on your own system.","demo26b,memoryhigh,memorymax,fundamentals"
@@ -540,18 +540,18 @@ dependable source for the kill event itself.
 "When is systemctl show name.service -p MemoryMax,MemoryCurrent reliable evidence, and when is it not?","Reliable while the service is still running, for sampling usage against the limit. Not reliable as after-the-fact evidence of usage at the moment of a kill — once the unit has died its cgroup may no longer exist.","demo26b,systemctl-show,limitation"
 "What does CPUQuota=50% cap, and what would CPUQuota=200% mean on a multi-core host?","50% caps the service's cgroup to half of one CPU core's worth of time. 200% scales to two full cores' worth of time on a multi-core host.","demo26b,cpuquota,fundamentals"
 "Why does this demo stay at the systemd-directive level (MemoryMax=, CPUQuota=) rather than covering raw cgroup filesystem mechanics?","Because that's the practical level almost all day-to-day service resource-limiting actually happens at — systemd translates these directives into real kernel-enforced cgroup limits without needing to manage /sys/fs/cgroup/ paths by hand.","demo26b,scope,fundamentals"
-"What loop does this demo close, and from which earlier demo?","Demo 08 (systemd services) mentioned that unit files support real resource control (MemoryMax=/CPUQuota=) but never built it — this demo builds it.","demo26b,cross-demo,fundamentals"
+"What loop does this demo close, and from which earlier demo?","Demo M02-05 (systemd services) mentioned that unit files support real resource control (MemoryMax=/CPUQuota=) but never built it — this demo builds it.","demo26b,cross-demo,fundamentals"
 ```
 
 ## Appendix B — Quiz
 
-**`26b-systemd-resource-control-quiz.md`:**
+**`m07-02-systemd-resource-control-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 26b: systemd Resource Control
+# Quiz — Demo M07-02: systemd Resource Control
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 26c.
+> Target: 80% or above before moving to Demo M07-03.
 
 ---
 
@@ -672,15 +672,15 @@ vast majority of real operational work.
 
 **Q7.** What loop does this demo explicitly close, and from which earlier demo?
 
-- A) Demo 26's strace/ltrace tracing, which this demo replaces
-- B) Demo 08, which mentioned systemd resource control directives without ever building them
-- C) Demo 09/10's monitoring tools, which this demo deprecates
+- A) Demo M07-01's strace/ltrace tracing, which this demo replaces
+- B) Demo M02-05, which mentioned systemd resource control directives without ever building them
+- C) Demo M02-07/10's monitoring tools, which this demo deprecates
 - D) No earlier demo referenced this topic before now
 
 <details>
 <summary>Answer</summary>
 
-**B** — Demo 08 (systemd services) specifically mentioned `MemoryMax=`/
+**B** — Demo M02-05 (systemd services) specifically mentioned `MemoryMax=`/
 `CPUQuota=` as real unit-file capabilities but never built a working
 example — this demo is that follow-through.
 
@@ -692,7 +692,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 26c |
+| 7/7 | Import Anki cards, move to Demo M07-03 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

@@ -1,8 +1,8 @@
-# Demo 34 — Shell Scripting Advanced
+# Demo M09-02 — Shell Scripting Advanced
 
 ## Overview
 
-Demo 33 built scripts that work when everything goes right. This demo
+Demo M09-01 built scripts that work when everything goes right. This demo
 builds scripts that behave correctly when something goes *wrong* — failing
 loudly instead of limping on with a bad exit code, cleaning up after
 themselves even when interrupted, accepting real command-line flags instead
@@ -17,15 +17,15 @@ yourself and one you'd trust in a production automation pipeline.
 3. Parse command-line flags properly with `getopts`
 4. Use bash arrays for lists of values, not string concatenation
 5. Use here-docs for multi-line text without cluttering the script with `echo` calls
-6. Combine all of the above into a script that calls the grep/sed/awk toolkit from Demos 18–21
+6. Combine all of the above into a script that calls the grep/sed/awk toolkit from Demos M05-05–21
 
 ## Directory Structure
 
 ```
-34-shell-scripting-advanced/
-├── README.md                                  # this file
-├── 34-shell-scripting-advanced-anki.csv       # Anki flashcard deck
-└── 34-shell-scripting-advanced-quiz.md        # standalone quiz
+02-shell-scripting-advanced/
+├── README.md                                 # this file
+├── m09-02-shell-scripting-advanced-anki.csv  # Anki flashcard deck
+└── m09-02-shell-scripting-advanced-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -40,9 +40,9 @@ yourself and one you'd trust in a production automation pipeline.
 > matches exactly what was produced. No `[Unverified]` markers are needed
 > anywhere in this demo.
 
-## Recall Check — 33-shell-scripting-fundamentals
+## Recall Check — 01-shell-scripting-fundamentals
 
-Answer these from memory before continuing — no looking back at Demo 33.
+Answer these from memory before continuing — no looking back at Demo M09-01.
 
 **Q1.** `rm $target_dir/*.tmp` deletes unexpected files when `target_dir`
 is empty. What actually happened, and what's the fix?
@@ -134,7 +134,7 @@ error partway through, not just the "happy path" end of the script.
 ```bash
 trap cleanup EXIT
 trap 'echo "Interrupted!"; cleanup; exit 130' INT TERM
-# INT: Ctrl+C. TERM: a kill signal (Demo 06's signal knowledge applies
+# INT: Ctrl+C. TERM: a kill signal (Demo M02-03's signal knowledge applies
 # directly). Registering a SEPARATE handler for these means the script
 # can do something specifically different on interruption (like logging
 # that it was interrupted) in addition to the same cleanup — and calling
@@ -198,7 +198,7 @@ done
 
 **`"${files[@]}"` (quoted, with `@`) preserves each element as a separate
 word even if an element contains spaces — the array equivalent of Demo
-19/33's quoting lessons.** Using `${files[*]}` instead (or unquoted `${files[@]}`)
+M05-06/33's quoting lessons.** Using `${files[*]}` instead (or unquoted `${files[@]}`)
 collapses multi-word elements incorrectly, the exact same word-splitting
 class of bug already covered for plain variables.
 
@@ -214,7 +214,7 @@ status_by_service["postgres"]="stopped"
 for service in "${!status_by_service[@]}"; do
     echo "$service: ${status_by_service[$service]}"
 done
-# declare -A: an associative array — bash's equivalent of awk's Demo 21
+# declare -A: an associative array — bash's equivalent of awk's Demo M05-08
 # associative arrays, keyed by string rather than only by numeric index.
 ```
 
@@ -255,7 +255,7 @@ template, an email body, a usage message — genuinely more readable than
 many separate `echo "..."` lines, especially once the text itself spans
 more than 3-4 lines.
 
-### 1.6 Bringing it together — scripts that call the Demos 18–21 toolkit
+### 1.6 Bringing it together — scripts that call the Demos M05-05–21 toolkit
 
 A production-grade script rarely does everything itself — it usually
 orchestrates the tools built in earlier demos, with the robustness
@@ -287,9 +287,9 @@ done
 cat "$report_file"
 ```
 
-This one script draws on: `${1:?...}` (Demo 33's fail-loudly pattern),
+This one script draws on: `${1:?...}` (Demo M09-01's fail-loudly pattern),
 `set -euo pipefail`, `trap` for cleanup, an associative array, and `grep
--c` (Demo 18) — the shape of a real, small operational script, not a toy
+-c` (Demo M05-05) — the shape of a real, small operational script, not a toy
 example.
 
 ## Part 2 — Hands-On Lab
@@ -571,7 +571,7 @@ word, even if an element contains spaces — exactly analogous to quoting a
 regular variable to prevent word splitting. `${array[*]}` (or any
 unquoted form) collapses the array into a single string, breaking
 multi-word elements apart incorrectly during iteration, the same class of
-bug covered for plain variables in Demo 33.
+bug covered for plain variables in Demo M09-01.
 
 ---
 
@@ -590,10 +590,10 @@ bug covered for plain variables in Demo 33.
    unconsumed positional argument instead.
 4. **Bash arrays, iterated with `"${arr[@]}"` (quoted, `@`), are the
    correct way to handle lists of values — not string concatenation.**
-   The quoting rules are the same word-splitting lesson from Demo 33,
+   The quoting rules are the same word-splitting lesson from Demo M09-01,
    applied to arrays.
 5. **Associative arrays (`declare -A`) bring the same key-based aggregation
-   pattern from `awk` (Demo 21) into bash scripts directly.**
+   pattern from `awk` (Demo M05-08) into bash scripts directly.**
 6. **A here-doc's delimiter quoting controls expansion entirely — quoted
    (`'EOF'`) is fully literal, unquoted (`EOF`) expands variables and
    command substitution.** Getting this backward is a common source of
@@ -641,10 +641,10 @@ bug covered for plain variables in Demo 33.
 
 ## Appendix A — Anki Cards
 
-**`34-shell-scripting-advanced-anki.csv`:**
+**`m09-02-shell-scripting-advanced-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 9 - Shell Scripting::Demo 34 - Shell Scripting Advanced
+#deck:Linux Mastery::Module 9 - Shell Scripting::Demo M09-02 - Shell Scripting Advanced
 #separator:Comma
 #columns:Front,Back,Tags
 "What specific failure does set -o pipefail catch that plain set -e does not?","A pipeline (cmd1 | cmd2) where an earlier stage fails but a later stage succeeds — without pipefail, the pipeline's exit status is only the LAST command's status, so an early failure is silently masked. pipefail makes the pipeline's exit status reflect the last FAILING command.","demo34,set-e,pipefail,fundamentals"
@@ -653,7 +653,7 @@ bug covered for plain variables in Demo 33.
 "In getopts \"vo:h\", what does the colon after 'o' specifically mean?","That the -o flag REQUIRES an argument, which getopts makes available in $OPTARG. Flags without a colon (v, h here) take no argument.","demo34,getopts,fundamentals"
 "A getopts script defined with option string \"vo\" (no colon) silently fails to capture -o's intended argument value. Why?","Without the colon, getopts treats -o as a no-argument flag — the value following -o on the command line becomes an unconsumed positional argument instead of being captured into $OPTARG.","demo34,getopts,common-mistake"
 "Why is \"${array[@]}\" (quoted, with @) the correct way to iterate a bash array, rather than ${array[*]} or an unquoted form?","Quoted \"${array[@]}\" preserves each element as its own distinct word even if it contains spaces — the array equivalent of quoting a regular variable to prevent word splitting. ${array[*]} or unquoted forms collapse elements incorrectly.","demo34,arrays,quoting,common-mistake"
-"What does declare -A create, and what awk concept from Demo 21 is it directly analogous to?","An associative array — keyed by string rather than only numeric index. It's bash's direct equivalent of awk's associative arrays for key-based aggregation (arr[key]++ or similar patterns).","demo34,arrays,associative,cross-demo"
+"What does declare -A create, and what awk concept from Demo M05-08 is it directly analogous to?","An associative array — keyed by string rather than only numeric index. It's bash's direct equivalent of awk's associative arrays for key-based aggregation (arr[key]++ or similar patterns).","demo34,arrays,associative,cross-demo"
 "What's the difference between cat << 'EOF' and cat << EOF (unquoted) for a here-doc?","Quoted delimiter ('EOF'): fully literal text, no variable expansion or command substitution at all. Unquoted delimiter (EOF): variables and command substitution ARE expanded inside the here-doc, like a double-quoted string.","demo34,heredoc,fundamentals"
 "What does OPTIND track after a getopts loop, and why is shift $((OPTIND - 1)) needed afterward?","OPTIND tracks how many arguments getopts consumed while parsing flags. Shifting past that count makes $1 correctly refer to the first remaining non-flag argument, rather than still pointing at the first parsed flag.","demo34,getopts,optind"
 "Why does trap register a SEPARATE handler for INT/TERM in addition to EXIT, rather than relying on EXIT alone?","To do something specifically different on interruption (like logging that the script was interrupted) beyond the same cleanup — though calling cleanup explicitly in the INT/TERM handler and then exiting still also triggers the EXIT trap, so cleanup logic shouldn't be duplicated destructively across both.","demo34,trap,signals,cross-demo"
@@ -661,13 +661,13 @@ bug covered for plain variables in Demo 33.
 
 ## Appendix B — Quiz
 
-**`34-shell-scripting-advanced-quiz.md`:**
+**`m09-02-shell-scripting-advanced-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 34: Shell Scripting Advanced
+# Quiz — Demo M09-02: Shell Scripting Advanced
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 34b.
+> Target: 80% or above before moving to Demo M09-03.
 
 **Q1. What specific failure does `set -o pipefail` catch that plain `set -e` alone does not?**
 

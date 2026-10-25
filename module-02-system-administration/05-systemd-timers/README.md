@@ -1,4 +1,4 @@
-# Demo 08 — systemd Timers
+# Demo M02-05 — systemd Timers
 
 ## Overview
 
@@ -29,10 +29,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-08-systemd-timers/
-├── README.md                          # this file
-├── 08-systemd-timers-anki.csv         # Anki flashcard deck
-└── 08-systemd-timers-quiz.md          # standalone quiz
+05-systemd-timers/
+├── README.md                       # this file
+├── m02-05-systemd-timers-anki.csv  # Anki flashcard deck
+└── m02-05-systemd-timers-quiz.md   # standalone quiz
 ```
 
 ---
@@ -47,7 +47,7 @@ By the end of this demo you will be able to:
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 07.
+> Answer from memory before reading further. From Demo M02-04.
 
 1. You run `systemctl enable myapp.service` without `--now`, then reboot the
    machine. Is `myapp` running after the reboot? What about if you had run
@@ -142,7 +142,7 @@ under the default name.
 "successful" or "failed" based on the exit code, which is what shows up in
 `systemctl list-timers` and `journalctl`.
 
-**Enabling a timer** uses the same four-combination model from Demo 07, applied
+**Enabling a timer** uses the same four-combination model from Demo M02-04, applied
 to the `.timer` unit, not the `.service`:
 
 ```bash
@@ -289,7 +289,7 @@ WantedBy=timers.target
 EOF
 
 sudo systemctl daemon-reload
-# Required after writing new unit files, same rule as Demo 07 — systemd hasn't
+# Required after writing new unit files, same rule as Demo M02-04 — systemd hasn't
 # read these files yet until you tell it to.
 
 sudo systemctl enable --now novatech-backup.timer
@@ -410,7 +410,7 @@ status` — no special-casing required because you already know how to look.
 - ✅ Read `systemctl list-timers` output to determine what will run next and why
 - ✅ Diagnosed a timer that silently never fires, using `systemd-analyze calendar`
 
-**Key Takeaway:** A `.timer` is only ever half the picture — it schedules, a paired `.service` does the work, and the naming convention connecting them is load-bearing, not decoration. When a timer "does nothing," the fault is almost always in one of two places: a calendar expression that loaded but never resolved to a next elapse time, or a unit that's enabled without being started (or vice versa) — the exact same enable/start independence from Demo 07, just applied to a `.timer` instead of a `.service`.
+**Key Takeaway:** A `.timer` is only ever half the picture — it schedules, a paired `.service` does the work, and the naming convention connecting them is load-bearing, not decoration. When a timer "does nothing," the fault is almost always in one of two places: a calendar expression that loaded but never resolved to a next elapse time, or a unit that's enabled without being started (or vice versa) — the exact same enable/start independence from Demo M02-04, just applied to a `.timer` instead of a `.service`.
 
 ---
 
@@ -468,7 +468,7 @@ $ journalctl -u novatech-logrotate.service --since "1 week ago" | tail -5
 Tasks:
 1. `disabled` + `inactive` — what does that combination mean happened during
    the maintenance window, in terms of what a systemd unit file edit requires?
-   (Hint: connect this back to Demo 07's four-combination `enable`/`start` model.)
+   (Hint: connect this back to Demo M02-04's four-combination `enable`/`start` model.)
 2. The unit file still exists on disk and is syntactically fine. Re-enable it
    correctly — not just `systemctl start`, which would only fix it until the
    next reboot.
@@ -585,7 +585,7 @@ self-correcting if the machine reboots.
    is the main practical argument for timers over cron in production, not
    scheduling syntax power.
 7. **Re-enabling a timer after a unit file edit follows the same rules as any
-   other unit (Demo 07).** `daemon-reload` after any file change, and
+   other unit (Demo M02-04).** `daemon-reload` after any file change, and
    `enable --now` (not just `start`) if it needs to survive the next reboot —
    a timer left `disabled` will not come back after a reboot even if you
    manually `start` it now.
@@ -625,10 +625,10 @@ self-correcting if the machine reboots.
 
 ## Appendix A — Anki Cards
 
-**`08-systemd-timers-anki.csv`:**
+**`m02-05-systemd-timers-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 2 - System Administration::Demo 08 - systemd Timers
+#deck:Linux Mastery::Module 2 - System Administration::Demo M02-05 - systemd Timers
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -648,7 +648,7 @@ self-correcting if the machine reboots.
 
 "Why is journalctl -u name.service generally considered an advantage of systemd timers over cron for critical jobs?","Timer-triggered services log to the same journalctl location and expose the same systemctl status/failure-state visibility as every other systemd-managed service — no separate log-file or syslog convention to remember, unlike cron.","demo08,cron-comparison,observability"
 
-"You edit an existing novatech-cleanup.timer file to change OnUnitActiveSec= from 15min to 30min. What must you run before the change takes effect, consistent with the Demo 07 unit-file-edit rule?","systemctl daemon-reload — systemd reads unit files into memory; edits on disk have no effect until daemon-reload tells it to re-read them, same rule as any other unit type.","demo08,daemon-reload,cross-demo"
+"You edit an existing novatech-cleanup.timer file to change OnUnitActiveSec= from 15min to 30min. What must you run before the change takes effect, consistent with the Demo M02-04 unit-file-edit rule?","systemctl daemon-reload — systemd reads unit files into memory; edits on disk have no effect until daemon-reload tells it to re-read them, same rule as any other unit type.","demo08,daemon-reload,cross-demo"
 
 "A timer shows disabled and inactive (dead) after a maintenance window. What does re-running only systemctl start name.timer fail to fix?","It starts the timer for the current boot, but disabled means no symlink exists in timers.target.wants/ — after the next reboot the timer will not come back. enable --now (not just start) is required to fix both the immediate and persistent state.","demo08,enable-vs-start,cross-demo"
 
@@ -659,13 +659,13 @@ self-correcting if the machine reboots.
 
 ## Appendix B — Quiz
 
-**`08-systemd-timers-quiz.md`:**
+**`m02-05-systemd-timers-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 08: systemd Timers
+# Quiz — Demo M02-05: systemd Timers
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 09.
+> Target: 80% or above before moving to Demo M02-07.
 
 ---
 
@@ -872,7 +872,7 @@ power efficiency by default.
 
 | Score | Action |
 |---|---|
-| 8/8 | Import Anki cards, move to Demo 09 |
+| 8/8 | Import Anki cards, move to Demo M02-07 |
 | 6-7/8 | Review the wrong answers, then proceed |
 | 4-5/8 | Re-read the relevant sections, retry those questions |
 | Below 4/8 | Re-read the full demo and redo the walkthrough before proceeding |

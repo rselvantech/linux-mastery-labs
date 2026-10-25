@@ -1,7 +1,7 @@
-# Demo 15b — Encryption at Rest (LUKS/dm-crypt)
+# Demo M04-06 — Encryption at Rest (LUKS/dm-crypt)
 
 > **A note on how this demo was built:**
-> Same constraint as Demo 15a: `cryptsetup` is not installed and can't be
+> Same constraint as Demo M04-05: `cryptsetup` is not installed and can't be
 > installed (no network access), and this container has no `dm-crypt`
 > kernel module or `/dev/mapper` device-mapper support available at all.
 > Every command and behavior below is sourced to the official
@@ -14,7 +14,7 @@
 
 ## Overview
 
-Demo 15a covered surviving a disk failing. This demo covers a different
+Demo M04-05 covered surviving a disk failing. This demo covers a different
 threat model entirely: what happens when a disk — working or not — ends
 up somewhere it shouldn't. A decommissioned drive sold without being
 wiped, a stolen laptop, a compliance auditor asking "is data at rest
@@ -23,7 +23,7 @@ filesystem permissions do nothing to address. LUKS (Linux Unified Key
 Setup), built on the kernel's `dm-crypt` device-mapper target, is the
 standard Linux answer: transparent block-device encryption that sits
 between the raw disk and everything above it (partitioning, filesystem,
-mounting) covered in Demo 14.
+mounting) covered in Demo M04-01.
 
 ## Demo Objectives
 
@@ -33,7 +33,7 @@ mounting) covered in Demo 14.
 2. Initialize a LUKS volume with `luksFormat` and unlock it with
    `luksOpen`/`open`, understanding the key-slot passphrase model
 3. Use the resulting `/dev/mapper` device exactly like any other block
-   device — partition, format, and mount it per Demo 14's pattern
+   device — partition, format, and mount it per Demo M04-01's pattern
 4. Read `luksDump` output and manage multiple key slots with `luksAddKey`
 5. Persist automatic unlocking via `/etc/crypttab`, and diagnose the
    classic "volume locked after reboot" failure
@@ -43,10 +43,10 @@ mounting) covered in Demo 14.
 ## Directory Structure
 
 ```
-15b-luks-encryption/
-├── README.md                              # this file
-├── 15b-luks-encryption-anki.csv           # Anki flashcard deck
-└── 15b-luks-encryption-quiz.md            # standalone quiz
+06-luks-encryption/
+├── README.md                        # this file
+├── m04-06-luks-encryption-anki.csv  # Anki flashcard deck
+└── m04-06-luks-encryption-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -55,9 +55,9 @@ mounting) covered in Demo 14.
 |---|---|---|---|
 | All lab tasks | ⚠️ [VERIFY] — `cryptsetup` is in Ubuntu 24.04's default `apt` repository (candidate 2:2.7.0-1ubuntu4.2 confirmed via `apt-cache policy` in this session) but neither installed nor executed; this session's container has no `dm-crypt` module or `/dev/mapper` support at all | ⚠️ [VERIFY] — not checked this session; `cryptsetup` ships in Rocky9's default repos as a standard package | Not required |
 
-## Recall Check — 15a-raid-mdadm
+## Recall Check — 05-raid-mdadm
 
-Answer these from memory before continuing — no looking back at Demo 15a.
+Answer these from memory before continuing — no looking back at Demo M04-05.
 
 1. Does RAID protect against accidental file deletion or ransomware? Why or why not?
 
@@ -145,10 +145,10 @@ sudo cryptsetup close secure-data
 `close` (or `luksClose`) removes the mapping — the underlying disk
 reverts to being unreadable ciphertext until opened again.
 
-### 1.4 Using the mapped device — Demo 14's pattern, one layer down
+### 1.4 Using the mapped device — Demo M04-01's pattern, one layer down
 
 Once unlocked, `/dev/mapper/secure-data` is a normal block device.
-Everything from Demo 14 applies directly:
+Everything from Demo M04-01 applies directly:
 
 ```bash
 sudo mkfs.ext4 /dev/mapper/secure-data
@@ -159,7 +159,7 @@ sudo mount /dev/mapper/secure-data /mnt/secure-data
 This is the core mental model worth having precisely: LUKS/`dm-crypt`
 sits as one additional layer *below* the filesystem and *above* the raw
 partition — `partition → LUKS/dm-crypt → filesystem → mount`, one link
-added to the chain Demo 14 already taught, not a replacement for any of
+added to the chain Demo M04-01 already taught, not a replacement for any of
 those steps.
 
 ### 1.5 `luksDump` — reading header and key-slot information
@@ -217,8 +217,8 @@ key, applied to disk encryption.
 ### 1.7 Persistence — `/etc/crypttab`, and the "locked after reboot" trap
 
 An unlocked LUKS volume from a manual `cryptsetup open` is exactly as
-temporary as an unpersisted `mount` (Demo 14) or an `ip addr add` without
-a config file (Demo 11) — it does not survive a reboot on its own.
+temporary as an unpersisted `mount` (Demo M04-01) or an `ip addr add` without
+a config file (Demo M03-01) — it does not survive a reboot on its own.
 
 Per Red Hat's LUKS documentation, persisting automatic unlocking requires
 an entry in `/etc/crypttab`:
@@ -232,17 +232,17 @@ echo 'secure-data UUID=a52e2cc9-a5be-47b8-a95d-6bdf4f2d9325 none' | sudo tee -a 
 
 The three fields are: the mapping name (matches what appears under
 `/dev/mapper/`), the volume's UUID (from `luksUUID`, the same
-stability rationale as Demo 14's `/etc/fstab` UUID guidance), and the
+stability rationale as Demo M04-01's `/etc/fstab` UUID guidance), and the
 key source (`none` means prompt interactively at boot; a key-file path
 enables unattended unlocking, with its own separate security
 considerations about protecting that key file). The mapped device then
-still needs its own `/etc/fstab` entry, exactly as in Demo 14, pointing
+still needs its own `/etc/fstab` entry, exactly as in Demo M04-01, pointing
 at `/dev/mapper/secure-data` or its own filesystem UUID.
 
 **A volume that's `cryptsetup open`'d manually but has no `/etc/crypttab`
 entry will not automatically unlock on the next boot** — this is
-precisely the same category of persistence trap Demo 14 covered for
-mounts and Demo 11 covered for network config, just one layer further
+precisely the same category of persistence trap Demo M04-01 covered for
+mounts and Demo M03-01 covered for network config, just one layer further
 down the stack. Part 3's Break-Fix scenario walks through exactly this.
 
 ### 1.8 LUKS1 vs. LUKS2, and the header-backup discipline
@@ -383,7 +383,7 @@ sudo sed -i '/secure-data/d' /etc/crypttab
 2. ✅ Initialized a LUKS volume with `luksFormat` and unlocked it with
    `open`/`luksOpen`, understanding the key-slot passphrase model
 3. ✅ Used the resulting `/dev/mapper` device exactly like any block
-   device — partitioned, formatted, and mounted it per Demo 14's pattern
+   device — partitioned, formatted, and mounted it per Demo M04-01's pattern
 4. ✅ Read `luksDump` output and managed multiple key slots with
    `luksAddKey`
 5. ✅ Persisted automatic unlocking via `/etc/crypttab` and understand
@@ -444,10 +444,10 @@ UUID at all. The fix: add the missing entry (§1.7's format), following
 open` manually once now, and confirm the array unlocks cleanly on a test
 reboot rather than assuming the crypttab entry alone is sufficient
 without verification. This is the same category of persistence mistake
-as Demo 14's unpersisted `mount` command and Demo 11's `ip addr add`
+as Demo M04-01's unpersisted `mount` command and Demo M03-01's `ip addr add`
 without a config file — "it worked when I ran it manually" and "it
 survives a reboot" are different claims, one layer further down the
-storage stack than Demo 14's version of this same lesson.
+storage stack than Demo M04-01's version of this same lesson.
 
 **Incident 2:** Per §1.8, LUKS's encryption model means the actual bulk
 data is encrypted with a volume key, and that volume key itself is what's
@@ -516,15 +516,15 @@ snapshot might be for an unencrypted volume.
 ---
 
 1. **LUKS/dm-crypt protects data at rest — a disk that's lost, stolen, or decommissioned — not data on a running, unlocked system.** Once a volume is `open`'d and mounted, it's readable plaintext to anything with access to that running system; conflating "encrypted at rest" with "safe if the server is compromised" is a common, costly mistake.
-2. **LUKS sits as one layer between the raw partition and the filesystem: `partition → LUKS/dm-crypt → filesystem → mount`.** Once unlocked, the resulting `/dev/mapper/name` device is a completely normal block device — every `mkfs`/`mount` step from Demo 14 applies to it unchanged.
+2. **LUKS sits as one layer between the raw partition and the filesystem: `partition → LUKS/dm-crypt → filesystem → mount`.** Once unlocked, the resulting `/dev/mapper/name` device is a completely normal block device — every `mkfs`/`mount` step from Demo M04-01 applies to it unchanged.
 3. **Key slots (8 on LUKS1, more on LUKS2) let multiple independent passphrases unlock the same underlying volume key.** This enables individually revocable access (`luksAddKey` to grant, `luksKillSlot` to revoke) without ever needing to re-encrypt the actual bulk data — the same principle as per-user SSH keys over one shared key.
-4. **A manually `cryptsetup open`'d volume does not survive a reboot without an `/etc/crypttab` entry.** This is the identical persistence trap as an unpersisted Demo 14 `mount` command or a Demo 11 `ip addr add` — it works until the next reboot, then silently doesn't, with no obviously related error to point at the cause.
+4. **A manually `cryptsetup open`'d volume does not survive a reboot without an `/etc/crypttab` entry.** This is the identical persistence trap as an unpersisted Demo M04-01 `mount` command or a Demo M03-01 `ip addr add` — it works until the next reboot, then silently doesn't, with no obviously related error to point at the cause.
 5. **LUKS header damage is catastrophic by design, not by implementation accident — the passphrase alone unlocks nothing without an intact header, even when the passphrase is correct and the underlying disk is physically fine.** Per `cryptsetup`'s own documentation, this happens with real, non-negligible frequency.
 6. **`luksHeaderBackup`, stored physically separate from the disk it protects, is the only thing standing between header damage and total, permanent, unrecoverable data loss.** This makes it a mandatory step at volume creation, not an optional extra the way a filesystem snapshot might be for unencrypted storage.
 7. **A weak or guessable passphrase defeats the entire scheme regardless of how sound the underlying cipher is.** LUKS's cryptographic strength says nothing about key-management discipline — those are separate concerns, and the second one is usually the actual weak point in practice.
 
 > **Demo scope:** Primary concept: LUKS/dm-crypt as an added layer in the
-> Demo 14 storage stack, and the header-backup discipline that prevents
+> Demo M04-01 storage stack, and the header-backup discipline that prevents
 > unrecoverable loss.
 > Supporting concepts: luksFormat/open/close, key slots and luksAddKey,
 > crypttab persistence, LUKS1 vs LUKS2, header backup.
@@ -563,30 +563,30 @@ snapshot might be for an unencrypted volume.
 
 ## Appendix A — Anki Cards
 
-**`15b-luks-encryption-anki.csv`:**
+**`m04-06-luks-encryption-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 4 - Storage::Demo 15b - Encryption at Rest (LUKS/dm-crypt)
+#deck:Linux Mastery::Module 4 - Storage::Demo M04-06 - Encryption at Rest (LUKS/dm-crypt)
 #separator:Comma
 #columns:Front,Back,Tags
 "Does LUKS encryption protect data on a running system that has already been unlocked and mounted?","No — once a LUKS volume is opened and mounted, it behaves like any normal filesystem. Anyone with access to that running, unlocked system reads the data in plaintext. LUKS protects data AT REST (disk lost, stolen, decommissioned), not a compromised running system.","demo15b,luks,fundamentals"
-"Where does an unlocked LUKS volume appear once cryptsetup open succeeds?","At /dev/mapper/<name> — a completely normal block device from that point on. Every mkfs/mount step from Demo 14 applies to it unchanged.","demo15b,luks,fundamentals,cross-demo"
+"Where does an unlocked LUKS volume appear once cryptsetup open succeeds?","At /dev/mapper/<name> — a completely normal block device from that point on. Every mkfs/mount step from Demo M04-01 applies to it unchanged.","demo15b,luks,fundamentals,cross-demo"
 "How many key slots does LUKS1 provide, and what does having multiple slots enable?","8 key slots on LUKS1 (LUKS2 supports more, configurable). Multiple independent passphrases can each unlock the same underlying volume key, enabling individually revocable access without needing to re-encrypt the actual bulk data.","demo15b,luks,keyslots,fundamentals"
-"A LUKS volume was manually unlocked with cryptsetup open and mounted, then the server rebooted. Is it still mounted and accessible?","No — a manually-opened volume with no /etc/crypttab entry does not survive a reboot. This is the same persistence trap as an unpersisted mount command (Demo 14) or ip addr add (Demo 11) — it works until the next reboot, then silently doesn't.","demo15b,luks,crypttab,break-fix,cross-demo"
+"A LUKS volume was manually unlocked with cryptsetup open and mounted, then the server rebooted. Is it still mounted and accessible?","No — a manually-opened volume with no /etc/crypttab entry does not survive a reboot. This is the same persistence trap as an unpersisted mount command (Demo M04-01) or ip addr add (Demo M03-01) — it works until the next reboot, then silently doesn't.","demo15b,luks,crypttab,break-fix,cross-demo"
 "What are the three fields in an /etc/crypttab entry?","The mapping name (matches /dev/mapper/<name>), the volume's UUID (from cryptsetup luksUUID), and the key source (none for an interactive prompt at boot, or a key-file path for unattended unlocking).","demo15b,luks,crypttab,fundamentals"
 "You have the CORRECT passphrase for a LUKS volume, but the header is corrupted. Can you still recover the data?","No — the passphrase unlocks the volume key stored IN the header. Without an intact header, there's nothing for the passphrase to decrypt, even though it's correct and the underlying disk is physically fine. This is a total, permanent loss without a header backup.","demo15b,luks,header,break-fix"
 "What does cryptsetup luksHeaderBackup do, and where should the backup be stored?","Backs up the LUKS header (which holds the encrypted volume key) to a separate file. It must be stored physically separate from the disk it protects — a backup stored only on the same disk is useless for the exact failure mode (header damage) it exists to guard against.","demo15b,luks,header,backup,fundamentals"
 "How does luksKillSlot let a team revoke one person's access to a shared encrypted volume without affecting anyone else?","Each team member has their own passphrase in their own key slot (added via luksAddKey). luksKillSlot disables just that one slot — everyone else's passphrase keeps working unchanged, and the actual bulk data never needs re-encrypting.","demo15b,luks,keyslots,revocation"
 "Does a cryptographically strong cipher guarantee a LUKS volume is actually secure?","No — a weak or guessable passphrase defeats the entire scheme regardless of cipher strength. Encryption algorithm soundness and key-management discipline (passphrase strength) are separate concerns, and the second is usually the actual weak point in practice.","demo15b,luks,security,fundamentals"
-"What layer does LUKS/dm-crypt occupy in the storage stack, relative to Demo 14's partition/filesystem/mount sequence?","partition -> LUKS/dm-crypt -> filesystem -> mount. LUKS is inserted as one additional layer between the raw partition and the filesystem, not a replacement for any of Demo 14's steps.","demo15b,luks,fundamentals,cross-demo"
+"What layer does LUKS/dm-crypt occupy in the storage stack, relative to Demo M04-01's partition/filesystem/mount sequence?","partition -> LUKS/dm-crypt -> filesystem -> mount. LUKS is inserted as one additional layer between the raw partition and the filesystem, not a replacement for any of Demo M04-01's steps.","demo15b,luks,fundamentals,cross-demo"
 ```
 
 ## Appendix B — Quiz
 
-**`15b-luks-encryption-quiz.md`:**
+**`m04-06-luks-encryption-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 15b: Encryption at Rest (LUKS/dm-crypt)
+# Quiz — Demo M04-06: Encryption at Rest (LUKS/dm-crypt)
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to the next demo.
@@ -614,7 +614,7 @@ Trap: A wrongly assumes encryption persists through the unlock; C and D both inv
 **Q2.** Where does a LUKS volume appear once `cryptsetup open /dev/sdb1 myvolume` succeeds, and what can be done with it?
 
 - A) At `/dev/sdb1_decrypted` — it must be accessed with special LUKS-aware tools only
-- B) At `/dev/mapper/myvolume` — a completely normal block device from that point on, usable with standard `mkfs`/`mount` exactly as covered in Demo 14
+- B) At `/dev/mapper/myvolume` — a completely normal block device from that point on, usable with standard `mkfs`/`mount` exactly as covered in Demo M04-01
 - C) Nowhere new — the original `/dev/sdb1` path is used directly, now transparently decrypted
 - D) At `/mnt/myvolume` automatically, already mounted
 
@@ -719,17 +719,17 @@ Trap: A describes a workable but clumsy alternative that requires redistributing
 
 ---
 
-**Q8.** Once unlocked, is a LUKS/`dm-crypt` volume's usage (partitioning, filesystem creation, mounting) different from an unencrypted block device's, per this demo and Demo 14?
+**Q8.** Once unlocked, is a LUKS/`dm-crypt` volume's usage (partitioning, filesystem creation, mounting) different from an unencrypted block device's, per this demo and Demo M04-01?
 
 - A) Yes — LUKS-specific tools replace `mkfs` and `mount` entirely
-- B) No — once mapped under `/dev/mapper/`, the exact same `mkfs`/`mount` steps from Demo 14 apply unchanged; LUKS is an added layer below the filesystem, not a replacement for it
+- B) No — once mapped under `/dev/mapper/`, the exact same `mkfs`/`mount` steps from Demo M04-01 apply unchanged; LUKS is an added layer below the filesystem, not a replacement for it
 - C) Yes — LUKS volumes cannot use `ext4` and require a LUKS-specific filesystem
 - D) Only the mount step differs; formatting is identical
 
 <details>
 <summary>Answer</summary>
 
-**B** — LUKS/`dm-crypt` inserts itself as a layer between the raw partition and the filesystem (`partition → LUKS/dm-crypt → filesystem → mount`); once unlocked, everything above that layer is completely standard, unmodified Demo 14 territory.
+**B** — LUKS/`dm-crypt` inserts itself as a layer between the raw partition and the filesystem (`partition → LUKS/dm-crypt → filesystem → mount`); once unlocked, everything above that layer is completely standard, unmodified Demo M04-01 territory.
 
 Trap: A and C both invent LUKS-specific requirements that don't exist — any normal filesystem works fine on a mapped LUKS device; D wrongly claims a partial difference when there's actually none.
 

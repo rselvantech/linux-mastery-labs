@@ -1,4 +1,4 @@
-# Demo 17 — Regular Expressions
+# Demo M05-01 — Regular Expressions
 
 ## Overview
 
@@ -30,10 +30,10 @@ know exactly which flavor a given tool expects.
 ## Directory Structure
 
 ```
-17-regular-expressions/
-├── README.md                          # this file
-├── 17-regular-expressions-anki.csv    # Anki flashcard deck
-└── 17-regular-expressions-quiz.md     # standalone quiz
+01-regular-expressions/
+├── README.md                            # this file
+├── m05-01-regular-expressions-anki.csv  # Anki flashcard deck
+└── m05-01-regular-expressions-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -42,9 +42,9 @@ know exactly which flavor a given tool expects.
 |---|---|---|---|
 | All lab tasks | ✅ | ✅ | Not required |
 
-## Recall Check — 16-remote-storage-troubleshooting
+## Recall Check — 07-remote-storage-troubleshooting
 
-Answer these from memory before continuing — no looking back at Demo 16.
+Answer these from memory before continuing — no looking back at Demo M04-07.
 
 1. Why is `_netdev` mandatory for a network-backed `/etc/fstab` entry,
    not just a best practice?
@@ -753,10 +753,10 @@ of the two words.
 
 ## Appendix A — Anki Cards
 
-**`17-regular-expressions-anki.csv`:**
+**`m05-01-regular-expressions-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo 17 - Regular Expressions
+#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-01 - Regular Expressions
 #separator:Comma
 #columns:Front,Back,Tags
 "grep 'cat' file.txt is run. Does it match ONLY lines that are exactly 'cat'?","No — matching is unanchored (substring) by default. It matches any line CONTAINING 'cat' anywhere, including 'category' and 'concatenate'. Anchors (^, $) exist specifically to override this default.","demo17,fundamentals,default-matching"
@@ -779,13 +779,13 @@ of the two words.
 
 ## Appendix B — Quiz
 
-**`17-regular-expressions-quiz.md`:**
+**`m05-01-regular-expressions-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 17: Regular Expressions
+# Quiz — Demo M05-01: Regular Expressions
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 18.
+> Target: 80% or above before moving to Demo M05-05.
 
 ---
 
@@ -937,7 +937,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 18 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M05-05 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

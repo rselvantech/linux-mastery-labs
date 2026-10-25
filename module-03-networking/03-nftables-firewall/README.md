@@ -1,8 +1,8 @@
-# Demo 12a — nftables & Production Firewall Patterns
+# Demo M03-03 — nftables & Production Firewall Patterns
 
 ## Overview
 
-Demo 12 covered firewall troubleshooting with the tools already present on
+Demo M03-02 covered firewall troubleshooting with the tools already present on
 a system. This demo covers writing firewall rules from scratch with
 `nftables` — the modern replacement for `iptables` on both Ubuntu and Rocky
 Linux — and the production patterns that show up in almost every real
@@ -33,10 +33,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-12a-nftables-firewall/
-├── README.md                              # this file
-├── 12a-nftables-firewall-anki.csv        # Anki flashcard deck
-└── 12a-nftables-firewall-quiz.md         # standalone quiz
+03-nftables-firewall/
+├── README.md                          # this file
+├── m03-03-nftables-firewall-anki.csv  # Anki flashcard deck
+└── m03-03-nftables-firewall-quiz.md   # standalone quiz
 ```
 
 ---
@@ -61,7 +61,7 @@ nftables` / `dnf install nftables` if not already present.
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 12.
+> Answer from memory before reading further. From Demo M03-02.
 
 1. A connection to a service works from the server itself but not from
    another machine. What's the first thing to check?
@@ -456,10 +456,10 @@ rate.
 
 ## Appendix A — Anki Cards
 
-**`12a-nftables-firewall-anki.csv`:**
+**`m03-03-nftables-firewall-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 3 - Networking::Demo 12a - nftables and Production Firewall Patterns
+#deck:Linux Mastery::Module 3 - Networking::Demo M03-03 - nftables and Production Firewall Patterns
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -488,12 +488,12 @@ rate.
 
 ## Appendix B — Quiz
 
-**`12a-nftables-firewall-quiz.md`:**
+**`m03-03-nftables-firewall-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 12a: nftables & Production Firewall Patterns
+# Quiz — Demo M03-03: nftables & Production Firewall Patterns
 
-> One correct answer per question. Target: 80% before Demo 13.
+> One correct answer per question. Target: 80% before Demo M03-04.
 
 ---
 
@@ -644,7 +644,7 @@ appended afterward.
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 13 |
+| 7/7 | Import Anki cards, move to Demo M03-04 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

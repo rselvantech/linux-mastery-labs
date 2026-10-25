@@ -1,4 +1,4 @@
-# Demo 01 — Linux Filesystem Hierarchy (FHS)
+# Demo M01-07 — Linux Filesystem Hierarchy (FHS)
 
 ## Overview
 
@@ -41,10 +41,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-01-linux-fhs/
-├── README.md                              # this file
-├── 01-linux-fhs-anki.csv        # Anki flashcard deck
-└── 01-linux-fhs-quiz.md         # standalone quiz
+07-linux-fhs/
+├── README.md                  # this file
+├── m01-07-linux-fhs-anki.csv  # Anki flashcard deck
+└── m01-07-linux-fhs-quiz.md   # standalone quiz
 ```
 
 ---
@@ -62,7 +62,7 @@ EC2 is not required for this demo.
 
 ---
 
-## Recall Check — Demo 00f
+## Recall Check — Demo M01-06
 
 Before starting, answer from memory:
 
@@ -259,7 +259,7 @@ Rocky9:  journald is the primary logging system
 ```
 
 This difference — and how to use `journalctl` — is covered in
-full detail in Demo 07 (systemd & Service Management).
+full detail in Demo M02-04 (systemd & Service Management).
 
 **`/var/lib` — persistent app state**
 Services that need to remember things between restarts store data
@@ -926,7 +926,7 @@ systems, or the service's text log file under `/var/log/` on older
 systems. The log shows the exact error. Look here before touching
 any config. Then check `/etc/servicename/` to review the config
 if the log points to a configuration issue. We cover `journalctl`
-in full in Demo 07.
+in full in Demo M02-04.
 
 ---
 
@@ -1020,10 +1020,10 @@ missing after reboot, the service has not started yet.
 
 ## Appendix A — Anki Cards
 
-**`01-linux-fhs-anki.csv`:**
+**`m01-07-linux-fhs-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo 01 - FHS
+#deck:Linux Mastery::Module 1 - Filesystem & Navigation::Demo M01-07 - FHS
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -1052,12 +1052,12 @@ missing after reboot, the service has not started yet.
 
 ## Appendix B — Quiz
 
-**`01-linux-fhs-quiz.md`:**
+**`m01-07-linux-fhs-quiz.md`:**
 
 ```
-# Quiz — Demo 01: Linux Filesystem Hierarchy
+# Quiz — Demo M01-07: Linux Filesystem Hierarchy
 
-> One correct answer per question. Target: 80% before Demo 02.
+> One correct answer per question. Target: 80% before Demo M01-08.
 
 ---
 
@@ -1235,7 +1235,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 02 |
+| 7/7 | Import Anki cards, move to Demo M01-08 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

@@ -1,8 +1,8 @@
-# Demo 27a — SELinux/AppArmor Deep Dive
+# Demo M08-02 — SELinux/AppArmor Deep Dive
 
 ## Overview
 
-Demo 27 taught you to recognize when MAC is the cause of a failure and to
+Demo M08-01 taught you to recognize when MAC is the cause of a failure and to
 check its mode. This demo covers the next step: actually fixing a
 MAC-caused failure without just disabling enforcement — permanent file
 contexts, scoped policy booleans, and reading (skeptically) what
@@ -31,10 +31,10 @@ the process was actually launched.
 ## Directory Structure
 
 ```
-27a-selinux-apparmor/
-├── README.md                          # this file
-├── 27a-selinux-apparmor-anki.csv      # Anki flashcard deck
-└── 27a-selinux-apparmor-quiz.md       # standalone quiz
+02-selinux-apparmor/
+├── README.md                         # this file
+├── m08-02-selinux-apparmor-anki.csv  # Anki flashcard deck
+└── m08-02-selinux-apparmor-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -56,9 +56,9 @@ the process was actually launched.
 > on an actual Rocky9 (SELinux) or Ubuntu (AppArmor) machine before
 > treating exact command output as guaranteed.
 
-## Recall Check — 27-security-hardening
+## Recall Check — 01-security-hardening
 
-Answer these from memory before continuing — no looking back at Demo 27.
+Answer these from memory before continuing — no looking back at Demo M08-01.
 
 1. `ls -la` on a file shows completely correct DAC ownership and mode.
    What category of cause has that evidence NOT ruled out?
@@ -228,7 +228,7 @@ sudo aa-genprof /opt/app/bin/myapp
 
 ```bash
 sudo aa-logprof
-# For a profile ALREADY in complain mode (Demo 27 §1.3), reviews the
+# For a profile ALREADY in complain mode (Demo M08-01 §1.3), reviews the
 # kernel audit log for anything the profile doesn't yet cover and
 # interactively offers to add each one — the ongoing-maintenance
 # counterpart to aa-genprof's initial-build workflow.
@@ -246,7 +246,7 @@ everything just to make the complaining stop.
 ### 1.6 Bringing it together — diagnosing the root/service-user pattern
 
 ```
-1. Confirm MAC is actually involved: getenforce / aa-status (Demo 27)
+1. Confirm MAC is actually involved: getenforce / aa-status (Demo M08-01)
 2. Reproduce via the REAL launch path — systemctl start, not su/sudo —
    because §1.1 means a manual reproduction attempt can succeed while
    the real service fails
@@ -502,10 +502,10 @@ defeating the purpose of having MAC in the first place.
 
 ## Appendix A — Anki Cards
 
-**`27a-selinux-apparmor-anki.csv`:**
+**`m08-02-selinux-apparmor-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 8 - Security::Demo 27a - SELinux/AppArmor Deep Dive
+#deck:Linux Mastery::Module 8 - Security::Demo M08-02 - SELinux/AppArmor Deep Dive
 #separator:Comma
 #columns:Front,Back,Tags
 "A script works when tested manually as a service account via sudo -u, but the real systemd service running the identical command as the identical user fails. Why?","SELinux context is tied to HOW a process is launched, not which Unix UID it runs as. A manual sudo -u test typically runs unconfined; the real systemd-launched service runs in its own confined domain, which is what actually gets enforced.","demo27a,selinux,context,common-mistake"
@@ -521,13 +521,13 @@ defeating the purpose of having MAC in the first place.
 
 ## Appendix B — Quiz
 
-**`27a-selinux-apparmor-quiz.md`:**
+**`m08-02-selinux-apparmor-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 27a: SELinux/AppArmor Deep Dive
+# Quiz — Demo M08-02: SELinux/AppArmor Deep Dive
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 27b.
+> Target: 80% or above before moving to Demo M08-03.
 
 ---
 
@@ -663,7 +663,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 27b |
+| 7/7 | Import Anki cards, move to Demo M08-03 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

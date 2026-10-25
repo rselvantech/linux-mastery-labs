@@ -1,8 +1,8 @@
-# Demo 21a — awk Multi-File Processing
+# Demo M05-09 — awk Multi-File Processing
 
 ## Overview
 
-Every `awk` example in Demo 21 processed exactly one file (or one stream).
+Every `awk` example in Demo M05-08 processed exactly one file (or one stream).
 Hand `awk` two or more files at once, and a new question appears
 immediately: when the second file starts, does the line-numbering carry
 on from the first file, or start over? The answer — it does both,
@@ -31,10 +31,10 @@ either file twice.
 ## Directory Structure
 
 ```
-21a-awk-multifile/
-├── README.md                          # this file
-├── 21a-awk-multifile-anki.csv         # Anki flashcard deck
-└── 21a-awk-multifile-quiz.md          # standalone quiz
+09-awk-multifile/
+├── README.md                      # this file
+├── m05-09-awk-multifile-anki.csv  # Anki flashcard deck
+└── m05-09-awk-multifile-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -43,9 +43,9 @@ either file twice.
 |---|---|---|---|
 | All lab tasks | ✅ (gawk) | ✅ (gawk) | Not required |
 
-## Recall Check — 21-awk-processing
+## Recall Check — 08-awk-processing
 
-Answer these from memory before continuing — no looking back at Demo 21.
+Answer these from memory before continuing — no looking back at Demo M05-08.
 
 1. What's the difference between a pattern-level condition (`$3 > 100
    {print $1}`) and an `if`/`else` written inside an action block?
@@ -96,7 +96,7 @@ NR=5 FNR=2 file2.txt e
 > `awk` — it never resets, reaching 5 total across both files here. `FNR`
 > counts records *within the current file only* — it resets to 1 the
 > moment `awk` starts reading `file2.txt`, exactly the way `NR` alone
-> behaved in every single-file example from Demo 21. Whenever a task
+> behaved in every single-file example from Demo M05-08. Whenever a task
 > needs "which line number is this within its own file" (for an error
 > message, say), `FNR` is the right variable; whenever it needs "how many
 > records have I processed in total," `NR` is.
@@ -251,7 +251,7 @@ knowing before leaning on it for something it isn't suited to:
 - **This pattern joins on exact key equality only.** Fuzzy matching,
   range joins ("orders placed within 5 minutes of a login event"), or
   multi-column composite keys are possible to hand-roll in `awk` but get
-  unwieldy fast — exactly the kind of complexity Demo 21 §1.6 flagged as
+  unwieldy fast — exactly the kind of complexity Demo M05-08 §1.6 flagged as
   the signal to reach for a proper script or a real data tool instead.
 - **More than two files compound the bookkeeping.** `FNR==NR` alone only
   distinguishes "first file" from "everything else" — correlating three
@@ -383,7 +383,7 @@ blank or incorrect value.
 4. **The `FNR==NR {arr[$1]=$2; next} {...}` skeleton is a genuine single-pass join** — one file loaded into memory as a lookup table, the second streamed through once against it in O(1) per lookup. Faster and simpler than `join` or a database for correlation tasks where the lookup table comfortably fits in memory.
 5. **Always check `key in array` before trusting a lookup result.** An unmatched key in an unchecked lookup can silently produce a blank or wrong value — explicit membership testing surfaces the "no match" case instead of hiding it.
 6. **`ARGV`/`ARGC` expose the command-line file list as inspectable, modifiable data.** Clearing an `ARGV` entry (setting it to `""`) in `BEGIN` removes that file from processing entirely, enabling dynamic input selection from inside the `awk` program itself.
-7. **This pattern has real limits: the lookup table must fit in memory, joins are exact-key-only, and more than two files need `FILENAME`-based logic instead of the binary `FNR==NR` test.** Past these edges, a real join tool, a database, or a proper script (Demo 21 §1.6) is the more appropriate choice.
+7. **This pattern has real limits: the lookup table must fit in memory, joins are exact-key-only, and more than two files need `FILENAME`-based logic instead of the binary `FNR==NR` test.** Past these edges, a real join tool, a database, or a proper script (Demo M05-08 §1.6) is the more appropriate choice.
 
 > **Demo scope:** Primary concept: correlating data across multiple files
 > in a single awk pass, via NR/FNR/FILENAME and associative-array lookups.
@@ -425,10 +425,10 @@ blank or incorrect value.
 
 ## Appendix A — Anki Cards
 
-**`21a-awk-multifile-anki.csv`:**
+**`m05-09-awk-multifile-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo 21a - awk Multi-File Processing
+#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-09 - awk Multi-File Processing
 #separator:Comma
 #columns:Front,Back,Tags
 "awk processes file1.txt (3 lines) then file2.txt (2 lines) in one command. What are NR and FNR at the first line of file2.txt?","NR=4 (it keeps counting across both files, never resetting). FNR=1 (it resets to 1 at the start of every new file).","demo21a,awk,nr-fnr,fundamentals"
@@ -445,10 +445,10 @@ blank or incorrect value.
 
 ## Appendix B — Quiz
 
-**`21a-awk-multifile-quiz.md`:**
+**`m05-09-awk-multifile-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 21a: awk Multi-File Processing
+# Quiz — Demo M05-09: awk Multi-File Processing
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to the next demo.

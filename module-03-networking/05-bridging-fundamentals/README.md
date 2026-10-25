@@ -1,4 +1,4 @@
-# Demo 13a — Linux Bridging Fundamentals
+# Demo M03-05 — Linux Bridging Fundamentals
 
 ## Overview
 
@@ -33,10 +33,10 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-13a-bridging-fundamentals/
+05-bridging-fundamentals/
 ├── README.md                              # this file
-├── 13a-bridging-fundamentals-anki.csv        # Anki flashcard deck
-└── 13a-bridging-fundamentals-quiz.md         # standalone quiz
+├── m03-05-bridging-fundamentals-anki.csv  # Anki flashcard deck
+└── m03-05-bridging-fundamentals-quiz.md   # standalone quiz
 ```
 
 ---
@@ -57,7 +57,7 @@ are kernel-level network state, not user-space configuration.
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 13.
+> Answer from memory before reading further. From Demo M03-04.
 
 1. Two hosts on the same subnet can't reach each other, but both
    can reach the internet. What layer is most likely broken?
@@ -456,10 +456,10 @@ integrity for virtual setups).
 
 ## Appendix A — Anki Cards
 
-**`13a-bridging-fundamentals-anki.csv`:**
+**`m03-05-bridging-fundamentals-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 3 - Networking::Demo 13a - Linux Bridging Fundamentals
+#deck:Linux Mastery::Module 3 - Networking::Demo M03-05 - Linux Bridging Fundamentals
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -488,12 +488,12 @@ integrity for virtual setups).
 
 ## Appendix B — Quiz
 
-**`13a-bridging-fundamentals-quiz.md`:**
+**`m03-05-bridging-fundamentals-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 13a: Linux Bridging Fundamentals
+# Quiz — Demo M03-05: Linux Bridging Fundamentals
 
-> One correct answer per question. Target: 80% before Demo 13b.
+> One correct answer per question. Target: 80% before Demo M03-06.
 
 ---
 
@@ -643,7 +643,7 @@ machine.
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 13b |
+| 7/7 | Import Anki cards, move to Demo M03-06 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

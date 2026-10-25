@@ -1,8 +1,8 @@
-# Demo 17a — PCRE and grep -P
+# Demo M05-02 — PCRE and grep -P
 
 ## Overview
 
-Demo 17 covered the regular-expression syntax every Linux tool shares.
+Demo M05-01 covered the regular-expression syntax every Linux tool shares.
 This demo covers what `grep -P` (Perl-Compatible Regular Expressions,
 PCRE) adds on top: shorthand classes like `\d` and `\w`, non-greedy
 matching, and — the feature that changes how you write extraction
@@ -14,7 +14,7 @@ everywhere. Knowing which `grep -P` features have a plain-POSIX
 equivalent, and which ones genuinely don't, is what lets you choose
 between a short PCRE one-liner and a more portable pipeline on purpose.
 
-Demo 17b covers how the flavors differ across tools; this demo goes deep
+Demo M05-03 covers how the flavors differ across tools; this demo goes deep
 on the richest one.
 
 ## Demo Objectives
@@ -35,10 +35,10 @@ on the richest one.
 ## Directory Structure
 
 ```
-17a-pcre-regex/
-├── README.md                      # this file
-├── 17a-pcre-regex-anki.csv        # Anki flashcard deck
-└── 17a-pcre-regex-quiz.md         # standalone quiz
+02-pcre-regex/
+├── README.md                   # this file
+├── m05-02-pcre-regex-anki.csv  # Anki flashcard deck
+└── m05-02-pcre-regex-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -55,9 +55,9 @@ on the richest one.
 > minimal container images or BSD-derived `grep`) — those statements are
 > marked `[Unverified — test before use]`.
 
-## Recall Check — 17-regular-expressions
+## Recall Check — 01-regular-expressions
 
-Answer these from memory before continuing — no looking back at Demo 17.
+Answer these from memory before continuing — no looking back at Demo M05-01.
 
 **Q1.** What is the difference between `.` and `\.` in a pattern?
 
@@ -143,7 +143,7 @@ $ printf '<a>x</a><a>y</a>\n' | grep -oP '<a>.*?</a>'
 
 The greedy `.*` would return the whole line as a single match. The lazy
 form returns the two pairs separately. (In `grep -E` the same `.*?` is
-accepted but is *not* lazy — see Demo 17b §1.6.)
+accepted but is *not* lazy — see Demo M05-03 §1.6.)
 
 ### 1.4 Lookaround — match by context, return only the value
 
@@ -238,7 +238,7 @@ is rejected.
 
 **Possessive quantifiers** (`a++`) take as much as they can and never give
 any back. That is what makes them useful for avoiding runaway matching
-(Demo 17c) and also what makes them match differently:
+(Demo M05-04) and also what makes them match differently:
 
 ```
 $ printf 'aaa\n' | grep -cP 'a+a'      # backtracks one "a" for the final "a"
@@ -590,10 +590,10 @@ legitimately empty result from a broken command.
 
 ## Appendix A — Anki Cards
 
-**`17a-pcre-regex-anki.csv`:**
+**`m05-02-pcre-regex-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo 17a - PCRE and grep -P
+#deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-02 - PCRE and grep -P
 #separator:Comma
 #columns:Front,Back,Tags
 "What does \w match in PCRE?","A word character: a letter, a digit, or an underscore.","demo17a,shorthand"
@@ -610,13 +610,13 @@ legitimately empty result from a broken command.
 
 ## Appendix B — Quiz
 
-**`17a-pcre-regex-quiz.md`:**
+**`m05-02-pcre-regex-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 17a: PCRE and grep -P
+# Quiz — Demo M05-02: PCRE and grep -P
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 17b.
+> Target: 80% or above before moving to Demo M05-03.
 
 ---
 
@@ -757,7 +757,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 17b |
+| 7/7 | Import Anki cards, move to Demo M05-03 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

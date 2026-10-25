@@ -1,8 +1,8 @@
-# Demo 23d — Neovim: Built-in LSP, Lua Config & checkhealth
+# Demo M06-05 — Neovim: Built-in LSP, Lua Config & checkhealth
 
 ## Overview
 
-Demos 23/23a/23b/23c taught Vim — and everything in them works
+Demos M06-01/23a/23b/23c taught Vim — and everything in them works
 identically in Neovim, because Neovim's default modes are Vim-compatible
 by design. This demo covers what's actually *different*: the one feature
 that genuinely separates the two for a working engineer is Neovim's
@@ -33,15 +33,15 @@ differentiator.
 5. Use `:checkhealth` to diagnose a broken or incomplete setup
 6. Explain when the switch to Neovim's built-in tooling is actually worth
    it, versus staying with plain Vim and the patterns from Demos
-   23/23a/23b/23c
+   M06-01/23a/23b/23c
 
 ## Directory Structure
 
 ```
-23d-neovim-lsp/
-├── README.md                    # this file
-├── 23d-neovim-lsp-anki.csv       # Anki flashcard deck
-└── 23d-neovim-lsp-quiz.md        # standalone quiz
+05-neovim-lsp/
+├── README.md                   # this file
+├── m06-05-neovim-lsp-anki.csv  # Anki flashcard deck
+└── m06-05-neovim-lsp-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -52,7 +52,7 @@ differentiator.
 
 > **Verification note — read before treating anything below as settled
 > fact.** This demo could not be verified live in this sandbox to a
-> *greater* degree than Demos 23/23a/23b/23c: not only is there no
+> *greater* degree than Demos M06-01/23a/23b/23c: not only is there no
 > network to install Neovim itself, there's also no way to install or
 > run an actual language server binary, which this topic genuinely
 > depends on. Core LSP concepts (diagnostics, hover, go-to-definition,
@@ -64,9 +64,9 @@ differentiator.
 > before treating any specific keymap below as guaranteed present without
 > configuring it yourself.
 
-## Recall Check — 23c-buffers-windows-tabs
+## Recall Check — 04-buffers-windows-tabs
 
-Answer these from memory before continuing — no looking back at Demo 23c.
+Answer these from memory before continuing — no looking back at Demo M06-04.
 
 1. What's the difference in scope between `:argdo` and `:bufdo`?
 2. Why use `| update` after an `:argdo`/`:bufdo` substitution instead of
@@ -112,7 +112,7 @@ cover these as differentiators):
 ```
 
 The reason this matters practically: if you're deciding whether learning
-Neovim specifically is worth the switch beyond what Demos 23/23a/23b/23c
+Neovim specifically is worth the switch beyond what Demos M06-01/23a/23b/23c
 already taught, the honest answer hinges entirely on whether the built-in
 LSP client's value is worth it *for you* — not on features both editors
 already share.
@@ -198,7 +198,7 @@ K      -- show hover documentation for the symbol under the cursor
 
 **This is the direct, tangible payoff over plain Vim:** `gd` here jumps to
 an *actual, semantically-resolved* definition — understanding imports,
-scope, and type information — not a text pattern match the way Demo 23's
+scope, and type information — not a text pattern match the way Demo M06-01's
 `/pattern` search or `ctags`-based navigation would. `K` similarly shows
 real documentation the language server understands, not just a `man`
 page lookup.
@@ -227,7 +227,7 @@ to look first, rather than guessing from silence or an unclear error.
 ### 1.7 When the switch to Neovim's built-in tooling is actually worth it
 
 If your work is mostly editing config files, scripts, and infrastructure
-code on remote servers — the kind of editing Demos 23/23a/23b/23c already
+code on remote servers — the kind of editing Demos M06-01/23a/23b/23c already
 cover thoroughly — plain Vim, universally available with zero setup, is
 often genuinely sufficient. The built-in LSP client earns its complexity
 specifically when you're doing enough active code-writing (not just
@@ -318,7 +318,7 @@ a quick one-line change. Separately, you're actively writing a 300-line
 Python module locally, with imports across several files. Per §1.7, which
 scenario benefits meaningfully from Neovim's built-in LSP client, and
 which is served just as well by plain Vim and the patterns from Demos
-23/23a/23b/23c?
+M06-01/23a/23b/23c?
 
 ## What You Learned
 
@@ -477,7 +477,7 @@ know, rather than trusting an assumed constant across all versions.
    always a separate, language-specific install.
 3. **`gd` and `K` give semantically-resolved results — an actual
    definition location and real documentation — not a text-pattern match**
-   the way Demo 23's `/search` or basic navigation would.
+   the way Demo M06-01's `/search` or basic navigation would.
 4. **`:checkhealth` is the structured first stop for diagnosing a broken
    setup**, rather than guessing from a silent failure or an unclear
    symptom — it's specifically designed to distinguish "client
@@ -489,7 +489,7 @@ know, rather than trusting an assumed constant across all versions.
 6. **The switch to Neovim's built-in tooling is worth it specifically for
    active code-writing in a language with a good language server
    available** — not for the kind of config/script editing Demos
-   23/23a/23b/23c already cover thoroughly, where plain Vim's universal,
+   M06-01/23a/23b/23c already cover thoroughly, where plain Vim's universal,
    zero-setup availability is often genuinely sufficient on its own.
 
 > **Demo scope:** Primary concept: Neovim's built-in LSP client for
@@ -520,10 +520,10 @@ know, rather than trusting an assumed constant across all versions.
 
 ## Appendix A — Anki Cards
 
-**`23d-neovim-lsp-anki.csv`:**
+**`m06-05-neovim-lsp-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 6 - Editors::Demo 23d - Neovim Built-in LSP
+#deck:Linux Mastery::Module 6 - Editors::Demo M06-05 - Neovim Built-in LSP
 #separator:Comma
 #columns:Front,Back,Tags
 "What is the genuine, defensible feature difference between Neovim and Vim, as opposed to a commonly-cited but incorrect one?","Genuine: Neovim's built-in LSP client (native diagnostics, hover, go-to-definition, no plugin required). Commonly incorrect: :terminal — Vim has had an integrated terminal since version 8, so it isn't Neovim-exclusive at all.","demo23d,neovim,differentiator,common-mistake"
@@ -532,15 +532,15 @@ know, rather than trusting an assumed constant across all versions.
 "What is :checkhealth, and why is it the recommended first stop when an LSP setup seems broken?","A structured set of self-checks covering Neovim's core systems and installed providers/plugins, with clear per-check status. It's the first stop specifically because it's designed to distinguish common setup mismatches (like client configured but server binary missing) rather than leaving you to guess from a silent failure.","demo23d,neovim,checkhealth,troubleshooting"
 "Why does this demo avoid stating a specific Neovim version's default LSP keybindings as settled fact?","Default LSP keybindings have genuinely changed across Neovim versions as built-in LSP support has matured — asserting one version's defaults universally would risk being simply wrong for whatever version someone is actually running. :help lsp-defaults against the actual installed version is the reliable source.","demo23d,neovim,lsp,version-dependent"
 "What is the relationship between Neovim's built-in LSP client and an actual language server like pylsp or gopls?","Neovim provides the client side of the LSP conversation natively (vim.lsp). The language server itself (pylsp, gopls, etc.) is a completely separate, language-specific binary that's never bundled with either editor and must be installed on its own.","demo23d,neovim,lsp,fundamentals"
-"When is switching to Neovim's built-in LSP tooling actually worth it, versus staying with plain Vim and Demos 23/23a/23b/23c's patterns?","When doing enough active code-writing (not just config/script editing) in a language with a good language server available, that real-time diagnostics and semantic navigation meaningfully speed up the work — and you're willing to maintain a per-language-server setup, which plain Vim's zero-dependency availability doesn't require.","demo23d,neovim,vim-comparison,cross-demo"
+"When is switching to Neovim's built-in LSP tooling actually worth it, versus staying with plain Vim and Demos M06-01/23a/23b/23c's patterns?","When doing enough active code-writing (not just config/script editing) in a language with a good language server available, that real-time diagnostics and semantic navigation meaningfully speed up the work — and you're willing to maintain a per-language-server setup, which plain Vim's zero-dependency availability doesn't require.","demo23d,neovim,vim-comparison,cross-demo"
 ```
 
 ## Appendix B — Quiz
 
-**`23d-neovim-lsp-quiz.md`:**
+**`m06-05-neovim-lsp-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 23d: Neovim: Built-in LSP, Lua Config & checkhealth
+# Quiz — Demo M06-05: Neovim: Built-in LSP, Lua Config & checkhealth
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to Demo 24.
@@ -669,7 +669,7 @@ server over SSH. Per §1.7, is Neovim's built-in LSP client likely to add
 meaningful value here?
 
 - A) Yes — LSP diagnostics improve every editing task regardless of context
-- B) Not meaningfully — this is exactly the kind of config-file editing Demos 23/23a/23b/23c already cover thoroughly, where plain Vim's zero-setup universal availability is typically sufficient on its own
+- B) Not meaningfully — this is exactly the kind of config-file editing Demos M06-01/23a/23b/23c already cover thoroughly, where plain Vim's zero-setup universal availability is typically sufficient on its own
 - C) Yes, but only if the remote server has a GUI installed
 - D) No editor can be used over SSH, making this question moot
 

@@ -1,4 +1,4 @@
-# Demo 27b — TLS/Certificate Management
+# Demo M08-03 — TLS/Certificate Management
 
 ## Overview
 
@@ -29,10 +29,10 @@ paraphrased into a plausible shape.
 ## Directory Structure
 
 ```
-27b-tls-certificates/
-├── README.md                          # this file
-├── 27b-tls-certificates-anki.csv      # Anki flashcard deck
-└── 27b-tls-certificates-quiz.md       # standalone quiz
+03-tls-certificates/
+├── README.md                         # this file
+├── m08-03-tls-certificates-anki.csv  # Anki flashcard deck
+└── m08-03-tls-certificates-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -54,9 +54,9 @@ paraphrased into a plausible shape.
 > `certbot` isn't installed here (no network) and §1.6 is entirely
 > doc-sourced; recommend confirming it on a real machine.
 
-## Recall Check — 27a-selinux-apparmor
+## Recall Check — 02-selinux-apparmor
 
-Answer these from memory before continuing — no looking back at Demo 27a.
+Answer these from memory before continuing — no looking back at Demo M08-02.
 
 1. Why can a script succeed when tested manually as a service account,
    but fail when the real systemd service runs the identical command as
@@ -612,10 +612,10 @@ handshake before either side's application code ever runs.
 
 ## Appendix A — Anki Cards
 
-**`27b-tls-certificates-anki.csv`:**
+**`m08-03-tls-certificates-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 8 - Security::Demo 27b - TLS/Certificate Management
+#deck:Linux Mastery::Module 8 - Security::Demo M08-03 - TLS/Certificate Management
 #separator:Comma
 #columns:Front,Back,Tags
 "Why must a server present its intermediate CA certificate, not just its own leaf certificate?","Clients only trust the root CA directly. Without the intermediate, the client has no way to link a valid leaf certificate to any root it trusts — the intermediate is what bridges the two.","demo27b,tls,chain,fundamentals"
@@ -630,13 +630,13 @@ handshake before either side's application code ever runs.
 
 ## Appendix B — Quiz
 
-**`27b-tls-certificates-quiz.md`:**
+**`m08-03-tls-certificates-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 27b: TLS/Certificate Management
+# Quiz — Demo M08-03: TLS/Certificate Management
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 27c.
+> Target: 80% or above before moving to Demo M08-04.
 
 ---
 
@@ -777,7 +777,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 27c |
+| 7/7 | Import Anki cards, move to Demo M08-04 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

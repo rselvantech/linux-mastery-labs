@@ -1,4 +1,4 @@
-# Demo 06 — Process Management
+# Demo M02-03 — Process Management
 
 ## Overview
 
@@ -46,19 +46,19 @@ By the end of this demo you will be able to:
 8. Diagnose a runaway process by CPU/memory using `top` and
    `htop`
 9. Connect process-held file handles back to the `lsof` pattern
-   from Demo 02, and explain why a service account's process
+   from Demo M01-08, and explain why a service account's process
    still appears in `ps` even though the account cannot log in
-   interactively (Demo 05)
+   interactively (Demo M02-02)
 
 ---
 
 ## Directory Structure
 
 ```
-06-process-management/
-├── README.md                          # this file
-├── 06-process-management-anki.csv     # Anki flashcard deck
-└── 06-process-management-quiz.md      # standalone quiz
+03-process-management/
+├── README.md                           # this file
+├── m02-03-process-management-anki.csv  # Anki flashcard deck
+└── m02-03-process-management-quiz.md   # standalone quiz
 ```
 
 ---
@@ -77,7 +77,7 @@ distro — Task 6 covers the one-line install on each.
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demo 05.
+> Answer from memory before reading further. From Demo M02-02.
 
 1. An admin runs `usermod -G backup deployer` intending to add
    deployer to the `backup` group. `id deployer` now shows only
@@ -133,7 +133,7 @@ PPID   Parent Process ID — the PID of the process that started
        this one. Critical for tracing "who launched this?"
 
 UID    User ID the process runs as — determines its permissions
-       (same UID concept from Demo 05's /etc/passwd). A process
+       (same UID concept from Demo M02-02's /etc/passwd). A process
        running as UID 1000 has exactly the same file access as
        the user with UID 1000.
 ```
@@ -841,14 +841,14 @@ htop key commands:
 of `top` and `htop` — load average interpretation, per-core CPU
 view, memory breakdown (buffers vs cache vs used), I/O wait
 meaning, and `htop`'s advanced filtering — is deferred to
-**Demo 09 — Live System Monitoring**, where they are
+**Demo M02-07 — Live System Monitoring**, where they are
 the primary tools alongside `vmstat`, `iostat`, and `free`. This
 demo introduces them for the immediate need: diagnosing a runaway
 process.
 
-### 1.9 Connecting back — Demo 02 and Demo 05
+### 1.9 Connecting back — Demo M01-08 and Demo M02-02
 
-**Demo 02's `lsof | grep deleted` pattern is a process
+**Demo M01-08's `lsof | grep deleted` pattern is a process
 management fact:**
 
 A deleted file stays allocated on disk specifically because some
@@ -862,18 +862,18 @@ lsof | grep deleted
 # process PID holding the file — restart this process to free space
 ```
 
-Now that this demo has covered `kill`/`pkill`, the Demo 02 fix
+Now that this demo has covered `kill`/`pkill`, the Demo M01-08 fix
 ("restart the process") is a concrete action: identify the PID
 from `lsof`, then `kill -TERM PID` (then `kill -9` only if
 needed) to release the handle and free the disk space.
 
-**`lsof` will be covered in full detail in Demo 11** (Security
+**`lsof` will be covered in full detail in Demo M03-01** (Security
 and Networking), where `lsof -i` (open network sockets), `lsof
 -p PID` (all files a specific process has open), and `lsof -i
 :8080` (what's listening on a port) are the primary diagnostic
 tools.
 
-**Demo 05's service accounts run as real processes:**
+**Demo M02-02's service accounts run as real processes:**
 
 A service account created with `/usr/sbin/nologin` cannot be used
 for interactive login. But the **process** systemd starts as that
@@ -1335,7 +1335,7 @@ CPU-burning process, and the kill escalation result.**
 - ✅ Managed foreground/background jobs and fixed the SSH-disconnect problem with `nohup` and `disown`
 - ✅ Set and changed process priority with `nice`/`renice`, and read `NI`/`PRI` columns in `ps -el` output
 - ✅ Diagnosed a runaway process by CPU using `top` and `htop`
-- ✅ Connected process-held file handles back to Demo 02's `lsof` pattern, and confirmed a service account's process behaves identically to any other process despite `nologin` restricting only interactive login
+- ✅ Connected process-held file handles back to Demo M01-08's `lsof` pattern, and confirmed a service account's process behaves identically to any other process despite `nologin` restricting only interactive login
 
 **Key Takeaway:** Almost every process-management incident is really one of three questions: is this process in a state it should be in, did it receive the signal you think it received, and does it have the parent/priority relationship you expect. The answer to all three is in `ps -o pid,stat,ppid,ni,cmd -p PID` — one command that shows you state, parent, and priority together. Always run this before deciding what action to take.
 
@@ -1587,16 +1587,16 @@ directly.
 |---|---|
 | `top` | Live monitor — P=CPU sort, M=MEM sort, q=quit |
 | `htop` | Enhanced monitor — F5=tree, F9=kill, F3=search |
-| `lsof \| grep deleted` | Files held open by processes (Demo 02 callback) |
+| `lsof \| grep deleted` | Files held open by processes (Demo M01-08 callback) |
 
 ---
 
 ## Appendix A — Anki Cards
 
-**`06-process-management-anki.csv`:**
+**`m02-03-process-management-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 2 - System Administration::Demo 06 - Process Management
+#deck:Linux Mastery::Module 2 - System Administration::Demo M02-03 - Process Management
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -1625,13 +1625,13 @@ directly.
 
 ## Appendix B — Quiz
 
-**`06-process-management-quiz.md`:**
+**`m02-03-process-management-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 06: Process Management
+# Quiz — Demo M02-03: Process Management
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 07.
+> Target: 80% or above before moving to Demo M02-04.
 
 ---
 
@@ -1809,7 +1809,7 @@ started.
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 07 |
+| 7/7 | Import Anki cards, move to Demo M02-04 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |

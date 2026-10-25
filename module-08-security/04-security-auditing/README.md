@@ -1,8 +1,8 @@
-# Demo 27c — Security Auditing Tools
+# Demo M08-04 — Security Auditing Tools
 
 ## Overview
 
-Demos 27/27a/27b each hardened one specific thing — SSH, MAC policy, TLS.
+Demos M08-01/27a/27b each hardened one specific thing — SSH, MAC policy, TLS.
 This demo covers the tools that check **all of it at once, systematically,
 and repeatedly**: `lynis` and OpenSCAP. Neither tool fixes anything by
 itself — both produce a prioritized list of findings, and the actual
@@ -25,10 +25,10 @@ matter, not treating every line as equally urgent.
 ## Directory Structure
 
 ```
-27c-security-auditing/
+04-security-auditing/
 ├── README.md                          # this file
-├── 27c-security-auditing-anki.csv     # Anki flashcard deck
-└── 27c-security-auditing-quiz.md      # standalone quiz
+├── m08-04-security-auditing-anki.csv  # Anki flashcard deck
+└── m08-04-security-auditing-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -50,9 +50,9 @@ matter, not treating every line as equally urgent.
 > guaranteed. `[Unverified — test before use]` applies to this entire
 > demo's captured-looking output.
 
-## Recall Check — 27b-tls-certificates
+## Recall Check — 03-tls-certificates
 
-Answer these from memory before continuing — no looking back at Demo 27b.
+Answer these from memory before continuing — no looking back at Demo M08-03.
 
 1. What's the practical difference between `openssl verify`'s `error 20`
    and `error 10`?
@@ -161,7 +161,7 @@ OpenSCAP:  narrow to a specific published profile, produces evidence
 ```
 
 Neither replaces the other, and neither replaces the targeted work from
-Demos 27/27a/27b — both tools would surface a *symptom* (weak SSH config,
+Demos M08-01/27a/27b — both tools would surface a *symptom* (weak SSH config,
 a MAC policy left permissive, a certificate near expiry) without doing
 the actual diagnosis and fix this series already covered in depth.
 
@@ -193,17 +193,17 @@ which neither tool can fully know on its own.
 ### 1.5 What a baseline scan would catch from this module
 
 A scan run against a host that skipped or misconfigured any of Demos
-27/27a/27b's work would surface it as a finding, even without anyone
+M08-01/27a/27b's work would surface it as a finding, even without anyone
 manually re-checking:
 
 ```
-Demo 27  (SSH/fail2ban/auditd):  PermitRootLogin/PasswordAuthentication
+Demo M08-01  (SSH/fail2ban/auditd):  PermitRootLogin/PasswordAuthentication
                                   left at insecure defaults; fail2ban not
                                   installed/running; no audit rules
                                   watching sensitive files
-Demo 27a (SELinux/AppArmor):     MAC left in Permissive/complain mode
+Demo M08-02 (SELinux/AppArmor):     MAC left in Permissive/complain mode
                                   rather than Enforcing/enforce
-Demo 27b (TLS/certificates):     a certificate approaching or past
+Demo M08-03 (TLS/certificates):     a certificate approaching or past
                                   expiry; weak TLS protocol versions or
                                   cipher suites still enabled
 ```
@@ -213,7 +213,7 @@ rather than once (§1.6): each of these is exactly the kind of thing that
 can silently drift back out of compliance after this series' work is
 done — a config gets reset by a package update, a MAC mode gets flipped
 to Permissive for a debugging session and never flipped back, a
-certificate renewal silently fails (Demo 27b §1.6).
+certificate renewal silently fails (Demo M08-03 §1.6).
 
 ### 1.6 Why this runs on a schedule, not once
 
@@ -221,7 +221,7 @@ A one-time scan proves the system was compliant *at that moment*. It says
 nothing about a week later, after a package update reset a config file, a
 temporary debugging change was never reverted, or a certificate crossed
 its renewal window. The standard pattern is a scheduled run (a systemd
-timer — Demo 08 — or cron) with results diffed against the previous run,
+timer — Demo M02-05 — or cron) with results diffed against the previous run,
 so a **new** finding that wasn't there last week gets attention
 immediately, rather than being buried in a report alongside a hundred
 long-accepted, already-triaged ones.
@@ -269,7 +269,7 @@ ID and what it's actually checking for.
 # environment-specific low-risk, everything else.
 ```
 
-### Task 4 — Recognize which findings map back to Demos 27/27a/27b
+### Task 4 — Recognize which findings map back to Demos M08-01/27a/27b
 
 For each of these hypothetical findings, name which earlier demo's work
 it relates to, and what "fixed" actually looks like per that demo:
@@ -283,15 +283,15 @@ C: "A certificate on this host expires in 3 days"
 <details>
 <summary>Answers</summary>
 
-**A** — Demo 27 §1.4: `PermitRootLogin no` in `sshd_config`, validated
+**A** — Demo M08-01 §1.4: `PermitRootLogin no` in `sshd_config`, validated
 with `sshd -t` before restarting.
 
-**B** — Demo 27a: confirm with `getenforce`; if it's Permissive rather
+**B** — Demo M08-02: confirm with `getenforce`; if it's Permissive rather
 than Enforcing, that's either a deliberate diagnostic state that should
 have been reverted, or a regression — either way it needs addressing, not
 silencing the finding.
 
-**C** — Demo 27b §1.4/§1.6: this is the exact expiry scenario — reissue
+**C** — Demo M08-03 §1.4/§1.6: this is the exact expiry scenario — reissue
 before it lapses, and confirm the consuming service actually reloads the
 new certificate once issued, not just that a new file exists on disk.
 
@@ -305,7 +305,7 @@ new certificate once issued, not just that a new file exists on disk.
   compliance report
 - ✅ Triaged a findings list instead of treating every line as equally
   urgent
-- ✅ Recognized which findings map back to gaps in Demos 27/27a/27b's own
+- ✅ Recognized which findings map back to gaps in Demos M08-01/27a/27b's own
   work
 - ✅ Explained why a baseline scan runs on a schedule, not once
 
@@ -334,7 +334,7 @@ Tasks:
 
 A scan passing months ago says nothing about today's state — it's a
 snapshot, not a continuous guarantee, exactly per §1.6. A scheduled,
-recurring scan (weekly or more often, via a systemd timer per Demo 08)
+recurring scan (weekly or more often, via a systemd timer per Demo M02-05)
 with each run's results diffed against the previous one would have
 surfaced "SELinux enforcement status changed" as a new finding within days
 of the mode actually changing, not left it undiscovered for six weeks.
@@ -430,10 +430,10 @@ accuracy.
 
 ## Appendix A — Anki Cards
 
-**`27c-security-auditing-anki.csv`:**
+**`m08-04-security-auditing-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 8 - Security::Demo 27c - Security Auditing Tools
+#deck:Linux Mastery::Module 8 - Security::Demo M08-04 - Security Auditing Tools
 #separator:Comma
 #columns:Front,Back,Tags
 "What's the fundamental difference between lynis and OpenSCAP?","lynis is broad and heuristic, requiring no external standard — good for general ongoing baselines. OpenSCAP scans against a specific, named, published profile (CIS, STIG) and maps findings to rule IDs — used to demonstrate compliance with a specific standard.","demo27c,lynis,openscap,comparison"
@@ -442,15 +442,15 @@ accuracy.
 "Why is treating a 200-finding audit report as a flat top-to-bottom to-do list a mistake?","Findings aren't equally urgent — some have a direct known exploit path, some are genuinely low-risk in the specific environment, and some represent a real regression against something already deliberately configured. Context changes priority in ways neither tool fully knows on its own.","demo27c,triage,best-practice"
 "Why does a security baseline scan need to run on a schedule rather than once?","A one-time scan only proves compliance at that instant. Configuration drifts afterward (package updates, forgotten debugging changes, expiring certificates) and none of that is caught by a scan that already ran.","demo27c,scan-cadence,fundamentals"
 "A host passed a compliance scan last quarter but had a MAC setting drift to Permissive mode in the meantime, undetected. Was the scan tool at fault?","No — the tool correctly reported the system's state at the time it ran. The gap was in cadence: nothing re-scanned the system between that pass and the drift. This argues for scheduled, diffed scanning, not a tool criticism.","demo27c,scan-cadence,break-fix"
-"If a baseline scan reports 'SSH root login is permitted,' which earlier demo's fix does that map to?","Demo 27 (SSH hardening): PermitRootLogin no in sshd_config, validated with sshd -t before restarting.","demo27c,cross-demo,ssh"
+"If a baseline scan reports 'SSH root login is permitted,' which earlier demo's fix does that map to?","Demo M08-01 (SSH hardening): PermitRootLogin no in sshd_config, validated with sshd -t before restarting.","demo27c,cross-demo,ssh"
 ```
 
 ## Appendix B — Quiz
 
-**`27c-security-auditing-quiz.md`:**
+**`m08-04-security-auditing-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 27c: Security Auditing Tools
+# Quiz — Demo M08-04: Security Auditing Tools
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above — this is the final quiz in Module 8.
@@ -529,7 +529,7 @@ internet-facing) changes real priority.
 ---
 
 **Q5.** A finding reports that SELinux is in Permissive mode, on a host
-where Demo 27a's work had it Enforcing. How should this be treated
+where Demo M08-02's work had it Enforcing. How should this be treated
 relative to a brand-new, never-addressed finding?
 
 - A) Identically — all findings carry the same priority

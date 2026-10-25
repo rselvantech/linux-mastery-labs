@@ -1,4 +1,4 @@
-# Demo 04 — Package Management
+# Demo M02-01 — Package Management
 
 ## Overview
 
@@ -46,7 +46,7 @@ By the end of this demo you will be able to:
     up the equivalent command on either distro family using the
     side-by-side reference
 11. Connect package manager install locations back to the FHS
-    knowledge from Demo 01 — explain why package-manager installs
+    knowledge from Demo M01-07 — explain why package-manager installs
     split files across `/usr`, `/etc`, `/var`, and `/run`, in
     contrast to the manual and vendor self-contained patterns
 
@@ -55,12 +55,12 @@ By the end of this demo you will be able to:
 ## Directory Structure
 
 ```
-04-package-management/
-├── README.md                          # this file
-├── 04-package-management-anki.csv     # Anki flashcard deck
-├── 04-package-management-quiz.md      # standalone quiz
+01-package-management/
+├── README.md                           # this file
+├── m02-01-package-management-anki.csv  # Anki flashcard deck
+├── m02-01-package-management-quiz.md   # standalone quiz
 └── src/
-    └── Dockerfile                     # DevOps base image — correct layer pattern
+    └── Dockerfile                      # DevOps base image — correct layer pattern
 ```
 
 ---
@@ -82,7 +82,7 @@ Note the differences — they reflect real production environments.
 
 ## Recall Check
 
-> Answer from memory before reading further. These are from Demo 03.
+> Answer from memory before reading further. These are from Demo M01-10.
 
 1. A new file is created inside `/var/www/project/` by user `alice`.
    The file ends up owned by group `alice` instead of `webteam`.
@@ -269,16 +269,16 @@ cannot help (e.g. verifying which package owns a specific file).
 **Connecting back to the filesystem — where package managers actually put things:**
 
 Every directory a package manager writes to is one you already
-learned the purpose of in Demo 01 (FHS). A package manager doesn't
+learned the purpose of in Demo M01-07 (FHS). A package manager doesn't
 invent new locations — it follows the same map, and specifically
-uses the **package manager install pattern** from Demo 01's three
+uses the **package manager install pattern** from Demo M01-07's three
 installation patterns (section 1.6) — the one where files are
 split across multiple FHS locations by purpose, rather than kept
 together in one place:
 
 ```
 /usr/bin/, /usr/sbin/    Binaries the package manager installs
-                         (e.g. nginx, jq, curl) — Demo 01: this is
+                         (e.g. nginx, jq, curl) — Demo M01-07: this is
                          where package-manager-installed binaries
                          belong, as opposed to /usr/local/bin/
                          for manually installed tools, or /opt/
@@ -286,21 +286,21 @@ together in one place:
 
 /etc/<package-name>/     Configuration files the package ships
                          with defaults for (e.g. /etc/nginx/) —
-                         Demo 01: every service's config lives
+                         Demo M01-07: every service's config lives
                          under /etc/, regardless of which package
                          manager installed it.
 
 /var/log/<package-name>/ Logs the installed service writes —
-                         Demo 01: /var/log/ is where persistent,
+                         Demo M01-07: /var/log/ is where persistent,
                          growing log data belongs.
 
 /var/lib/<package-name>/ Application state the service needs to
                          persist (databases, caches that must
-                         survive a reboot) — Demo 01: /var/lib/
+                         survive a reboot) — Demo M01-07: /var/lib/
                          is for this kind of persistent app data,
                          distinct from /var/log/.
 
-/run/<package-name>.pid  PID files for running services — Demo 01:
+/run/<package-name>.pid  PID files for running services — Demo M01-07:
                          /run/ is tmpfs, cleared on every reboot,
                          which is exactly right for a PID file —
                          if the service isn't running, the PID
@@ -313,9 +313,9 @@ together in one place:
                          record of what's installed.
 ```
 
-**Why apt/dnf installs land split across FHS, while some software doesn't — the `/opt` contrast from Demo 01:**
+**Why apt/dnf installs land split across FHS, while some software doesn't — the `/opt` contrast from Demo M01-07:**
 
-Demo 01 covered three installation patterns side by side. The table above is entirely about the first:
+Demo M01-07 covered three installation patterns side by side. The table above is entirely about the first:
 
 ```
 Package manager install (apt/dnf) — what this entire demo covers:
@@ -325,11 +325,11 @@ Package manager install (apt/dnf) — what this entire demo covers:
   data     → /var/lib/nginx/
   Split across multiple FHS locations, by purpose — the standard way
 
-Manual binary install — covered in Demo 01, not this demo:
+Manual binary install — covered in Demo M01-07, not this demo:
   binary   → /usr/local/bin/kubectl
   Just a single binary file, no separate config or data location
 
-Vendor/self-contained install — covered in Demo 01, not this demo:
+Vendor/self-contained install — covered in Demo M01-07, not this demo:
   everything → /opt/vendorname/
   binary, config, data, libraries all kept together in one tree
   Jenkins, Atlassian tools, some commercial software
@@ -347,8 +347,8 @@ package manager's normal behavior.
 **Why this matters in practice:** when something goes wrong with
 an installed service, you don't need to memorize a separate set of
 "package manager locations" — you already know the FHS map from
-Demo 01, and the package manager simply respects it. Quiz Q7 in
-Demo 01 tested exactly this: nginx's config, PID file, log, and
+Demo M01-07, and the package manager simply respects it. Quiz Q7 in
+Demo M01-07 tested exactly this: nginx's config, PID file, log, and
 binary locations — all four are predictable once you know FHS,
 regardless of whether `apt` or `dnf` put them there. The same
 quiz question also included a vendor-install example (Jenkins →
@@ -1400,7 +1400,7 @@ broken install or a stale mirror.
 fails with `sudo: apt: command not found` — expected and correct.
 `apt` simply does not exist on RHEL-family systems; this is the
 same distro-family muscle-memory mistake covered for sudo groups
-in Demo 05, just showing up here for package managers instead.
+in Demo M02-02, just showing up here for package managers instead.
 
 ---
 
@@ -1653,7 +1653,7 @@ build time — never a version string copied from elsewhere.
 **`src/Dockerfile`:**
 
 ```dockerfile
-# DevOps base image — Demo 04: Package Management
+# DevOps base image — Demo M02-01: Package Management
 #
 # Demonstrates the correct Dockerfile RUN layer pattern for apt:
 #   - apt-get update and install in one RUN instruction (cache busting)
@@ -1704,7 +1704,7 @@ CMD ["/bin/bash"]
 ```
 
 ```bash
-cd ~/path/to/04-package-management/src
+cd ~/path/to/01-package-management/src
 
 # Build the image — first build, everything fresh
 docker build -t devops-base:demo04 .
@@ -1790,9 +1790,9 @@ what triggered each one to behave differently.**
 - ✅ Read and interpreted `rpm -V` output flags
 - ✅ Wrote a correct `Dockerfile` `RUN` layer for package installation — correct layer ordering, no cache, no unnecessary packages — and learned why hardcoded version pins go stale and how to pin safely when truly required
 - ✅ Explained the relationship between the high-level tool (`apt`/`dnf`) and the low-level tool (`dpkg`/`rpm`), with a side-by-side command reference for both distro families
-- ✅ Connected package manager install locations back to the FHS map from Demo 01
+- ✅ Connected package manager install locations back to the FHS map from Demo M01-07
 
-**Key Takeaway:** Package management failures almost always trace back to one of three things: a stale index, a missing GPG key, or a Docker layer caching the wrong state. Knowing which of the three you're looking at turns a confusing error into a two-command fix. And once you see that a package manager is just placing files into the same FHS locations you already mapped in Demo 01 — `/usr`, `/etc`, `/var`, `/run` — you stop needing a separate mental model for "where package managers put things."
+**Key Takeaway:** Package management failures almost always trace back to one of three things: a stale index, a missing GPG key, or a Docker layer caching the wrong state. Knowing which of the three you're looking at turns a confusing error into a two-command fix. And once you see that a package manager is just placing files into the same FHS locations you already mapped in Demo M01-07 — `/usr`, `/etc`, `/var`, `/run` — you stop needing a separate mental model for "where package managers put things."
 
 ---
 
@@ -2101,10 +2101,10 @@ new base image to force that.
 
 ## Appendix A — Anki Cards
 
-**`04-package-management-anki.csv`:**
+**`m02-01-package-management-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 2 - System Administration::Demo 04 - Package Management
+#deck:Linux Mastery::Module 2 - System Administration::Demo M02-01 - Package Management
 #separator:Comma
 #columns:Front,Back,Tags
 
@@ -2132,7 +2132,7 @@ new base image to force that.
 
 "Is a package's embedded metadata the same thing as a repository's package index? Explain the difference.","No. A package's metadata (name, version, dependencies, maintainer) is embedded inside that one package file and describes only itself. The repository index (Packages/Release for Debian, repodata for RHEL) is a separate manifest the repository publishes, built by aggregating metadata across every package it hosts, plus a checksum for each entry. The index is what search/show/info query before install; the package's own metadata is read from the local install database after install.","demo04,package-index,metadata"
 
-"A package manager installs nginx via apt. Where do the binary, config, logs, and persistent data each go, and why does this match Demo 01's FHS map rather than a separate 'package manager' convention?","Binary: /usr/bin/nginx (package-manager-installed binaries). Config: /etc/nginx/ (host-specific service config). Logs: /var/log/nginx/ (persistent growing log data). Data: /var/lib/nginx/ (persistent app state). The package manager doesn't invent new locations — it follows the exact FHS map from Demo 01. This is the 'package manager install' pattern, distinct from manual install (/usr/local/bin only) and vendor self-contained install (/opt, everything together).","demo04,fhs,package-locations"
+"A package manager installs nginx via apt. Where do the binary, config, logs, and persistent data each go, and why does this match Demo M01-07's FHS map rather than a separate 'package manager' convention?","Binary: /usr/bin/nginx (package-manager-installed binaries). Config: /etc/nginx/ (host-specific service config). Logs: /var/log/nginx/ (persistent growing log data). Data: /var/lib/nginx/ (persistent app state). The package manager doesn't invent new locations — it follows the exact FHS map from Demo M01-07. This is the 'package manager install' pattern, distinct from manual install (/usr/local/bin only) and vendor self-contained install (/opt, everything together).","demo04,fhs,package-locations"
 
 "Why does this demo's Dockerfile NOT pin exact package versions like curl=8.5.0-2ubuntu10.6, even though pinning is described as good practice for reproducibility?","Ubuntu publishes frequent security patch rebuilds that change the patch suffix every few weeks. A hardcoded version string copied from documentation or an earlier build can simply no longer exist in the repo, causing 'Version ... was not found' errors. For general-purpose tooling images, pinning only the base image tag (ubuntu:24.04, never :latest) and leaving package versions unpinned is more maintainable. True version pinning, when genuinely required, must use a version string fetched fresh via apt-cache policy immediately before that exact build — never reused from an earlier session.","demo04,dockerfile,versioning,reproducibility"
 ```
@@ -2141,13 +2141,13 @@ new base image to force that.
 
 ## Appendix B — Quiz
 
-**`04-package-management-quiz.md`:**
+**`m02-01-package-management-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 04: Package Management
+# Quiz — Demo M02-01: Package Management
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 05.
+> Target: 80% or above before moving to Demo M02-02.
 
 ---
 
@@ -2319,7 +2319,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/7 | Import Anki cards, move to Demo 05 |
+| 7/7 | Import Anki cards, move to Demo M02-02 |
 | 6/7 | Review the wrong answer, then proceed |
 | 5/7 | Re-read the relevant section, retry those questions |
 | Below 5/7 | Re-read the full demo and redo the walkthrough before proceeding |
@@ -2577,7 +2577,7 @@ wins when more than one source could apply.
    from control.tar.xz (Appendix D, section D.1)
 
 6. Place files on disk
-   Following the FHS pattern from Demo 01/this demo's section 1.1
+   Following the FHS pattern from Demo M01-07/this demo's section 1.1
    connecting content — binary to /usr/bin/, config to /etc/,
    etc.
 

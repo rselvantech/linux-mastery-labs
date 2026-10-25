@@ -1,4 +1,4 @@
-# Demo 16 — Remote Storage & Troubleshooting
+# Demo M04-07 — Remote Storage & Troubleshooting
 
 ## Overview
 
@@ -21,10 +21,10 @@ troubleshooting decision tree cover the "something's wrong, now what" half.
 ## Directory Structure
 
 ```
-16-remote-storage-troubleshooting/
-├── README.md                                          # this file
-├── 16-remote-storage-troubleshooting-anki.csv         # Anki flashcard deck
-└── 16-remote-storage-troubleshooting-quiz.md          # standalone quiz
+07-remote-storage-troubleshooting/
+├── README.md                                       # this file
+├── m04-07-remote-storage-troubleshooting-anki.csv  # Anki flashcard deck
+└── m04-07-remote-storage-troubleshooting-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -35,9 +35,9 @@ troubleshooting decision tree cover the "something's wrong, now what" half.
 | NBD server/client | `sudo apt install nbd-server` | `sudo dnf install nbd` (enable EPEL first if not found in base repos) | Not required |
 | `autofs` | `sudo apt install autofs` | `sudo dnf install autofs` | Not required |
 
-## Recall Check — 15-lvm-management
+## Recall Check — 04-lvm-management
 
-Answer these from memory before continuing — no looking back at Demo 15.
+Answer these from memory before continuing — no looking back at Demo M04-04.
 
 1. `lvextend` grows an LV, but `df` still shows the old size. What was
    missed?
@@ -81,7 +81,7 @@ proc              0     0     0    - /proc
 **`/proc` and `/sys` are virtual filesystems — they don't occupy disk
 space at all.** Every file under them is generated on-demand by the kernel
 when read, reflecting live kernel/process state — there's nothing on disk
-backing `/proc/loadavg` (Demo 09) or `/proc/meminfo` (also Demo 09); the
+backing `/proc/loadavg` (Demo M02-07) or `/proc/meminfo` (also Demo M02-07); the
 kernel constructs that content the instant something reads it. `/sys`
 exposes device and driver state in a similar spirit, organized around the
 kernel's internal device model rather than process information.
@@ -128,7 +128,7 @@ showmount -e nfs-server.novatech.internal
 sudo mount -t nfs nfs-server.novatech.internal:/export/shared /mnt/shared
 ```
 
-Persisting it — the same `/etc/fstab` pattern as Demo 14, with NFS-specific
+Persisting it — the same `/etc/fstab` pattern as Demo M04-01, with NFS-specific
 options:
 
 ```bash
@@ -149,8 +149,8 @@ and the client sees files and folders. A **network block device** (NBD)
 exports a *raw block device* instead — the client sees what looks like a
 local disk (`/dev/nbd0`), with no filesystem imposed by the remote side at
 all; the client formats and manages it exactly like a local disk (including
-everything from Demo 14 — partition it, or hand it straight to LVM as a PV
-from Demo 15).
+everything from Demo M04-01 — partition it, or hand it straight to LVM as a PV
+from Demo M04-04).
 
 ```bash
 sudo modprobe nbd
@@ -229,7 +229,7 @@ sudo fsck -f /dev/sdb1
 
 `fsck` on the root filesystem specifically can't be run this way at all
 (you can't unmount `/` while the system is running from it) — that's what
-the automatic fsck-on-boot pass (Demo 14 §1.4's fstab pass-number field) and
+the automatic fsck-on-boot pass (Demo M04-01 §1.4's fstab pass-number field) and
 rescue/single-user mode boot targets exist for.
 
 ### 1.6 A storage troubleshooting decision tree
@@ -238,7 +238,7 @@ When storage is inaccessible, work through these in order:
 
 1. **Does the kernel see the device at all?** (`lsblk`, or `/sys/block/` per
    §1.1 — if the device isn't there, nothing above this layer matters yet.)
-2. **For remote storage, is the network path actually working?** (Demo 12's
+2. **For remote storage, is the network path actually working?** (Demo M03-02's
    `ss`/`tcpdump` toolkit — is the NFS server or NBD host even reachable?)
 3. **Is the mount actually active?** (`mount | grep PATH`, or `df -h` — a
    mount that failed silently at boot due to `_netdev` being missing looks
@@ -246,7 +246,7 @@ When storage is inaccessible, work through these in order:
 4. **Is the filesystem itself healthy?** (`fsck`, only after unmounting —
    the last resort, not the first thing to reach for.)
 
-This order matters for the same reason Demo 12's decision tree did: each
+This order matters for the same reason Demo M03-02's decision tree did: each
 step rules out an entire category before the next, and jumping straight to
 `fsck` on a filesystem that was simply never mounted (or a device the kernel
 never even recognized) wastes time diagnosing the wrong layer.
@@ -357,7 +357,7 @@ sudo fsck -f /dev/sdb1
 sudo umount /mnt/nfs-shared 2>/dev/null
 # Using a local scratch partition instead, since NFS filesystems aren't
 # fsck'd this way:
-sudo umount /mnt/labdata 2>/dev/null   # from Demo 14's lab volume, if present
+sudo umount /mnt/labdata 2>/dev/null   # from Demo M04-01's lab volume, if present
 sudo fsck -f /dev/sdb1
 # Now it actually runs the check, correctly, on an unmounted filesystem.
 ```
@@ -447,7 +447,7 @@ malfunction — per §1.4, `hard` mounts guarantee an NFS operation eventually
 completes rather than silently failing, which means blocking/hanging
 indefinitely while the server is unreachable, by design. Working the
 decision tree: step 2 (is the network path actually working — is the NFS
-server reachable at all, via Demo 12's `ss`/connectivity tools) would have
+server reachable at all, via Demo M03-02's `ss`/connectivity tools) would have
 identified the server-side unavailability *before* anyone ran a file
 operation and got stuck waiting on it. Changing to `soft` would trade away
 `hard`'s guarantee that operations eventually complete (or wait indefinitely
@@ -530,7 +530,7 @@ concerns being entirely the client's own responsibility.
 6. **A systematic decision tree — kernel visibility, network reachability,
    mount state, filesystem health, in that order — beats guessing.** Each
    step rules out an entire category of cause before the next, the same
-   principle as Demo 12's firewall decision tree applied to storage.
+   principle as Demo M03-02's firewall decision tree applied to storage.
 7. **NFS's `sync` export option confirms a write is on stable storage
    before acknowledging it; `async` acknowledges faster but can lose a
    recently-acknowledged write if the server crashes before actually
@@ -576,10 +576,10 @@ concerns being entirely the client's own responsibility.
 
 ## Appendix A — Anki Cards
 
-**`16-remote-storage-troubleshooting-anki.csv`:**
+**`m04-07-remote-storage-troubleshooting-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 4 - Storage::Demo 16 - Remote Storage & Troubleshooting
+#deck:Linux Mastery::Module 4 - Storage::Demo M04-07 - Remote Storage & Troubleshooting
 #separator:Comma
 #columns:Front,Back,Tags
 "Why don't /proc and /sys occupy any disk space, and what does df show for them?","They are virtual filesystems — every file is generated on-demand by the kernel when read, reflecting live state. df shows 0 size/used/available for them since there's nothing backing them on disk.","demo16,proc,sys,fundamentals"
@@ -596,13 +596,13 @@ concerns being entirely the client's own responsibility.
 
 ## Appendix B — Quiz
 
-**`16-remote-storage-troubleshooting-quiz.md`:**
+**`m04-07-remote-storage-troubleshooting-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 16: Remote Storage & Troubleshooting
+# Quiz — Demo M04-07: Remote Storage & Troubleshooting
 
 > One correct answer per question unless stated otherwise.
-> Target: 80% or above before moving to Demo 17.
+> Target: 80% or above before moving to Demo M05-01.
 
 ---
 
@@ -754,7 +754,7 @@ Score guide:
 
 | Score | Action |
 |---|---|
-| 7/8 or 8/8 | Import Anki cards, move to Demo 17 |
+| 7/8 or 8/8 | Import Anki cards, move to Demo M05-01 |
 | 6/8 | Review the wrong answers, then proceed |
 | 5/8 | Re-read the relevant sections, retry those questions |
 | Below 5/8 | Re-read the full demo and redo the walkthrough before proceeding |

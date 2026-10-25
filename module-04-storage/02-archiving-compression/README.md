@@ -1,8 +1,8 @@
-# Demo 14a — Archiving & Compression
+# Demo M04-02 — Archiving & Compression
 
 ## Overview
 
-Two operations get treated as one, and that confusion is the root cause of most archiving mistakes: **archiving** bundles many files into a single stream (`tar`), and **compression** shrinks that stream (`gzip`, `bzip2`, `xz`). `tar` by itself doesn't compress anything — it's a shipping container, not a vacuum bag. Demo 14 covered provisioning storage; this demo covers moving data off it safely — backups, log shipping, and the exact commands a NovaTech deploy script runs every night.
+Two operations get treated as one, and that confusion is the root cause of most archiving mistakes: **archiving** bundles many files into a single stream (`tar`), and **compression** shrinks that stream (`gzip`, `bzip2`, `xz`). `tar` by itself doesn't compress anything — it's a shipping container, not a vacuum bag. Demo M04-01 covered provisioning storage; this demo covers moving data off it safely — backups, log shipping, and the exact commands a NovaTech deploy script runs every night.
 
 By the end of this demo you'll know why `tar czf` isn't one command but three ideas glued together, which compressor to reach for and why, and how to avoid the two mistakes that account for almost every real-world archiving incident: a flag-order slip that silently writes the wrong file, and a "tarbomb" that scatters files across whatever directory you happened to be standing in when you extracted it.
 
@@ -18,10 +18,10 @@ By the end of this demo you'll know why `tar czf` isn't one command but three id
 ## Directory Structure
 
 ```
-14a-archiving-compression/
+02-archiving-compression/
 ├── README.md                              # this file
-├── 14a-archiving-compression-anki.csv     # Anki flashcard deck
-└── 14a-archiving-compression-quiz.md      # standalone quiz
+├── m04-02-archiving-compression-anki.csv  # Anki flashcard deck
+└── m04-02-archiving-compression-quiz.md   # standalone quiz
 ```
 
 ## Environments
@@ -30,9 +30,9 @@ By the end of this demo you'll know why `tar czf` isn't one command but three id
 |---|---|---|---|
 | All lab tasks | ✅ verified in this session (tar 1.35, gzip 1.12, bzip2 1.0.8, xz 5.4.5) | ⚠️ [VERIFY] — not run this session; all four tools ship by default on RHEL9/Rocky9 as base packages, but exact versions and behavior weren't independently confirmed here | Not required |
 
-## Recall Check — 14-storage-fundamentals
+## Recall Check — 01-storage-fundamentals
 
-Answer these from memory before continuing — no looking back at Demo 14.
+Answer these from memory before continuing — no looking back at Demo M04-01.
 
 1. `df` shows a filesystem at 95% used; `du -sh` on the same path only accounts for half that space. What's the most likely cause?
 
@@ -125,7 +125,7 @@ file app.tar.gz
 file app.tar
 # app.tar: POSIX tar archive (GNU)
 ```
-`file` (introduced in Demo 01) identifies the archive by content, not extension — useful when you've received a file with no reliable name, or a `.tar` that's secretly something else.
+`file` (introduced in Demo M01-07) identifies the archive by content, not extension — useful when you've received a file with no reliable name, or a `.tar` that's secretly something else.
 
 **`-C` — extracting into a specific directory without `cd`-ing there first:**
 
@@ -242,7 +242,7 @@ tar -tzf app-nologs.tar.gz
 
 ### 1.6 Building archives safely from filenames with spaces
 
-Demo 19 covered why unquoted `xargs` breaks on filenames containing spaces, and the `find -print0` / `xargs -0` fix. The same hazard applies to building an archive from a dynamically generated file list:
+Demo M05-06 covered why unquoted `xargs` breaks on filenames containing spaces, and the `find -print0` / `xargs -0` fix. The same hazard applies to building an archive from a dynamically generated file list:
 
 ```bash
 find /tmp/mixed -name '*.txt' -print0 | tar --null -czf mixed.tar.gz --files-from=-
@@ -251,7 +251,7 @@ tar -tzf mixed.tar.gz
 # tmp/mixed/report one.txt
 # tmp/mixed/normal.txt
 ```
-> **Observation:** `report two.txt` is preserved as one member, not split into `report` and `two.txt`. `--files-from=-` tells `tar` to read the list of files to archive from stdin instead of the command line; `--null` tells it that list is null-delimited, matching `find -print0`'s output — the same null-safety pattern from Demo 19, applied to `tar` instead of `xargs`.
+> **Observation:** `report two.txt` is preserved as one member, not split into `report` and `two.txt`. `--files-from=-` tells `tar` to read the list of files to archive from stdin instead of the command line; `--null` tells it that list is null-delimited, matching `find -print0`'s output — the same null-safety pattern from Demo M05-06, applied to `tar` instead of `xargs`.
 
 ### 1.7 zip and unzip — cross-platform interoperability
 
@@ -467,7 +467,7 @@ Not entirely. `gzip -t` verifies the gzip stream's own internal checksum — it 
 3. **`tar` strips a leading `/` from member paths automatically (with a warning) to prevent an archive from writing outside the extraction directory — but this does not protect against a "tarbomb."** A relative archive built without a common wrapping directory (created via `tar -czf x.tar.gz .` from inside the source directory) scatters its contents into whatever directory you extract into. Always check `-tzf` for a common prefix, and always extract into a fresh subdirectory regardless.
 4. **Choose the compressor by trade-off, not habit: `gzip` for speed, `xz` for ratio, `bzip2` sits between them.** On this demo's test data, `xz` produced a file roughly a third the size of `gzip`'s output at the cost of meaningfully more CPU time — the right choice depends on whether the bottleneck is a backup window or long-term storage cost.
 5. **`gzip -t` verifies the compressed stream's internal checksum; `sha256sum` verifies the whole file hasn't changed since a known-good point.** They catch different failure modes — a single flipped byte anywhere in a compressed archive produces a full `invalid compressed data--crc error`, not a partial or localized failure, which is why integrity checks belong in any real backup verification step, not just "the job completed."
-6. **The `find -print0` / null-delimited pattern from Demo 19 applies to building `tar` archives from dynamic file lists, not just `xargs`.** `find ... -print0 | tar --null -czf out.tar.gz --files-from=-` handles filenames with spaces correctly; a plain newline-delimited list does not.
+6. **The `find -print0` / null-delimited pattern from Demo M05-06 applies to building `tar` archives from dynamic file lists, not just `xargs`.** `find ... -print0 | tar --null -czf out.tar.gz --files-from=-` handles filenames with spaces correctly; a plain newline-delimited list does not.
 7. **`zip` compresses per-file and is natively readable on Windows/macOS without extra tooling; `tar`+compressor preserves Unix permissions and ownership more faithfully.** Choose `zip` specifically when the recipient's environment is unknown or non-Unix; choose `tar` for anything staying inside Linux/Unix infrastructure.
 
 > **Demo scope:** Primary concept: the archive/compression separation and its safe composition.
@@ -515,10 +515,10 @@ Not entirely. `gzip -t` verifies the gzip stream's own internal checksum — it 
 
 ## Appendix A — Anki Cards
 
-**`14a-archiving-compression-anki.csv`:**
+**`m04-02-archiving-compression-anki.csv`:**
 
 ```
-#deck:Linux Mastery::Module 4 - Storage::Demo 14a - Archiving & Compression
+#deck:Linux Mastery::Module 4 - Storage::Demo M04-02 - Archiving & Compression
 #separator:Comma
 #columns:Front,Back,Tags
 "You run tar -cf archive.tar dir and the resulting file is smaller than the source directory's total size shown by du. Did tar compress the data?","No — tar alone never compresses anything. The size difference comes from tar not preserving the filesystem's per-file block-rounding overhead, not from any compression. Compression requires an explicit flag (-z/-j/-J) or piping through a separate compressor.","demo14a,tar,compression,fundamentals"
@@ -529,7 +529,7 @@ Not entirely. `gzip -t` verifies the gzip stream's own internal checksum — it 
 "When would you choose xz over gzip for compressing a backup?","When compression ratio matters more than CPU time — a compliance archive written once and rarely read benefits from xz's smaller footprint despite its higher CPU cost at creation. gzip is the better default when the backup window itself is the constraint.","demo14a,compression,gzip,xz,tradeoffs"
 "gzip -t on a backup file returns exit code 0 (success). Does this guarantee the backup is fully restorable?","Not entirely. gzip -t only verifies the compressed stream's internal checksum — it doesn't confirm the tar contents inside are the expected files or that a real extraction produces correct data. A fuller check also runs tar -tzf (or a real test extraction) against the decompressed contents.","demo14a,integrity,verification,gzip"
 "A single byte is flipped inside a .tar.gz file. What does gzip -t report, and why isn't the damage localized to one file inside the archive?","gzip: invalid compressed data--crc error — compressed streams don't degrade gracefully; corruption anywhere in the stream can invalidate everything after that point, not just the one logical file whose bytes were altered.","demo14a,integrity,corruption,gzip"
-"How do you safely build a tar archive from a dynamically generated list of filenames that might contain spaces?","find DIR -print0 | tar --null -czf out.tar.gz --files-from=- — the same null-delimited pattern from Demo 19's find -print0 | xargs -0, applied to tar's --files-from instead of xargs.","demo14a,tar,find,cross-demo,safety"
+"How do you safely build a tar archive from a dynamically generated list of filenames that might contain spaces?","find DIR -print0 | tar --null -czf out.tar.gz --files-from=- — the same null-delimited pattern from Demo M05-06's find -print0 | xargs -0, applied to tar's --files-from instead of xargs.","demo14a,tar,find,cross-demo,safety"
 "--exclude='logs' is passed to tar during archive CREATION, not extraction. What's the practical implication?","The excluded content never enters the archive at all — it's not a filter applied when reading the archive back out. This matters because you can't recover excluded content from that archive later; the decision to exclude is permanent for that archive.","demo14a,tar,exclude,fundamentals"
 "Why might you choose zip over tar+gzip for a specific deliverable?","When the recipient's environment is unknown or non-Unix (Windows, macOS) — .zip is natively readable there without extra tooling, unlike .tar.gz. tar+compressor remains preferable for Linux-to-Linux transfer where preserving Unix permissions/ownership matters more.","demo14a,zip,tar,comparison"
 "What's the difference between tar -tvf and unzip -l?","They're the direct equivalent of each other for their respective formats — both list an archive's contents with details (size, date, name) without extracting anything. tar -tvf works on tar archives (any compression); unzip -l works on .zip files specifically.","demo14a,tar,zip,comparison"
@@ -537,10 +537,10 @@ Not entirely. `gzip -t` verifies the gzip stream's own internal checksum — it 
 
 ## Appendix B — Quiz
 
-**`14a-archiving-compression-quiz.md`:**
+**`m04-02-archiving-compression-quiz.md`:**
 
 ````markdown
-# Quiz — Demo 14a: Archiving & Compression
+# Quiz — Demo M04-02: Archiving & Compression
 
 > One correct answer per question unless stated otherwise.
 > Target: 80% or above before moving to the next demo.
@@ -665,7 +665,7 @@ Trap: A overstates what a single check proves; C understates it — `gzip -t` is
 <details>
 <summary>Answer</summary>
 
-**B** — This is the same null-safety pattern from Demo 19's `find -print0 | xargs -0`, applied to `tar`'s `--files-from` instead. Null bytes can't appear in filenames, making them the only delimiter safe for arbitrary names, including ones with spaces.
+**B** — This is the same null-safety pattern from Demo M05-06's `find -print0 | xargs -0`, applied to `tar`'s `--files-from` instead. Null bytes can't appear in filenames, making them the only delimiter safe for arbitrary names, including ones with spaces.
 
 Trap: A invents an unrelated compression-ratio effect; C and D both invent scale/tool-specific requirements that don't apply — the safety concern is about filename content, not archive size or compressor choice.
 
