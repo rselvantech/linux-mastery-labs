@@ -1,9 +1,7 @@
 temp/backup/
 src/
-*log*
+*.log
+*.log.*
 logs/
-old*
-new.md
-new*
-
-
+old*.md
+new*.md
