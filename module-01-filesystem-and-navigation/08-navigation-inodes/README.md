@@ -674,8 +674,8 @@ during an incident.
 ### Task 2 — ls flags in practice
 
 ```bash
-mkdir -p ~/demo02/testdir
-cd ~/demo02
+mkdir -p ~/demo-m01-08/testdir
+cd ~/demo-m01-08
 
 # Create some test files with content
 echo "config content" > app.conf
@@ -714,7 +714,7 @@ as hard links.
 ### Task 3 — stat and timestamps
 
 ```bash
-cd ~/demo02
+cd ~/demo-m01-08
 
 stat app.conf    # complete inode view
 
@@ -744,7 +744,7 @@ change and which do not.**
 ### Task 4 — Hard links and inodes
 
 ```bash
-cd ~/demo02
+cd ~/demo-m01-08
 
 # Create a file and check its inode
 echo "important data" > original.txt
@@ -770,9 +770,9 @@ cat hardlink.txt     # still readable — inode still has link count 1
 ls -li hardlink.txt  # link count = 1 now
 
 # Create hard link across directories
-mkdir -p /tmp/demo02-links
-ln hardlink.txt /tmp/demo02-links/another-name.txt
-ls -li hardlink.txt /tmp/demo02-links/another-name.txt
+mkdir -p /tmp/demo-m01-08-links
+ln hardlink.txt /tmp/demo-m01-08-links/another-name.txt
+ls -li hardlink.txt /tmp/demo-m01-08-links/another-name.txt
 # Same inode number — same file
 ```
 
@@ -799,7 +799,7 @@ df -i .     # inode COUNT available — a completely separate limit
 ### Task 5 — Soft links
 
 ```bash
-cd ~/demo02
+cd ~/demo-m01-08
 
 # Create a soft link
 echo "target content" > target.txt
@@ -826,9 +826,9 @@ ls -la softlink.txt  # still shows link but target is gone
 echo "recreated" > target.txt  # fix by recreating target
 
 # Real DevOps pattern: version alias
-ln -s /usr/bin/python3 ~/demo02/python
-ls -la ~/demo02/python   # shows -> /usr/bin/python3
-~/demo02/python --version
+ln -s /usr/bin/python3 ~/demo-m01-08/python
+ls -la ~/demo-m01-08/python   # shows -> /usr/bin/python3
+~/demo-m01-08/python --version
 
 
 # stat on symlink vs stat -L
@@ -850,7 +850,7 @@ stat -L symlink:   target's inode and timestamps
 ### Task 6 — cp with preserve and archive flags
 
 ```bash
-cd ~/demo02
+cd ~/demo-m01-08
 
 # Create a target file and a symlink to use for testing
 echo "original content" > source.txt
@@ -902,7 +902,7 @@ cp -a:          timestamps preserved + symlinks preserved as symlinks
 ### Task 7 — touch and timestamps
 
 ```bash
-cd ~/demo02
+cd ~/demo-m01-08
 
 # Create multiple files at once
 touch file{1..5}.txt
@@ -1192,29 +1192,29 @@ are removed AND no process has it open.
 #separator:Comma
 #columns:Front,Back,Tags
 
-"ls -l shows link count 3 for a directory. What does 3 mean?","Every directory has minimum 2 hard links: the entry in its parent, and its own . (dot) entry. Each subdirectory adds 1 more via its .. (dotdot) entry. Link count 3 means exactly one subdirectory exists. Use ls -lai to see inode numbers.","demo02,inodes,links"
+"ls -l shows link count 3 for a directory. What does 3 mean?","Every directory has minimum 2 hard links: the entry in its parent, and its own . (dot) entry. Each subdirectory adds 1 more via its .. (dotdot) entry. Link count 3 means exactly one subdirectory exists. Use ls -lai to see inode numbers.","demo-m01-08,inodes,links"
 
-"You delete a 5GB file but df -h shows no change. What command diagnoses this and what is the fix?","lsof | grep deleted — shows files with directory entry removed but still held open by a process. The kernel keeps inode and data blocks allocated until the process closes the file. Fix: restart the process holding it. The kernel then frees the blocks.","demo02,inodes,disk,lsof"
+"You delete a 5GB file but df -h shows no change. What command diagnoses this and what is the fix?","lsof | grep deleted — shows files with directory entry removed but still held open by a process. The kernel keeps inode and data blocks allocated until the process closes the file. Fix: restart the process holding it. The kernel then frees the blocks.","demo-m01-08,inodes,disk,lsof"
 
-"What is the difference between mtime and ctime? Why does writing content update both?","mtime updates when file contents change. ctime updates when any inode metadata changes. Writing content changes mtime — but the new mtime value must be stored in the inode — so the inode is modified — so ctime also updates. ctime always updates when mtime updates, but ctime can update without mtime (chmod, chown).","demo02,timestamps"
+"What is the difference between mtime and ctime? Why does writing content update both?","mtime updates when file contents change. ctime updates when any inode metadata changes. Writing content changes mtime — but the new mtime value must be stored in the inode — so the inode is modified — so ctime also updates. ctime always updates when mtime updates, but ctime can update without mtime (chmod, chown).","demo-m01-08,timestamps"
 
-"ls -lai shows two files with the same inode number. What are they? What happens if you delete one?","Hard links — two directory entries pointing to the same inode and data blocks. Created with: ln original.txt hardlink.txt. Deleting one reduces link count by 1. Data survives until link count = 0 AND no process has file open.","demo02,hardlinks,inodes"
+"ls -lai shows two files with the same inode number. What are they? What happens if you delete one?","Hard links — two directory entries pointing to the same inode and data blocks. Created with: ln original.txt hardlink.txt. Deleting one reduces link count by 1. Data survives until link count = 0 AND no process has file open.","demo-m01-08,hardlinks,inodes"
 
-"ls -la shows: lrwxrwxrwx 1 root root 26 May 29 nginx.conf -> /etc/nginx/nginx.conf. What is the 26?","26 is the number of characters in the target path string /etc/nginx/nginx.conf. For symlinks, the size column shows the byte length of the stored path string — not data size. lrwxrwxrwx: l = symbolic link type.","demo02,softlinks,ls"
+"ls -la shows: lrwxrwxrwx 1 root root 26 May 29 nginx.conf -> /etc/nginx/nginx.conf. What is the 26?","26 is the number of characters in the target path string /etc/nginx/nginx.conf. For symlinks, the size column shows the byte length of the stored path string — not data size. lrwxrwxrwx: l = symbolic link type.","demo-m01-08,softlinks,ls"
 
-"chmod on a file updates ctime but not mtime. mv updates ctime but not mtime. Why?","chmod changes permissions — inode metadata. Any inode change updates ctime. mv renames the directory entry — the inode is touched during the rename operation. ctime records any inode change. mtime only changes when file contents change. Neither chmod nor mv touches file data.","demo02,timestamps,ctime"
+"chmod on a file updates ctime but not mtime. mv updates ctime but not mtime. Why?","chmod changes permissions — inode metadata. Any inode change updates ctime. mv renames the directory entry — the inode is touched during the rename operation. ctime records any inode change. mtime only changes when file contents change. Neither chmod nor mv touches file data.","demo-m01-08,timestamps,ctime"
 
-"Explain the nginx sites-available/sites-enabled symlink pattern. Why symlinks instead of copies?","sites-available/ holds all config files. sites-enabled/ holds symlinks pointing to active configs in sites-available/. Enable: ln -s ../sites-available/app.conf sites-enabled/. Disable: rm sites-enabled/app.conf (symlink only, config preserved). One file exists — edits are immediately seen. Copies would go out of sync.","demo02,softlinks,nginx"
+"Explain the nginx sites-available/sites-enabled symlink pattern. Why symlinks instead of copies?","sites-available/ holds all config files. sites-enabled/ holds symlinks pointing to active configs in sites-available/. Enable: ln -s ../sites-available/app.conf sites-enabled/. Disable: rm sites-enabled/app.conf (symlink only, config preserved). One file exists — edits are immediately seen. Copies would go out of sync.","demo-m01-08,softlinks,nginx"
 
-"What is a directory entry? What information does it contain?","A directory in Linux is a special file whose contents are a table mapping filenames to inode numbers. Each row is a directory entry: filename → inode number. The filename lives here, not in the inode. Create a file: new inode + new entry. Delete: entry removed (inode freed when count=0 and no open fd). Rename: entry's filename changed, same inode.","demo02,inodes,directory-entry"
+"What is a directory entry? What information does it contain?","A directory in Linux is a special file whose contents are a table mapping filenames to inode numbers. Each row is a directory entry: filename → inode number. The filename lives here, not in the inode. Create a file: new inode + new entry. Delete: entry removed (inode freed when count=0 and no open fd). Rename: entry's filename changed, same inode.","demo-m01-08,inodes,directory-entry"
 
-"You run stat on a symlink. Does it show the symlink's own metadata or the target's? How do you make stat follow the symlink?","stat on a symlink shows the symlink's OWN metadata — its own inode, its own timestamps, its own size (= path string length). It does NOT follow the symlink by default. To follow the symlink and show the target's metadata: stat -L symlink.txt. The -L flag means dereference (follow the link). This distinction matters when checking whether an edit through a symlink was saved — always stat the target directly, not the symlink.","demo02,symlink,stat"
+"You run stat on a symlink. Does it show the symlink's own metadata or the target's? How do you make stat follow the symlink?","stat on a symlink shows the symlink's OWN metadata — its own inode, its own timestamps, its own size (= path string length). It does NOT follow the symlink by default. To follow the symlink and show the target's metadata: stat -L symlink.txt. The -L flag means dereference (follow the link). This distinction matters when checking whether an edit through a symlink was saved — always stat the target directly, not the symlink.","demo-m01-08,symlink,stat"
 
-"What is the difference between cp, cp -p, and cp -a when copying a file that is a symlink?","cp (plain): follows the symlink and copies the target content as a regular file. New timestamps from now, your umask permissions. cp -p (preserve): follows the symlink, copies target content, but preserves original timestamps, permissions and ownership. Still a regular file. cp -a (archive): preserves the symlink AS a symlink — does not follow it. Also preserves timestamps and permissions. Use cp -a for complete faithful directory copies — backups, migrations, staging. cp -a = -r + -p + -d (preserve symlinks).","demo02,cp,symlink,flags"
+"What is the difference between cp, cp -p, and cp -a when copying a file that is a symlink?","cp (plain): follows the symlink and copies the target content as a regular file. New timestamps from now, your umask permissions. cp -p (preserve): follows the symlink, copies target content, but preserves original timestamps, permissions and ownership. Still a regular file. cp -a (archive): preserves the symlink AS a symlink — does not follow it. Also preserves timestamps and permissions. Use cp -a for complete faithful directory copies — backups, migrations, staging. cp -a = -r + -p + -d (preserve symlinks).","demo-m01-08,cp,symlink,flags"
 
-"touch file{1..5}.txt creates 5 files. Is this a touch feature or something else? What other commands can use the same syntax?","This is bash brace expansion — a shell feature, not specific to touch. The shell expands {1..5} before touch even runs, converting it to: touch file1.txt file2.txt file3.txt file4.txt file5.txt. Works with any command: mkdir dir{a,b,c}, cp config{,.bak}, rm log{1..10}.txt. Covered fully in Demo 24 (Shell Scripting Fundamentals).","demo02,touch,bash,brace-expansion"
+"touch file{1..5}.txt creates 5 files. Is this a touch feature or something else? What other commands can use the same syntax?","This is bash brace expansion — a shell feature, not specific to touch. The shell expands {1..5} before touch even runs, converting it to: touch file1.txt file2.txt file3.txt file4.txt file5.txt. Works with any command: mkdir dir{a,b,c}, cp config{,.bak}, rm log{1..10}.txt. Covered fully in Demo 24 (Shell Scripting Fundamentals).","demo-m01-08,touch,bash,brace-expansion"
 
-"You try to create a hard link to a directory: ln /etc/nginx/ /tmp/nginx-link. It fails. Why? What should you use instead?","Hard links to directories are not allowed — the kernel explicitly prevents it to avoid circular directory loops which would break filesystem traversal. Error: hard link not allowed for directory. Use a soft link instead: ln -s /etc/nginx/ /tmp/nginx-link. Soft links can point to directories and are the correct tool for directory aliasing.","demo02,hardlinks,directories"
+"You try to create a hard link to a directory: ln /etc/nginx/ /tmp/nginx-link. It fails. Why? What should you use instead?","Hard links to directories are not allowed — the kernel explicitly prevents it to avoid circular directory loops which would break filesystem traversal. Error: hard link not allowed for directory. Use a soft link instead: ln -s /etc/nginx/ /tmp/nginx-link. Soft links can point to directories and are the correct tool for directory aliasing.","demo-m01-08,hardlinks,directories"
 ```
 
 ---

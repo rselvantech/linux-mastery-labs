@@ -248,11 +248,11 @@ predicts, not as a transcript to compare against blindly.
 ### Task 1 — Local sync, trailing slash both ways
 
 ```bash
-mkdir -p ~/14b-lab/src/subdir
-echo "file one" > ~/14b-lab/src/one.txt
-echo "file two" > ~/14b-lab/src/subdir/two.txt
-mkdir -p ~/14b-lab/dst-noslash ~/14b-lab/dst-slash
-cd ~/14b-lab
+mkdir -p ~/m04-03-lab/src/subdir
+echo "file one" > ~/m04-03-lab/src/one.txt
+echo "file two" > ~/m04-03-lab/src/subdir/two.txt
+mkdir -p ~/m04-03-lab/dst-noslash ~/m04-03-lab/dst-slash
+cd ~/m04-03-lab
 
 rsync -av src dst-noslash
 find dst-noslash
@@ -268,7 +268,7 @@ find dst-slash
 ### Task 2 — Dry run before a real sync
 
 ```bash
-echo "file three" > ~/14b-lab/src/three.txt
+echo "file three" > ~/m04-03-lab/src/three.txt
 rsync -avn src/ dst-slash
 # Expected (per §1.3): a listing of just "three.txt" as what WOULD be
 # transferred, with no actual change made yet — confirm by re-listing
@@ -282,15 +282,15 @@ ls dst-slash
 ### Task 3 — Exclude patterns
 
 ```bash
-mkdir -p ~/14b-lab/src/node_modules
-echo "should not sync" > ~/14b-lab/src/node_modules/pkg.js
-echo "temp data" > ~/14b-lab/src/scratch.tmp
+mkdir -p ~/m04-03-lab/src/node_modules
+echo "should not sync" > ~/m04-03-lab/src/node_modules/pkg.js
+echo "temp data" > ~/m04-03-lab/src/scratch.tmp
 
 rsync -avn --exclude='*.tmp' --exclude='node_modules' src/ dst-slash
 # Expected (per §1.5): the dry-run listing should show neither
 # node_modules/ nor scratch.tmp as items to transfer
 
-cat > ~/14b-lab/exclude-patterns.txt <<'EOF'
+cat > ~/m04-03-lab/exclude-patterns.txt <<'EOF'
 *.tmp
 node_modules
 EOF
@@ -301,7 +301,7 @@ rsync -avn --exclude-from=exclude-patterns.txt src/ dst-slash
 ### Task 4 — `--delete`, always preceded by `--dry-run`
 
 ```bash
-rm ~/14b-lab/src/one.txt
+rm ~/m04-03-lab/src/one.txt
 rsync -avn --delete src/ dst-slash
 # Expected (per §1.3/§1.7): dry-run output should list one.txt as a
 # file that WOULD be deleted from dst-slash, since it's no longer in src
@@ -314,7 +314,7 @@ ls dst-slash
 ### Task 5 — Bandwidth throttling
 
 ```bash
-dd if=/dev/zero of=~/14b-lab/src/bigfile bs=1M count=20 2>/dev/null
+dd if=/dev/zero of=~/m04-03-lab/src/bigfile bs=1M count=20 2>/dev/null
 time rsync -av --bwlimit=500 src/bigfile /tmp/throttled-copy
 # Expected (per §1.6): the transfer takes measurably longer than an
 # unthrottled copy of the same file — run without --bwlimit for
@@ -325,11 +325,11 @@ time rsync -av --bwlimit=500 src/bigfile /tmp/throttled-copy
 ### Task 6 — Remote sync over SSH (if you have SSH access to a second host or VM)
 
 ```bash
-rsync -avz -e ssh src/ user@remote-host:/tmp/14b-remote-test/
+rsync -avz -e ssh src/ user@remote-host:/tmp/m04-03-remote-test/
 # Expected (per §1.7): identical behavior to the local sync in Task 1,
 # just transported over SSH; both ends need rsync installed
 
-rsync -avzn -e ssh --delete src/ user@remote-host:/tmp/14b-remote-test/
+rsync -avzn -e ssh --delete src/ user@remote-host:/tmp/m04-03-remote-test/
 # Dry-run first, exactly as in Task 4 — the habit doesn't change just
 # because the destination is remote
 ```
@@ -534,16 +534,16 @@ directory structure (a common pattern in some backup tools) needs to add
 #deck:Linux Mastery::Module 4 - Storage::Demo M04-03 - rsync for Sync & Backup
 #separator:Comma
 #columns:Front,Back,Tags
-"What is rsync's core advantage over tar+scp for a directory that gets synced to the same destination repeatedly?","rsync uses delta-transfer — it compares source and destination and transfers only the changed portions of files, not the whole tree every time. tar+scp re-sends the entire archive on every run regardless of how much actually changed.","demo14b,rsync,fundamentals"
-"rsync -a src dst and rsync -a src/ dst produce different results. What's the rule, and which one copies src's CONTENTS rather than src itself?","A trailing slash on the SOURCE path changes the result; a trailing slash on the destination never matters. rsync -a src/ dst copies the contents of src into dst. rsync -a src dst copies src itself (as a subdirectory) into dst.","demo14b,rsync,trailing-slash,fundamentals"
-"The same rsync -a src dst command (no trailing slash) is run twice against the same destination. What happens on the second run that didn't happen on the first?","A nested duplicate directory appears. The first run creates dst/src/. The second run, unchanged, again copies the src directory itself into dst — but dst already contains an src/ from the first run, so the new copy lands inside it: dst/src/src/.","demo14b,rsync,trailing-slash,break-fix"
-"Does rsync's -a (archive mode) preserve hard links?","No — -a expands to -rlptgoD, which deliberately does NOT include -H (hard-link preservation). Hard-link detection is comparatively expensive, so it's left out of the bundle on purpose and must be requested explicitly with -H if needed.","demo14b,rsync,archive-mode,common-mistake"
-"What should always precede a real rsync run that includes --delete?","The exact same command with --dry-run (-n) added, so the file list rsync intends to delete can be reviewed first. rsync's own manual page explicitly recommends this — --delete is documented as dangerous if used incorrectly, since a wrong source path doesn't error, it silently deletes real destination files.","demo14b,rsync,delete,safety"
-"A script runs rsync -a --delete against a typo'd source path (e.g. /data/ap-source instead of /data/app-source). What does rsync actually do, and why doesn't it fail with an error?","rsync has no way to know the path is a typo — it treats /data/ap-source as the intended source and brings the destination in line with it, deleting any destination files that don't exist in that (wrong, likely empty or unrelated) source. This is exactly why a dry-run step matters: it surfaces the unexpected file list before real deletion happens.","demo14b,rsync,delete,break-fix"
-"How does rsync's --exclude differ from tar's --exclude (Demo M04-02) in terms of WHEN it's applied?","rsync's --exclude is evaluated per-file at sync time, on every run — the rules can change between runs without rebuilding anything. tar's --exclude is baked into the archive permanently at creation time and can't be changed afterward for that archive.","demo14b,rsync,tar,exclude,comparison"
-"Why does rsync need to be installed on BOTH ends of a remote (SSH) transfer, unlike scp which only needs a plain SSH server on the remote end?","rsync's delta-transfer relies on a comparison protocol that runs on both sides — both the sending and receiving rsync processes participate in figuring out which blocks actually changed. scp has no such comparison; it just copies bytes, so it only needs SSH access, not rsync itself, on the remote end.","demo14b,rsync,ssh,fundamentals"
-"When would tar+scp (Demo M04-02) still be the better choice over rsync?","For a genuine one-off transfer to a destination that doesn't exist yet and won't be synced again — delta-transfer's advantage only shows up on repeat syncs to the same destination. For a single transfer, tar+scp is simpler with no meaningful disadvantage.","demo14b,rsync,tar,comparison"
-"What does --bwlimit=500 do, per rsync's own documentation, and what's its documented mechanism?","Throttles the transfer to roughly 500 KB/s. Per the manual page, rsync sends a block of data, then pauses if the transfer is running faster than the specified limit — the result averages out to approximately the requested rate over time, most effective on larger files.","demo14b,rsync,bwlimit,fundamentals"
+"What is rsync's core advantage over tar+scp for a directory that gets synced to the same destination repeatedly?","rsync uses delta-transfer — it compares source and destination and transfers only the changed portions of files, not the whole tree every time. tar+scp re-sends the entire archive on every run regardless of how much actually changed.","demo-m04-03,rsync,fundamentals"
+"rsync -a src dst and rsync -a src/ dst produce different results. What's the rule, and which one copies src's CONTENTS rather than src itself?","A trailing slash on the SOURCE path changes the result; a trailing slash on the destination never matters. rsync -a src/ dst copies the contents of src into dst. rsync -a src dst copies src itself (as a subdirectory) into dst.","demo-m04-03,rsync,trailing-slash,fundamentals"
+"The same rsync -a src dst command (no trailing slash) is run twice against the same destination. What happens on the second run that didn't happen on the first?","A nested duplicate directory appears. The first run creates dst/src/. The second run, unchanged, again copies the src directory itself into dst — but dst already contains an src/ from the first run, so the new copy lands inside it: dst/src/src/.","demo-m04-03,rsync,trailing-slash,break-fix"
+"Does rsync's -a (archive mode) preserve hard links?","No — -a expands to -rlptgoD, which deliberately does NOT include -H (hard-link preservation). Hard-link detection is comparatively expensive, so it's left out of the bundle on purpose and must be requested explicitly with -H if needed.","demo-m04-03,rsync,archive-mode,common-mistake"
+"What should always precede a real rsync run that includes --delete?","The exact same command with --dry-run (-n) added, so the file list rsync intends to delete can be reviewed first. rsync's own manual page explicitly recommends this — --delete is documented as dangerous if used incorrectly, since a wrong source path doesn't error, it silently deletes real destination files.","demo-m04-03,rsync,delete,safety"
+"A script runs rsync -a --delete against a typo'd source path (e.g. /data/ap-source instead of /data/app-source). What does rsync actually do, and why doesn't it fail with an error?","rsync has no way to know the path is a typo — it treats /data/ap-source as the intended source and brings the destination in line with it, deleting any destination files that don't exist in that (wrong, likely empty or unrelated) source. This is exactly why a dry-run step matters: it surfaces the unexpected file list before real deletion happens.","demo-m04-03,rsync,delete,break-fix"
+"How does rsync's --exclude differ from tar's --exclude (Demo M04-02) in terms of WHEN it's applied?","rsync's --exclude is evaluated per-file at sync time, on every run — the rules can change between runs without rebuilding anything. tar's --exclude is baked into the archive permanently at creation time and can't be changed afterward for that archive.","demo-m04-03,rsync,tar,exclude,comparison"
+"Why does rsync need to be installed on BOTH ends of a remote (SSH) transfer, unlike scp which only needs a plain SSH server on the remote end?","rsync's delta-transfer relies on a comparison protocol that runs on both sides — both the sending and receiving rsync processes participate in figuring out which blocks actually changed. scp has no such comparison; it just copies bytes, so it only needs SSH access, not rsync itself, on the remote end.","demo-m04-03,rsync,ssh,fundamentals"
+"When would tar+scp (Demo M04-02) still be the better choice over rsync?","For a genuine one-off transfer to a destination that doesn't exist yet and won't be synced again — delta-transfer's advantage only shows up on repeat syncs to the same destination. For a single transfer, tar+scp is simpler with no meaningful disadvantage.","demo-m04-03,rsync,tar,comparison"
+"What does --bwlimit=500 do, per rsync's own documentation, and what's its documented mechanism?","Throttles the transfer to roughly 500 KB/s. Per the manual page, rsync sends a block of data, then pauses if the transfer is running faster than the specified limit — the result averages out to approximately the requested rate over time, most effective on larger files.","demo-m04-03,rsync,bwlimit,fundamentals"
 ```
 
 ## Appendix B — Quiz

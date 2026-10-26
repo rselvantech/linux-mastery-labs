@@ -2,7 +2,7 @@
 
 ## Overview
 
-Demos M08-01/27a/27b each hardened one specific thing — SSH, MAC policy, TLS.
+Demos M08-01/M08-02/M08-03 each hardened one specific thing — SSH, MAC policy, TLS.
 This demo covers the tools that check **all of it at once, systematically,
 and repeatedly**: `lynis` and OpenSCAP. Neither tool fixes anything by
 itself — both produce a prioritized list of findings, and the actual
@@ -161,7 +161,7 @@ OpenSCAP:  narrow to a specific published profile, produces evidence
 ```
 
 Neither replaces the other, and neither replaces the targeted work from
-Demos M08-01/27a/27b — both tools would surface a *symptom* (weak SSH config,
+Demos M08-01/M08-02/M08-03 — both tools would surface a *symptom* (weak SSH config,
 a MAC policy left permissive, a certificate near expiry) without doing
 the actual diagnosis and fix this series already covered in depth.
 
@@ -193,7 +193,7 @@ which neither tool can fully know on its own.
 ### 1.5 What a baseline scan would catch from this module
 
 A scan run against a host that skipped or misconfigured any of Demos
-M08-01/27a/27b's work would surface it as a finding, even without anyone
+M08-01/M08-02/M08-03's work would surface it as a finding, even without anyone
 manually re-checking:
 
 ```
@@ -269,7 +269,7 @@ ID and what it's actually checking for.
 # environment-specific low-risk, everything else.
 ```
 
-### Task 4 — Recognize which findings map back to Demos M08-01/27a/27b
+### Task 4 — Recognize which findings map back to Demos M08-01/M08-02/M08-03
 
 For each of these hypothetical findings, name which earlier demo's work
 it relates to, and what "fixed" actually looks like per that demo:
@@ -305,7 +305,7 @@ new certificate once issued, not just that a new file exists on disk.
   compliance report
 - ✅ Triaged a findings list instead of treating every line as equally
   urgent
-- ✅ Recognized which findings map back to gaps in Demos M08-01/27a/27b's own
+- ✅ Recognized which findings map back to gaps in Demos M08-01/M08-02/M08-03's own
   work
 - ✅ Explained why a baseline scan runs on a schedule, not once
 
@@ -436,13 +436,13 @@ accuracy.
 #deck:Linux Mastery::Module 8 - Security::Demo M08-04 - Security Auditing Tools
 #separator:Comma
 #columns:Front,Back,Tags
-"What's the fundamental difference between lynis and OpenSCAP?","lynis is broad and heuristic, requiring no external standard — good for general ongoing baselines. OpenSCAP scans against a specific, named, published profile (CIS, STIG) and maps findings to rule IDs — used to demonstrate compliance with a specific standard.","demo27c,lynis,openscap,comparison"
-"What does lynis's 'hardening index' represent, and why shouldn't it be the primary goal?","An overall pass-rate summary (0-100). It shouldn't be the primary goal because a handful of specific high-severity WARNINGs matter far more than a marginal index increase from fixing several low-severity SUGGESTIONs.","demo27c,lynis,hardening-index"
-"Why does the choice of SCAP profile matter as much as running an OpenSCAP scan at all?","Scanning against the wrong profile (e.g. CIS when the actual requirement is DISA STIG) produces a report that answers the wrong compliance question entirely, even though the scan itself completes successfully.","demo27c,openscap,profile"
-"Why is treating a 200-finding audit report as a flat top-to-bottom to-do list a mistake?","Findings aren't equally urgent — some have a direct known exploit path, some are genuinely low-risk in the specific environment, and some represent a real regression against something already deliberately configured. Context changes priority in ways neither tool fully knows on its own.","demo27c,triage,best-practice"
-"Why does a security baseline scan need to run on a schedule rather than once?","A one-time scan only proves compliance at that instant. Configuration drifts afterward (package updates, forgotten debugging changes, expiring certificates) and none of that is caught by a scan that already ran.","demo27c,scan-cadence,fundamentals"
-"A host passed a compliance scan last quarter but had a MAC setting drift to Permissive mode in the meantime, undetected. Was the scan tool at fault?","No — the tool correctly reported the system's state at the time it ran. The gap was in cadence: nothing re-scanned the system between that pass and the drift. This argues for scheduled, diffed scanning, not a tool criticism.","demo27c,scan-cadence,break-fix"
-"If a baseline scan reports 'SSH root login is permitted,' which earlier demo's fix does that map to?","Demo M08-01 (SSH hardening): PermitRootLogin no in sshd_config, validated with sshd -t before restarting.","demo27c,cross-demo,ssh"
+"What's the fundamental difference between lynis and OpenSCAP?","lynis is broad and heuristic, requiring no external standard — good for general ongoing baselines. OpenSCAP scans against a specific, named, published profile (CIS, STIG) and maps findings to rule IDs — used to demonstrate compliance with a specific standard.","demo-m08-04,lynis,openscap,comparison"
+"What does lynis's 'hardening index' represent, and why shouldn't it be the primary goal?","An overall pass-rate summary (0-100). It shouldn't be the primary goal because a handful of specific high-severity WARNINGs matter far more than a marginal index increase from fixing several low-severity SUGGESTIONs.","demo-m08-04,lynis,hardening-index"
+"Why does the choice of SCAP profile matter as much as running an OpenSCAP scan at all?","Scanning against the wrong profile (e.g. CIS when the actual requirement is DISA STIG) produces a report that answers the wrong compliance question entirely, even though the scan itself completes successfully.","demo-m08-04,openscap,profile"
+"Why is treating a 200-finding audit report as a flat top-to-bottom to-do list a mistake?","Findings aren't equally urgent — some have a direct known exploit path, some are genuinely low-risk in the specific environment, and some represent a real regression against something already deliberately configured. Context changes priority in ways neither tool fully knows on its own.","demo-m08-04,triage,best-practice"
+"Why does a security baseline scan need to run on a schedule rather than once?","A one-time scan only proves compliance at that instant. Configuration drifts afterward (package updates, forgotten debugging changes, expiring certificates) and none of that is caught by a scan that already ran.","demo-m08-04,scan-cadence,fundamentals"
+"A host passed a compliance scan last quarter but had a MAC setting drift to Permissive mode in the meantime, undetected. Was the scan tool at fault?","No — the tool correctly reported the system's state at the time it ran. The gap was in cadence: nothing re-scanned the system between that pass and the drift. This argues for scheduled, diffed scanning, not a tool criticism.","demo-m08-04,scan-cadence,break-fix"
+"If a baseline scan reports 'SSH root login is permitted,' which earlier demo's fix does that map to?","Demo M08-01 (SSH hardening): PermitRootLogin no in sshd_config, validated with sshd -t before restarting.","demo-m08-04,cross-demo,ssh"
 ```
 
 ## Appendix B — Quiz

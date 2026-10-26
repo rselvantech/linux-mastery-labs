@@ -1,7 +1,7 @@
 # Demo M04-08 — Disk Quotas
 
 > **A note on how this demo was built:**
-> Same constraint as Demos M04-05 and 15b: the `quota` package is not
+> Same constraint as Demos M04-05 and M04-06: the `quota` package is not
 > installed and can't be installed (no network access), and this
 > container has no quota kernel subsystem available either (no
 > `/lib/modules/.../kernel/fs/quota/` tree). Every command and behavior
@@ -14,7 +14,7 @@
 
 ## Overview
 
-Demo M04-01 covered provisioning a volume; Demos M04-05 and 15b covered
+Demo M04-01 covered provisioning a volume; Demos M04-05 and M04-06 covered
 protecting it from disk failure and unauthorized physical access. This
 demo covers a different problem entirely: what happens when the people
 or processes *using* a shared volume don't fail or misbehave, but simply
@@ -28,7 +28,7 @@ clean up before they're actually locked out.
 
 1. Explain what disk quotas actually solve (fair-share capacity
    enforcement) and how that's distinct from RAID (Demo M04-05) or backups
-   (Demo M04-02/14b) — none of which prevent one user from filling a shared disk
+   (Demo M04-02/M04-03) — none of which prevent one user from filling a shared disk
 2. Enable quotas on a filesystem via `/etc/fstab` and initialize them
    with `quotacheck`
 3. Set user quota limits with `setquota`/`edquota`, understanding the
@@ -83,7 +83,7 @@ Answer these from memory before continuing — no looking back at Demo M04-06.
 ### 1.1 What quotas solve — and what they don't
 
 Quotas are a *fair-share* mechanism, not a durability or security one.
-None of Demo M04-02/14b's backups, Demo M04-05's RAID, or Demo M04-06's LUKS
+None of Demo M04-02/M04-03's backups, Demo M04-05's RAID, or Demo M04-06's LUKS
 encryption prevent a single user or group from filling a shared
 filesystem — a runaway log directory, a forgotten dataset, or simple
 carelessness on a shared `/home` can take down every other user's
@@ -319,7 +319,7 @@ sudo quotaoff -avu
 ## What You Learned
 
 1. ✅ Explained what disk quotas solve (fair-share capacity enforcement)
-   and how that's distinct from RAID (Demo M04-05) and backups (Demo M04-02/14b)
+   and how that's distinct from RAID (Demo M04-05) and backups (Demo M04-02/M04-03)
 2. ✅ Enabled quotas via `/etc/fstab` and initialized accounting with
    `quotacheck`
 3. ✅ Set user quota limits with `setquota`/`edquota`, distinguishing
@@ -440,7 +440,7 @@ completed.
 
 ---
 
-1. **Quotas are a fair-share mechanism, not a durability or security one — they solve a problem RAID (Demo M04-05), backups (Demo M04-02/14b), and LUKS (Demo M04-06) don't touch.** None of those protections stop one user from filling a shared disk; quotas cap per-user/per-group consumption specifically to prevent that.
+1. **Quotas are a fair-share mechanism, not a durability or security one — they solve a problem RAID (Demo M04-05), backups (Demo M04-02/M04-03), and LUKS (Demo M04-06) don't touch.** None of those protections stop one user from filling a shared disk; quotas cap per-user/per-group consumption specifically to prevent that.
 2. **Enabling quotas is a three-step process, and skipping the last step is the most common real-world mistake: mark `/etc/fstab` (`usrquota`/`grpquota`), remount, then separately run `quotacheck` to build the accounting database.** The fstab edit and remount alone create no `aquota.user`/`aquota.group` files and enforce nothing.
 3. **Block limits (space) and inode limits (file count) are genuinely separate constraints.** A user with many small files can exhaust their inode limit while barely touching their block limit — a distinct failure mode from "ran out of space," worth setting deliberately rather than defaulting to unlimited.
 4. **The soft/hard/grace model has a specific, easy-to-misread behavior: once a grace period on the soft limit expires, the soft limit is enforced as a hard stop — even while usage remains well under the actual hard limit.** This produces the exact confusing symptom of "I'm blocked but not even close to my hard limit," which is working as designed, not a malfunction.
@@ -487,16 +487,16 @@ completed.
 #deck:Linux Mastery::Module 4 - Storage::Demo M04-08 - Disk Quotas
 #separator:Comma
 #columns:Front,Back,Tags
-"Do RAID and backups prevent one user from filling a shared disk?","No — RAID protects against disk failure and backups protect against data loss, but neither stops a single user's excessive usage from taking down write access for everyone else sharing that filesystem. Quotas are the specific tool for that fair-share problem.","demo16a,quota,fundamentals"
-"You added usrquota,grpquota to /etc/fstab and remounted the filesystem. Is quota tracking now active?","Not necessarily — enabling quotas is a three-step process. The fstab edit and remount only complete steps one and two. quotacheck must be run separately to build the aquota.user/aquota.group accounting database that tracking and enforcement depend on.","demo16a,quota,break-fix,common-mistake"
-"What two files does quotacheck create, and where?","aquota.user and aquota.group, at the root of the quota-enabled filesystem. Their absence means quotacheck was never run, even if usrquota/grpquota are active mount options.","demo16a,quota,quotacheck,fundamentals"
-"What's the difference between a block limit and an inode limit in disk quotas?","Block limits cap total disk space consumed; inode limits cap the NUMBER of files, regardless of individual file size. A user with many small files can exhaust an inode limit while barely touching their block limit.","demo16a,quota,inodes,fundamentals"
-"A user crosses their soft limit but stays under their hard limit. Are their writes blocked?","Not immediately — crossing the soft limit starts a grace period countdown, during which writes still succeed. Writes are only blocked once the grace period expires without usage dropping back under the soft limit, OR if usage reaches the hard limit directly.","demo16a,quota,soft-limit,grace-period,fundamentals"
-"A user's grace period on their soft limit has expired, but they're still well under their hard limit. Can they write?","No — once the grace period expires, the soft limit itself is enforced as if it were a hard limit, regardless of remaining headroom before the actual hard limit. This produces a confusing 'blocked but under my hard limit' symptom that is working as designed, not a malfunction.","demo16a,quota,grace-period,break-fix"
-"In repquota output, what does a + vs - mean in the two-character status column after a username?","- means under the limit; + means the soft limit is exceeded (or hard limit reached if no soft limit is set). The first character is for block (space) limits, the second for inode (file count) limits.","demo16a,quota,repquota,fundamentals"
-"What's the difference between setquota and edquota for setting limits?","setquota sets limits directly in one command (positional: user, block soft, block hard, inode soft, inode hard, filesystem) — good for scripting. edquota opens an interactive editor showing current usage alongside the limits, letting you edit them directly.","demo16a,quota,setquota,edquota,comparison"
-"Is the grace period set per-user or per-filesystem?","Per-filesystem, via edquota -t — not set individually per user the way soft and hard limits are. Every user sharing that filesystem gets the same grace window once they cross their own soft limit.","demo16a,quota,grace-period,fundamentals"
-"A repquota report shows a user's grace column has a countdown value. What does this indicate?","The user has exceeded their soft limit and is currently within their grace period — writes are still succeeding, but will be blocked once the grace period shown expires unless usage drops back under the soft limit first.","demo16a,quota,repquota,grace-period"
+"Do RAID and backups prevent one user from filling a shared disk?","No — RAID protects against disk failure and backups protect against data loss, but neither stops a single user's excessive usage from taking down write access for everyone else sharing that filesystem. Quotas are the specific tool for that fair-share problem.","demo-m04-08,quota,fundamentals"
+"You added usrquota,grpquota to /etc/fstab and remounted the filesystem. Is quota tracking now active?","Not necessarily — enabling quotas is a three-step process. The fstab edit and remount only complete steps one and two. quotacheck must be run separately to build the aquota.user/aquota.group accounting database that tracking and enforcement depend on.","demo-m04-08,quota,break-fix,common-mistake"
+"What two files does quotacheck create, and where?","aquota.user and aquota.group, at the root of the quota-enabled filesystem. Their absence means quotacheck was never run, even if usrquota/grpquota are active mount options.","demo-m04-08,quota,quotacheck,fundamentals"
+"What's the difference between a block limit and an inode limit in disk quotas?","Block limits cap total disk space consumed; inode limits cap the NUMBER of files, regardless of individual file size. A user with many small files can exhaust an inode limit while barely touching their block limit.","demo-m04-08,quota,inodes,fundamentals"
+"A user crosses their soft limit but stays under their hard limit. Are their writes blocked?","Not immediately — crossing the soft limit starts a grace period countdown, during which writes still succeed. Writes are only blocked once the grace period expires without usage dropping back under the soft limit, OR if usage reaches the hard limit directly.","demo-m04-08,quota,soft-limit,grace-period,fundamentals"
+"A user's grace period on their soft limit has expired, but they're still well under their hard limit. Can they write?","No — once the grace period expires, the soft limit itself is enforced as if it were a hard limit, regardless of remaining headroom before the actual hard limit. This produces a confusing 'blocked but under my hard limit' symptom that is working as designed, not a malfunction.","demo-m04-08,quota,grace-period,break-fix"
+"In repquota output, what does a + vs - mean in the two-character status column after a username?","- means under the limit; + means the soft limit is exceeded (or hard limit reached if no soft limit is set). The first character is for block (space) limits, the second for inode (file count) limits.","demo-m04-08,quota,repquota,fundamentals"
+"What's the difference between setquota and edquota for setting limits?","setquota sets limits directly in one command (positional: user, block soft, block hard, inode soft, inode hard, filesystem) — good for scripting. edquota opens an interactive editor showing current usage alongside the limits, letting you edit them directly.","demo-m04-08,quota,setquota,edquota,comparison"
+"Is the grace period set per-user or per-filesystem?","Per-filesystem, via edquota -t — not set individually per user the way soft and hard limits are. Every user sharing that filesystem gets the same grace window once they cross their own soft limit.","demo-m04-08,quota,grace-period,fundamentals"
+"A repquota report shows a user's grace column has a countdown value. What does this indicate?","The user has exceeded their soft limit and is currently within their grace period — writes are still succeeding, but will be blocked once the grace period shown expires unless usage drops back under the soft limit first.","demo-m04-08,quota,repquota,grace-period"
 ```
 
 ## Appendix B — Quiz

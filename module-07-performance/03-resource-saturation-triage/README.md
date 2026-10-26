@@ -618,16 +618,16 @@ more cores.
 #deck:Linux Mastery::Module 7 - Performance::Demo M07-03 - Resource Saturation Triage
 #separator:Comma
 #columns:Front,Back,Tags
-"What does the FIRST row of vmstat output represent?","Averages since boot, not a live reading — ignore it and read the rows after it.","demo26c,vmstat"
-"vmstat column r — what does it count?","Processes that are runnable: running or waiting for a CPU. Compare against the CPU count (nproc).","demo26c,vmstat"
-"vmstat column b — what does it count?","Processes in uninterruptible sleep, usually blocked waiting on I/O.","demo26c,vmstat"
-"vmstat columns si and so — what do they measure?","Memory swapped in from disk (si) and out to disk (so), per second. Sustained so above 0 indicates memory pressure.","demo26c,vmstat,memory"
-"vmstat column wa — what does it measure?","Percentage of CPU time spent waiting on I/O. proc(5) warns iowait is not a reliable figure, so confirm with iostat -x.","demo26c,vmstat,io"
-"vmstat column st — what does it measure?","Percentage of time a virtual CPU was ready to run but the hypervisor ran something else (stolen time).","demo26c,steal"
-"Name two places besides vmstat where steal time is visible.","The %st field in top's CPU summary line, and the 8th value on the cpu line of /proc/stat.","demo26c,steal,proc"
-"Which command shows utilization for each CPU separately, and which package provides it?","mpstat -P ALL 1 (sysstat). Without sysstat, top shows per-CPU lines when you press 1.","demo26c,mpstat,needs-verification"
-"What does the -x flag add to iostat?","Extended per-device statistics, including await, average queue length (aqu-sz), and %util.","demo26c,iostat,needs-verification"
-"What do the letters U, S, E stand for in the USE method?","Utilization, Saturation, Errors — checked for every resource.","demo26c,use-method"
+"What does the FIRST row of vmstat output represent?","Averages since boot, not a live reading — ignore it and read the rows after it.","demo-m07-03,vmstat"
+"vmstat column r — what does it count?","Processes that are runnable: running or waiting for a CPU. Compare against the CPU count (nproc).","demo-m07-03,vmstat"
+"vmstat column b — what does it count?","Processes in uninterruptible sleep, usually blocked waiting on I/O.","demo-m07-03,vmstat"
+"vmstat columns si and so — what do they measure?","Memory swapped in from disk (si) and out to disk (so), per second. Sustained so above 0 indicates memory pressure.","demo-m07-03,vmstat,memory"
+"vmstat column wa — what does it measure?","Percentage of CPU time spent waiting on I/O. proc(5) warns iowait is not a reliable figure, so confirm with iostat -x.","demo-m07-03,vmstat,io"
+"vmstat column st — what does it measure?","Percentage of time a virtual CPU was ready to run but the hypervisor ran something else (stolen time).","demo-m07-03,steal"
+"Name two places besides vmstat where steal time is visible.","The %st field in top's CPU summary line, and the 8th value on the cpu line of /proc/stat.","demo-m07-03,steal,proc"
+"Which command shows utilization for each CPU separately, and which package provides it?","mpstat -P ALL 1 (sysstat). Without sysstat, top shows per-CPU lines when you press 1.","demo-m07-03,mpstat,needs-verification"
+"What does the -x flag add to iostat?","Extended per-device statistics, including await, average queue length (aqu-sz), and %util.","demo-m07-03,iostat,needs-verification"
+"What do the letters U, S, E stand for in the USE method?","Utilization, Saturation, Errors — checked for every resource.","demo-m07-03,use-method"
 ```
 
 ---

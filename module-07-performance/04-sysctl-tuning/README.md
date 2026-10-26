@@ -219,7 +219,7 @@ The dependable check is always to **read the value back** after applying.
    changing it.
 2. **Change** it at runtime with `sysctl -w`.
 3. **Measure** against the symptom that motivated the change, using the
-   tools from Demos M07-01/26c. If nothing improves, revert.
+   tools from Demos M07-01/M07-03. If nothing improves, revert.
 4. **Persist** it in a named `.conf` file, with a comment giving the
    reason, the date, and the previous value.
 5. **Apply and verify**: `sudo sysctl --system`, then read the value back.
@@ -589,16 +589,16 @@ measure-persist-verify workflow — rather than a bulk copy.
 #deck:Linux Mastery::Module 7 - Performance::Demo M07-04 - sysctl Tuning
 #separator:Comma
 #columns:Front,Back,Tags
-"Which sysctl flag sets a parameter at runtime?","-w (for example: sudo sysctl -w vm.swappiness=10). It changes the running kernel only.","demo26d,sysctl"
-"What does sysctl -n do?","Prints the value only, without the name — useful in scripts.","demo26d,sysctl"
-"What does sysctl -N do?","Lists parameter names only, without values.","demo26d,sysctl"
-"Which /proc path corresponds to net.core.somaxconn?","/proc/sys/net/core/somaxconn — dots in the name become slashes under /proc/sys.","demo26d,sysctl,proc"
-"Does a value set with sysctl -w survive a reboot?","No. Persist it in a .conf file under /etc/sysctl.d/.","demo26d,sysctl,persistence"
-"Which command applies every standard sysctl configuration location?","sudo sysctl --system","demo26d,sysctl"
-"In what order does sysctl --system apply files, and which setting wins?","Lexical order of file name across the directories; the last setting for a key wins.","demo26d,sysctl,precedence"
-"What file suffix must a file in /etc/sysctl.d have to be applied?",".conf — files without it are ignored.","demo26d,sysctl,persistence"
-"What does sysctl -p with no argument read?","/etc/sysctl.conf. Given a path, it loads only that file.","demo26d,sysctl"
-"How does fs.file-max differ from LimitNOFILE= in a unit file?","fs.file-max is the system-wide ceiling on open file handles; LimitNOFILE= is the per-process/service limit, which is usually reached first.","demo26d,sysctl,limits,cross-demo"
+"Which sysctl flag sets a parameter at runtime?","-w (for example: sudo sysctl -w vm.swappiness=10). It changes the running kernel only.","demo-m07-04,sysctl"
+"What does sysctl -n do?","Prints the value only, without the name — useful in scripts.","demo-m07-04,sysctl"
+"What does sysctl -N do?","Lists parameter names only, without values.","demo-m07-04,sysctl"
+"Which /proc path corresponds to net.core.somaxconn?","/proc/sys/net/core/somaxconn — dots in the name become slashes under /proc/sys.","demo-m07-04,sysctl,proc"
+"Does a value set with sysctl -w survive a reboot?","No. Persist it in a .conf file under /etc/sysctl.d/.","demo-m07-04,sysctl,persistence"
+"Which command applies every standard sysctl configuration location?","sudo sysctl --system","demo-m07-04,sysctl"
+"In what order does sysctl --system apply files, and which setting wins?","Lexical order of file name across the directories; the last setting for a key wins.","demo-m07-04,sysctl,precedence"
+"What file suffix must a file in /etc/sysctl.d have to be applied?",".conf — files without it are ignored.","demo-m07-04,sysctl,persistence"
+"What does sysctl -p with no argument read?","/etc/sysctl.conf. Given a path, it loads only that file.","demo-m07-04,sysctl"
+"How does fs.file-max differ from LimitNOFILE= in a unit file?","fs.file-max is the system-wide ceiling on open file handles; LimitNOFILE= is the per-process/service limit, which is usually reached first.","demo-m07-04,sysctl,limits,cross-demo"
 ```
 
 ---

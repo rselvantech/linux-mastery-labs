@@ -640,11 +640,11 @@ mount | grep -E " /run | /tmp "
 # Confirms the filesystem type is tmpfs, not proc/sysfs/devtmpfs
 
 # Prove /run and /tmp are writable exactly like a normal filesystem
-touch /tmp/demo01-tmpfs-test
-echo "hello" > /tmp/demo01-tmpfs-test
-cat /tmp/demo01-tmpfs-test
-ls -l /tmp/demo01-tmpfs-test
-rm -f /tmp/demo01-tmpfs-test
+touch /tmp/demo-m01-07-tmpfs-test
+echo "hello" > /tmp/demo-m01-07-tmpfs-test
+cat /tmp/demo-m01-07-tmpfs-test
+ls -l /tmp/demo-m01-07-tmpfs-test
+rm -f /tmp/demo-m01-07-tmpfs-test
 # You just created, wrote to, read, and deleted a file normally —
 # try the same sequence against /proc/meminfo and it will fail,
 # because /proc's contents are kernel-computed, not something you
@@ -1027,25 +1027,25 @@ missing after reboot, the service has not started yet.
 #separator:Comma
 #columns:Front,Back,Tags
 
-"A service fails after a config change. Before touching anything, what is the first place you check and why?","Check /var/log first — journalctl -u servicename or the service text log file. The log shows the exact error. Look here before changing any config — the actual problem may be different from what you assume.","demo01,fhs,troubleshooting"
+"A service fails after a config change. Before touching anything, what is the first place you check and why?","Check /var/log first — journalctl -u servicename or the service text log file. The log shows the exact error. Look here before changing any config — the actual problem may be different from what you assume.","demo-m01-07,fhs,troubleshooting"
 
-"You run df -h /proc and see Size: 0, Use%: -. What does this tell you and why can you not calculate a percentage?","/proc is a virtual filesystem. The kernel generates its contents dynamically on demand — nothing is stored on disk or in RAM. Size is literally 0. Use% shows - because percentage is mathematically undefined for a zero-size filesystem. This is correct, not an error.","demo01,fhs,proc,virtual"
+"You run df -h /proc and see Size: 0, Use%: -. What does this tell you and why can you not calculate a percentage?","/proc is a virtual filesystem. The kernel generates its contents dynamically on demand — nothing is stored on disk or in RAM. Size is literally 0. Use% shows - because percentage is mathematically undefined for a zero-size filesystem. This is correct, not an error.","demo-m01-07,fhs,proc,virtual"
 
-"What is the difference between /proc (virtual) and /run (tmpfs)? Give one operational example of each.","Virtual (/proc, /sys, /dev): kernel generates content on demand, nothing stored, size 0, you cannot create arbitrary files. Operational: cat /proc/meminfo — kernel computes memory stats at that moment. tmpfs (/run, /tmp): RAM-backed storage, you write normally, cleared on reboot. Operational: /run/docker.sock — Docker daemon creates this socket on startup, gone after reboot.","demo01,fhs,virtual,tmpfs"
+"What is the difference between /proc (virtual) and /run (tmpfs)? Give one operational example of each.","Virtual (/proc, /sys, /dev): kernel generates content on demand, nothing stored, size 0, you cannot create arbitrary files. Operational: cat /proc/meminfo — kernel computes memory stats at that moment. tmpfs (/run, /tmp): RAM-backed storage, you write normally, cleared on reboot. Operational: /run/docker.sock — Docker daemon creates this socket on startup, gone after reboot.","demo-m01-07,fhs,virtual,tmpfs"
 
-"Install kubectl manually. Where does it go and why? What happens if you put it in /usr/bin instead?","Goes in /usr/local/bin/ — the package manager (apt/dnf) never touches this directory. If you put it in /usr/bin/, a future apt upgrade or dnf update can overwrite it with a packaged version, breaking your pinned version silently.","demo01,fhs,usrlocalbin,tools"
+"Install kubectl manually. Where does it go and why? What happens if you put it in /usr/bin instead?","Goes in /usr/local/bin/ — the package manager (apt/dnf) never touches this directory. If you put it in /usr/bin/, a future apt upgrade or dnf update can overwrite it with a packaged version, breaking your pinned version silently.","demo-m01-07,fhs,usrlocalbin,tools"
 
-"Rocky9 has no /var/log/syslog. Where are the logs and how do you read them?","Rocky Linux 9 (RHEL-family) uses journald as the only logging system. Logs go to the binary journal at /var/log/journal/. Read them with: journalctl (all logs), journalctl -u nginx (service logs), journalctl -f (follow live). Ubuntu runs both journald AND rsyslog, which writes text files.","demo01,fhs,logging,rocky,ubuntu"
+"Rocky9 has no /var/log/syslog. Where are the logs and how do you read them?","Rocky Linux 9 (RHEL-family) uses journald as the only logging system. Logs go to the binary journal at /var/log/journal/. Read them with: journalctl (all logs), journalctl -u nginx (service logs), journalctl -f (follow live). Ubuntu runs both journald AND rsyslog, which writes text files.","demo-m01-07,fhs,logging,rocky,ubuntu"
 
-"file /usr/bin/ls shows ELF on Ubuntu but shows a coreutils script on Rocky9. Why? Are they functionally different?","Rocky Linux uses a multi-call binary — all coreutils commands (ls, cp, mv, cat) are compiled into one binary called coreutils. Each command is a wrapper script that calls coreutils with its name. Ubuntu compiles each command as a separate ELF binary. Functionally identical — just a packaging decision for space efficiency.","demo01,fhs,file,coreutils,rocky"
+"file /usr/bin/ls shows ELF on Ubuntu but shows a coreutils script on Rocky9. Why? Are they functionally different?","Rocky Linux uses a multi-call binary — all coreutils commands (ls, cp, mv, cat) are compiled into one binary called coreutils. Each command is a wrapper script that calls coreutils with its name. Ubuntu compiles each command as a separate ELF binary. Functionally identical — just a packaging decision for space efficiency.","demo-m01-07,fhs,file,coreutils,rocky"
 
-"A deploy script fails because it cannot find config at /etc/app/app.conf. find locates it at /opt/app/config/app.conf. What does the /opt location tell you about how this was installed?","/opt is for self-contained third-party vendor packages that install everything (binary, config, data, libraries) in one directory tree. The file is in /opt because a vendor installer packaged it that way — not split across /etc, /usr, /var as FHS standard expects. The script was written expecting FHS convention. One must be updated to match the other.","demo01,fhs,opt,break-fix"
+"A deploy script fails because it cannot find config at /etc/app/app.conf. find locates it at /opt/app/config/app.conf. What does the /opt location tell you about how this was installed?","/opt is for self-contained third-party vendor packages that install everything (binary, config, data, libraries) in one directory tree. The file is in /opt because a vendor installer packaged it that way — not split across /etc, /usr, /var as FHS standard expects. The script was written expecting FHS convention. One must be updated to match the other.","demo-m01-07,fhs,opt,break-fix"
 
-"What does statically linked mean in file command output? Why does kubectl being statically linked matter for DevOps?","Statically linked means all required libraries are compiled into the binary itself. No external dependencies. kubectl runs on any Linux system regardless of which shared libraries are installed. This is why you can drop the kubectl binary into a minimal container or a fresh server and it just works — no library version conflicts.","demo01,fhs,file,static,kubectl"
+"What does statically linked mean in file command output? Why does kubectl being statically linked matter for DevOps?","Statically linked means all required libraries are compiled into the binary itself. No external dependencies. kubectl runs on any Linux system regardless of which shared libraries are installed. This is why you can drop the kubectl binary into a minimal container or a fresh server and it just works — no library version conflicts.","demo-m01-07,fhs,file,static,kubectl"
 
-"Why does root's home directory live at /root instead of /home/root?","/home is often a separate partition, sometimes NFS-mounted, sometimes mounted late in boot. If root's home were under /home and that mount failed, you would be locked out of your own recovery console. /root sits directly on the root filesystem — always accessible, even in single-user recovery mode.","demo01,fhs,root,recovery"
+"Why does root's home directory live at /root instead of /home/root?","/home is often a separate partition, sometimes NFS-mounted, sometimes mounted late in boot. If root's home were under /home and that mount failed, you would be locked out of your own recovery console. /root sits directly on the root filesystem — always accessible, even in single-user recovery mode.","demo-m01-07,fhs,root,recovery"
 
-"ls -lh / shows bin -> usr/bin as a symlink. What is this called, and does it break scripts that use #!/bin/bash?","This is UsrMerge — on all modern distros (Ubuntu 20.04+, Rocky Linux 9, RHEL 9+), /bin, /sbin, and /lib are symlinks to their /usr/ equivalents. Scripts using /bin/bash still work fine because the symlink resolves correctly to the real binary under /usr/bin. Ubuntu marks this explicitly with a bin.usr-is-merged/ marker directory; Rocky9 does it silently with no marker.","demo01,fhs,usrmerge,symlink"
+"ls -lh / shows bin -> usr/bin as a symlink. What is this called, and does it break scripts that use #!/bin/bash?","This is UsrMerge — on all modern distros (Ubuntu 20.04+, Rocky Linux 9, RHEL 9+), /bin, /sbin, and /lib are symlinks to their /usr/ equivalents. Scripts using /bin/bash still work fine because the symlink resolves correctly to the real binary under /usr/bin. Ubuntu marks this explicitly with a bin.usr-is-merged/ marker directory; Rocky9 does it silently with no marker.","demo-m01-07,fhs,usrmerge,symlink"
 ```
 
 ---

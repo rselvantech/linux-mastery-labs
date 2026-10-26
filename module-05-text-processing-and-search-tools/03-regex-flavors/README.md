@@ -637,16 +637,16 @@ interval       \{n\}        {n}     {n}
 #deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-03 - Regex Flavor Differences
 #separator:Comma
 #columns:Front,Back,Tags
-"Which regex flavor does plain sed use by default?","BRE (Basic Regular Expressions). sed -E switches it to ERE.","demo17b,flavors,sed"
-"Which regex flavor does plain grep use by default, and which flag gives ERE and which gives PCRE?","BRE by default; grep -E for ERE; grep -P for PCRE.","demo17b,flavors,grep"
-"In BRE, which of + ? | ( ) { } are operators by default?","None — they are literal characters. A backslash turns each into an operator (GNU extension for \+ \? \|).","demo17b,bre,operators"
-"In ERE, how do you match a literal plus sign?","Escape it (\+) or put it in a bracket expression ([+]). Or use grep -F to skip regex entirely.","demo17b,ere,literals"
-"Which exit status does grep return when nothing matches, and what do sed and awk return?","grep returns 1; sed and awk return 0 regardless of whether anything matched.","demo17b,exit-status"
-"What does \d match, and which of grep -P, grep -E, sed -E, awk understand it?","A digit. Only grep -P; the others accept it but silently match nothing.","demo17b,pcre,shorthand"
-"What is the portable replacement for \d and \s?","POSIX bracket classes: [[:digit:]] and [[:space:]] (or [0-9] for digits).","demo17b,portability,posix-classes"
-"What is the difference between grep -F and grep with a pattern?","-F treats the pattern as a fixed literal string with no operators at all; otherwise the pattern is interpreted as BRE (or ERE/PCRE with -E/-P).","demo17b,grep,fixed-string"
-"Name two features that exist only in PCRE (grep -P) and not in BRE or ERE.","Lazy quantifiers (.*?) and lookahead/lookbehind assertions such as (?<=...) and (?=...).","demo17b,pcre,features"
-"Is awk one regex flavor? Name the two common implementations.","No. mawk (Ubuntu default) and gawk (RHEL-family default) differ — e.g. mawk has no \s or \< \>.","demo17b,awk,mawk-gawk"
+"Which regex flavor does plain sed use by default?","BRE (Basic Regular Expressions). sed -E switches it to ERE.","demo-m05-03,flavors,sed"
+"Which regex flavor does plain grep use by default, and which flag gives ERE and which gives PCRE?","BRE by default; grep -E for ERE; grep -P for PCRE.","demo-m05-03,flavors,grep"
+"In BRE, which of + ? | ( ) { } are operators by default?","None — they are literal characters. A backslash turns each into an operator (GNU extension for \+ \? \|).","demo-m05-03,bre,operators"
+"In ERE, how do you match a literal plus sign?","Escape it (\+) or put it in a bracket expression ([+]). Or use grep -F to skip regex entirely.","demo-m05-03,ere,literals"
+"Which exit status does grep return when nothing matches, and what do sed and awk return?","grep returns 1; sed and awk return 0 regardless of whether anything matched.","demo-m05-03,exit-status"
+"What does \d match, and which of grep -P, grep -E, sed -E, awk understand it?","A digit. Only grep -P; the others accept it but silently match nothing.","demo-m05-03,pcre,shorthand"
+"What is the portable replacement for \d and \s?","POSIX bracket classes: [[:digit:]] and [[:space:]] (or [0-9] for digits).","demo-m05-03,portability,posix-classes"
+"What is the difference between grep -F and grep with a pattern?","-F treats the pattern as a fixed literal string with no operators at all; otherwise the pattern is interpreted as BRE (or ERE/PCRE with -E/-P).","demo-m05-03,grep,fixed-string"
+"Name two features that exist only in PCRE (grep -P) and not in BRE or ERE.","Lazy quantifiers (.*?) and lookahead/lookbehind assertions such as (?<=...) and (?=...).","demo-m05-03,pcre,features"
+"Is awk one regex flavor? Name the two common implementations.","No. mawk (Ubuntu default) and gawk (RHEL-family default) differ — e.g. mawk has no \s or \< \>.","demo-m05-03,awk,mawk-gawk"
 ```
 
 ## Appendix B — Quiz

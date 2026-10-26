@@ -1383,45 +1383,45 @@ level. Make the sub-command report it before exiting, for example
 #separator:Comma
 #columns:Front,Back,Tags
 
-"What are the three standard streams, and why are stdout and stderr separate?","0 = stdin (input), 1 = stdout (normal output), 2 = stderr (error output). They are separate so results and errors never have to share one channel: you can capture output to a file while still seeing errors on screen, or the reverse.","demo00b,redirection,filedescriptors"
+"What are the three standard streams, and why are stdout and stderr separate?","0 = stdin (input), 1 = stdout (normal output), 2 = stderr (error output). They are separate so results and errors never have to share one channel: you can capture output to a file while still seeing errors on screen, or the reverse.","demo-m01-02,redirection,filedescriptors"
 
-"What is redirection?","Changing where one of a process's streams is connected: to a file, from a file, or to /dev/null, instead of the keyboard or screen. The shell sets it up before the command starts; the command does not know.","demo00b,redirection,definition"
+"What is redirection?","Changing where one of a process's streams is connected: to a file, from a file, or to /dev/null, instead of the keyboard or screen. The shell sets it up before the command starts; the command does not know.","demo-m01-02,redirection,definition"
 
-"What is the difference between > file and >> file?","> overwrites the file (or creates it); >> appends to the end of the file.","demo00b,redirection,append"
+"What is the difference between > file and >> file?","> overwrites the file (or creates it); >> appends to the end of the file.","demo-m01-02,redirection,append"
 
-"What are the two meanings of & in redirection?","In &> it means both streams: stdout and stderr together (bash shortcut for > file 2>&1). In 2>&1 and >&2 it means the stream with this number (a file descriptor), not a file name. Without it, 2>1 sends stderr to a file named 1.","demo00b,redirection,ampersand"
+"What are the two meanings of & in redirection?","In &> it means both streams: stdout and stderr together (bash shortcut for > file 2>&1). In 2>&1 and >&2 it means the stream with this number (a file descriptor), not a file name. Without it, 2>1 sends stderr to a file named 1.","demo-m01-02,redirection,ampersand"
 
-"What does >&2 do, and when do you use it?","It sends a command's stdout to stderr. Scripts use it to print their own error messages (echo ""error"" >&2) so they do not mix into the normal results.","demo00b,redirection,stderr"
+"What does >&2 do, and when do you use it?","It sends a command's stdout to stderr. Scripts use it to print their own error messages (echo ""error"" >&2) so they do not mix into the normal results.","demo-m01-02,redirection,stderr"
 
-"Why does 'cmd > file 2>&1' capture both streams, but 'cmd 2>&1 > file' only captures stdout?","Redirections are applied left to right and 2>&1 copies where stdout points AT THAT MOMENT. In '> file 2>&1' stdout is already the file when stderr is copied to it. In '2>&1 > file' stderr is copied to the screen first, then stdout moves to the file and stderr does not follow.","demo00b,redirection,order,2>&1"
+"Why does 'cmd > file 2>&1' capture both streams, but 'cmd 2>&1 > file' only captures stdout?","Redirections are applied left to right and 2>&1 copies where stdout points AT THAT MOMENT. In '> file 2>&1' stdout is already the file when stderr is copied to it. In '2>&1 > file' stderr is copied to the screen first, then stdout moves to the file and stderr does not follow.","demo-m01-02,redirection,order,2>&1"
 
-"What is an exit status, and what is $?","The exit status (also called exit code or return code) is the number a process returns when it finishes: 0 means success, 1-255 means failure. $? is a special parameter that holds the exit status of the most recent command.","demo00b,exitstatus,dollar-question"
+"What is an exit status, and what is $?","The exit status (also called exit code or return code) is the number a process returns when it finishes: 0 means success, 1-255 means failure. $? is a special parameter that holds the exit status of the most recent command.","demo-m01-02,exitstatus,dollar-question"
 
-"$? shows 0 after grep matched, but 0 again after a plain echo run in between. Is grep's status still known?","No. $? holds only the MOST RECENT command's status. After echo ran, $? is echo's own status. Read $? immediately after the command you care about.","demo00b,exitstatus,overwritten"
+"$? shows 0 after grep matched, but 0 again after a plain echo run in between. Is grep's status still known?","No. $? holds only the MOST RECENT command's status. After echo ran, $? is echo's own status. Read $? immediately after the command you care about.","demo-m01-02,exitstatus,overwritten"
 
-"grep exits 1 in one case and 2 in another. What does each mean?","1 = searched fine but found no match (often a normal outcome). 2 = a real error, such as a missing file. Scripts should not treat them the same.","demo00b,exitstatus,grep"
+"grep exits 1 in one case and 2 in another. What does each mean?","1 = searched fine but found no match (often a normal outcome). 2 = a real error, such as a missing file. Scripts should not treat them the same.","demo-m01-02,exitstatus,grep"
 
-"What do exit statuses 126, 127 and 130 mean?","126 = file found but not executable (permissions). 127 = command not found. 130 = terminated by Ctrl-C (SIGINT): 128 + signal number 2.","demo00b,exitstatus,126,127,130"
+"What do exit statuses 126, 127 and 130 mean?","126 = file found but not executable (permissions). 127 = command not found. 130 = terminated by Ctrl-C (SIGINT): 128 + signal number 2.","demo-m01-02,exitstatus,126,127,130"
 
-"What does an exit status of 137 mean, and how is it derived?","The process was killed by signal 9 (SIGKILL), such as kill -9 or the kernel OOM killer. Statuses above 128 mean 128 + signal number: 128 + 9 = 137 (SIGTERM gives 143).","demo00b,exitstatus,137,signals"
+"What does an exit status of 137 mean, and how is it derived?","The process was killed by signal 9 (SIGKILL), such as kill -9 or the kernel OOM killer. Statuses above 128 mean 128 + signal number: 128 + 9 = 137 (SIGTERM gives 143).","demo-m01-02,exitstatus,137,signals"
 
-"What does $? hold after 'false | true', and where can you see every command's status?","$? holds the LAST command's status, so 0 here. Bash keeps all of them in the array PIPESTATUS (echo ${PIPESTATUS[@]} prints 1 0).","demo00b,exitstatus,pipeline"
+"What does $? hold after 'false | true', and where can you see every command's status?","$? holds the LAST command's status, so 0 here. Bash keeps all of them in the array PIPESTATUS (echo ${PIPESTATUS[@]} prints 1 0).","demo-m01-02,exitstatus,pipeline"
 
-"What do 'a && b' and 'a || b' do, and is 'a && b || c' an if/else?","a && b runs b only if a exited 0. a || b runs b only if a exited non-zero. a ; b always runs b. a && b || c is NOT if/else: c also runs when b fails.","demo00b,exitstatus,chaining"
+"What do 'a && b' and 'a || b' do, and is 'a && b || c' an if/else?","a && b runs b only if a exited 0. a || b runs b only if a exited non-zero. a ; b always runs b. a && b || c is NOT if/else: c also runs when b fails.","demo-m01-02,exitstatus,chaining"
 
-"Why does 'ls *.tmp | rm' fail with 'missing operand', and what does xargs change?","A pipe carries text on the next command's stdin, but rm reads its targets from arguments and never reads stdin. xargs reads stdin, splits it into items and runs rm with those items as arguments: ls *.tmp | xargs rm.","demo00b,xargs,why"
+"Why does 'ls *.tmp | rm' fail with 'missing operand', and what does xargs change?","A pipe carries text on the next command's stdin, but rm reads its targets from arguments and never reads stdin. xargs reads stdin, splits it into items and runs rm with those items as arguments: ls *.tmp | xargs rm.","demo-m01-02,xargs,why"
 
-"For the input lines 'a b c' and 'd e', what do xargs echo, xargs -n2 echo and xargs -I{} echo [{}] produce?","xargs echo: one run, 'a b c d e'. xargs -n2 echo: three runs, 'a b' / 'c d' / 'e' (words, 2 at a time, appended at the end). xargs -I{} echo [{}]: two runs, '[a b c]' / '[d e]' (one whole line per run, placed at {}).","demo00b,xargs,dash-n,dash-I"
+"For the input lines 'a b c' and 'd e', what do xargs echo, xargs -n2 echo and xargs -I{} echo [{}] produce?","xargs echo: one run, 'a b c d e'. xargs -n2 echo: three runs, 'a b' / 'c d' / 'e' (words, 2 at a time, appended at the end). xargs -I{} echo [{}]: two runs, '[a b c]' / '[d e]' (one whole line per run, placed at {}).","demo-m01-02,xargs,dash-n,dash-I"
 
-"When must you use xargs -I{} instead of -n, and can you combine them?","When the item must be in a specific position or used more than once, e.g. xargs -I{} mv {} {}.bak. -n always appends words at the end. They cannot be combined: xargs warns the options are mutually exclusive and ignores -n.","demo00b,xargs,dash-I"
+"When must you use xargs -I{} instead of -n, and can you combine them?","When the item must be in a specific position or used more than once, e.g. xargs -I{} mv {} {}.bak. -n always appends words at the end. They cannot be combined: xargs warns the options are mutually exclusive and ignores -n.","demo-m01-02,xargs,dash-I"
 
-"What does xargs -P3 do, and what is the catch?","It runs up to 3 runs at the same time instead of one after another, so three 1-second jobs take about 1 second instead of 3. The catch: jobs finish in any order, so output order is not guaranteed.","demo00b,xargs,dash-P,parallel"
+"What does xargs -P3 do, and what is the catch?","It runs up to 3 runs at the same time instead of one after another, so three 1-second jobs take about 1 second instead of 3. The catch: jobs finish in any order, so output order is not guaranteed.","demo-m01-02,xargs,dash-P,parallel"
 
-"What does xargs do when its input is empty, and how do you prevent it?","GNU xargs still runs the command once with no arguments (which makes 'xargs rm' fail with 'missing operand', status 123). Use -r (--no-run-if-empty) so nothing runs on empty input.","demo00b,xargs,dash-r"
+"What does xargs do when its input is empty, and how do you prevent it?","GNU xargs still runs the command once with no arguments (which makes 'xargs rm' fail with 'missing operand', status 123). Use -r (--no-run-if-empty) so nothing runs on empty input.","demo-m01-02,xargs,dash-r"
 
-"find dir -name '*.txt' | xargs -n1 echo found: splits 'has space.txt' into two. Why, and what is the fix?","xargs splits on whitespace by default, the same footgun as an unquoted variable. Fix: find dir -name '*.txt' -print0 | xargs -0 -n1 echo found: (NUL bytes cannot appear in filenames).","demo00b,xargs,footgun,print0"
+"find dir -name '*.txt' | xargs -n1 echo found: splits 'has space.txt' into two. Why, and what is the fix?","xargs splits on whitespace by default, the same footgun as an unquoted variable. Fix: find dir -name '*.txt' -print0 | xargs -0 -n1 echo found: (NUL bytes cannot appear in filenames).","demo-m01-02,xargs,footgun,print0"
 
-"What do xargs exit statuses 123 and 124 mean?","123 = at least one run exited with a status from 1 to 125; xargs keeps processing the rest. 124 = a run exited with 255; xargs stops immediately. Neither is the sub-command's real status, so the sub-command must report the failing item itself.","demo00b,xargs,exitstatus,123,124"
+"What do xargs exit statuses 123 and 124 mean?","123 = at least one run exited with a status from 1 to 125; xargs keeps processing the rest. 124 = a run exited with 255; xargs stops immediately. Neither is the sub-command's real status, so the sub-command must report the failing item itself.","demo-m01-02,xargs,exitstatus,123,124"
 ```
 
 ---

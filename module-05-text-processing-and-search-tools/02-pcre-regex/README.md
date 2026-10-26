@@ -596,16 +596,16 @@ legitimately empty result from a broken command.
 #deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-02 - PCRE and grep -P
 #separator:Comma
 #columns:Front,Back,Tags
-"What does \w match in PCRE?","A word character: a letter, a digit, or an underscore.","demo17a,shorthand"
-"What does \b match?","A word boundary — a position between a word character and a non-word character, not a character itself.","demo17a,shorthand"
-"What does ? after a quantifier (as in .*?) do?","Makes it lazy — it matches as little as possible instead of as much as possible.","demo17a,lazy"
-"What are the four lookaround forms?","(?=X) positive lookahead, (?!X) negative lookahead, (?<=X) positive lookbehind, (?<!X) negative lookbehind.","demo17a,lookaround"
-"What does zero-width mean for a lookaround?","It checks the surrounding text without consuming it, so that text is not part of the match.","demo17a,lookaround"
-"What does \K do?","Resets the start of the reported match to the current position, discarding everything matched before it.","demo17a,K"
-"Why does grep -oP '(?<=id=\d+ user=)\w+' fail, and what is the error's exit status?","PCRE lookbehinds must be fixed-length and \d+ is not. Error: lookbehind assertion is not fixed length; exit status 2.","demo17a,lookbehind,errors"
-"What does exit status 1 versus 2 mean for grep?","1: valid command, no match. 2: the command itself failed (e.g. a bad or unsupported pattern).","demo17a,exit-status"
-"What does the possessive quantifier a++ do?","Takes as many a's as possible and never gives any back, so a++a can never match.","demo17a,possessive"
-"Give the portable replacement for the lazy pattern <a>.*?</a>.","<a>[^<]*</a> — a negated class that stops at the first <.","demo17a,portability"
+"What does \w match in PCRE?","A word character: a letter, a digit, or an underscore.","demo-m05-02,shorthand"
+"What does \b match?","A word boundary — a position between a word character and a non-word character, not a character itself.","demo-m05-02,shorthand"
+"What does ? after a quantifier (as in .*?) do?","Makes it lazy — it matches as little as possible instead of as much as possible.","demo-m05-02,lazy"
+"What are the four lookaround forms?","(?=X) positive lookahead, (?!X) negative lookahead, (?<=X) positive lookbehind, (?<!X) negative lookbehind.","demo-m05-02,lookaround"
+"What does zero-width mean for a lookaround?","It checks the surrounding text without consuming it, so that text is not part of the match.","demo-m05-02,lookaround"
+"What does \K do?","Resets the start of the reported match to the current position, discarding everything matched before it.","demo-m05-02,K"
+"Why does grep -oP '(?<=id=\d+ user=)\w+' fail, and what is the error's exit status?","PCRE lookbehinds must be fixed-length and \d+ is not. Error: lookbehind assertion is not fixed length; exit status 2.","demo-m05-02,lookbehind,errors"
+"What does exit status 1 versus 2 mean for grep?","1: valid command, no match. 2: the command itself failed (e.g. a bad or unsupported pattern).","demo-m05-02,exit-status"
+"What does the possessive quantifier a++ do?","Takes as many a's as possible and never gives any back, so a++a can never match.","demo-m05-02,possessive"
+"Give the portable replacement for the lazy pattern <a>.*?</a>.","<a>[^<]*</a> — a negated class that stops at the first <.","demo-m05-02,portability"
 ```
 
 ## Appendix B — Quiz

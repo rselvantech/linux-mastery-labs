@@ -1152,37 +1152,37 @@ fi
 #separator:Comma
 #columns:Front,Back,Tags
 
-"What are the two independent questions bash uses to classify a shell?","Login vs non-login, and interactive vs non-interactive. All four combinations exist: ssh host = login + interactive; a GUI terminal tab = non-login + interactive; a cron job or script = non-login + non-interactive; bash -l -c 'cmd' = login + non-interactive.","demo00d,startup,axes"
+"What are the two independent questions bash uses to classify a shell?","Login vs non-login, and interactive vs non-interactive. All four combinations exist: ssh host = login + interactive; a GUI terminal tab = non-login + interactive; a cron job or script = non-login + non-interactive; bash -l -c 'cmd' = login + non-interactive.","demo-m01-04,startup,axes"
 
-"How do you check whether your current shell is a login shell, and whether it is interactive?","shopt login_shell prints on (login) or off. echo $- prints the flags; an i in them means interactive.","demo00d,startup,check"
+"How do you check whether your current shell is a login shell, and whether it is interactive?","shopt login_shell prints on (login) or off. echo $- prints the flags; an i in them means interactive.","demo-m01-04,startup,check"
 
-"What is a startup file, and what is another name for it?","A file bash reads automatically when it starts, to set up PATH, aliases and so on. Also called an init file or rc file (run commands).","demo00d,startup,vocabulary"
+"What is a startup file, and what is another name for it?","A file bash reads automatically when it starts, to set up PATH, aliases and so on. Also called an init file or rc file (run commands).","demo-m01-04,startup,vocabulary"
 
-"What is the difference between sourcing a file and running it as a script?","Sourcing (. file or source file) runs the file's commands in the CURRENT shell, so its variables survive. Running it (bash file) uses a child process, so its variables vanish when it exits. Startup files are sourced.","demo00d,startup,source"
+"What is the difference between sourcing a file and running it as a script?","Sourcing (. file or source file) runs the file's commands in the CURRENT shell, so its variables survive. Running it (bash file) uses a child process, so its variables vanish when it exits. Startup files are sourced.","demo-m01-04,startup,source"
 
-"A login shell has .bash_profile, .bash_login and .profile all present. Which loads?","Only .bash_profile. Bash uses the FIRST found of .bash_profile, .bash_login, .profile and stops; it never loads more than one of the three.","demo00d,startup,fallback"
+"A login shell has .bash_profile, .bash_login and .profile all present. Which loads?","Only .bash_profile. Bash uses the FIRST found of .bash_profile, .bash_login, .profile and stops; it never loads more than one of the three.","demo-m01-04,startup,fallback"
 
-"Which file does a non-login interactive shell read, and which does a plain non-interactive shell read?","Non-login interactive: ~/.bashrc (on Ubuntu /etc/bash.bashrc first; on Rocky ~/.bashrc sources /etc/bashrc). Plain non-interactive (script, cron): none, unless BASH_ENV is set.","demo00d,startup,bashrc"
+"Which file does a non-login interactive shell read, and which does a plain non-interactive shell read?","Non-login interactive: ~/.bashrc (on Ubuntu /etc/bash.bashrc first; on Rocky ~/.bashrc sources /etc/bashrc). Plain non-interactive (script, cron): none, unless BASH_ENV is set.","demo-m01-04,startup,bashrc"
 
-"What loads BEFORE your own login file in a login shell?","The system-wide /etc/profile, which loads every /etc/profile.d/*.sh. That is where system-wide PATH and locale settings usually come from.","demo00d,startup,etc-profile"
+"What loads BEFORE your own login file in a login shell?","The system-wide /etc/profile, which loads every /etc/profile.d/*.sh. That is where system-wide PATH and locale settings usually come from.","demo-m01-04,startup,etc-profile"
 
-"What is BASH_ENV?","An environment variable naming a file that bash sources even for a plain non-interactive, non-login shell. It is the explicit exception to 'scripts load no startup file'.","demo00d,startup,bash_env"
+"What is BASH_ENV?","An environment variable naming a file that bash sources even for a plain non-interactive, non-login shell. It is the explicit exception to 'scripts load no startup file'.","demo-m01-04,startup,bash_env"
 
-"What is the sshd special case?","A fresh top-level bash started by sshd for a remote command (it sees SSH_CLIENT set, or a network socket on stdin) reads ~/.bashrc even though it is non-interactive. Debian and Ubuntu builds do this.","demo00d,startup,ssh"
+"What is the sshd special case?","A fresh top-level bash started by sshd for a remote command (it sees SSH_CLIENT set, or a network socket on stdin) reads ~/.bashrc even though it is non-interactive. Debian and Ubuntu builds do this.","demo-m01-04,startup,ssh"
 
-"What does the guard at the top of Ubuntu's default ~/.bashrc do?","case $- in *i*) ;; *) return;; esac makes bash stop reading .bashrc unless the shell is interactive. Lines above it run in the sshd case; lines below it (aliases, PATH changes) are skipped.","demo00d,startup,guard"
+"What does the guard at the top of Ubuntu's default ~/.bashrc do?","case $- in *i*) ;; *) return;; esac makes bash stop reading .bashrc unless the shell is interactive. Lines above it run in the sshd case; lines below it (aliases, PATH changes) are skipped.","demo-m01-04,startup,guard"
 
-"What environment does cron give a job, and which startup files does it read?","Cron runs the job with /bin/sh -c (unless SHELL= is set) and a small environment, typically PATH=/usr/bin:/bin. It reads no startup file, so settings only in .bashrc are invisible.","demo00d,startup,cron"
+"What environment does cron give a job, and which startup files does it read?","Cron runs the job with /bin/sh -c (unless SHELL= is set) and a small environment, typically PATH=/usr/bin:/bin. It reads no startup file, so settings only in .bashrc are invisible.","demo-m01-04,startup,cron"
 
-"A systemd service cannot find a tool whose path is in .bashrc. Why, and what is the fix?","systemd starts ExecStart directly with no shell, so no startup file is ever read. Declare the environment in the unit, e.g. Environment=PATH=....","demo00d,startup,systemd"
+"A systemd service cannot find a tool whose path is in .bashrc. Why, and what is the fix?","systemd starts ExecStart directly with no shell, so no startup file is ever read. Declare the environment in the unit, e.g. Environment=PATH=....","demo-m01-04,startup,systemd"
 
-"What does env -i do, and why use it in this demo?","env -i (ignore environment) runs a command with an empty environment. It reproduces cron's or sshd's fresh start: only the variables you pass are present and no inherited PATH or SHLVL.","demo00d,startup,env-i"
+"What does env -i do, and why use it in this demo?","env -i (ignore environment) runs a command with an empty environment. It reproduces cron's or sshd's fresh start: only the variables you pass are present and no inherited PATH or SHLVL.","demo-m01-04,startup,env-i"
 
-"What do bash --norc, --noprofile and --rcfile do, and what is the ordering gotcha?","--norc skips ~/.bashrc, --noprofile skips the login files, --rcfile FILE reads FILE instead of ~/.bashrc. Long options must come BEFORE short ones: bash --norc -i works, bash -i --norc is an error.","demo00d,startup,options"
+"What do bash --norc, --noprofile and --rcfile do, and what is the ordering gotcha?","--norc skips ~/.bashrc, --noprofile skips the login files, --rcfile FILE reads FILE instead of ~/.bashrc. Long options must come BEFORE short ones: bash --norc -i works, bash -i --norc is an error.","demo-m01-04,startup,options"
 
-"When does ~/.bash_logout run?","When an interactive login shell exits. It is not run for bash -l -c 'cmd'.","demo00d,startup,logout"
+"When does ~/.bash_logout run?","When an interactive login shell exits. It is not run for bash -l -c 'cmd'.","demo-m01-04,startup,logout"
 
-"Why is the standard fix for 'aliases missing after SSH login' to make the login file source .bashrc, and what is the Ubuntu trap?","Login shells read the login file, not .bashrc, so the login file sources .bashrc (if [ -f ~/.bashrc ]; then . ~/.bashrc; fi). Trap: on Ubuntu, creating ~/.bash_profile hides ~/.profile (first found wins), so it must source ~/.profile.","demo00d,startup,pattern,ubuntu"
+"Why is the standard fix for 'aliases missing after SSH login' to make the login file source .bashrc, and what is the Ubuntu trap?","Login shells read the login file, not .bashrc, so the login file sources .bashrc (if [ -f ~/.bashrc ]; then . ~/.bashrc; fi). Trap: on Ubuntu, creating ~/.bash_profile hides ~/.profile (first found wins), so it must source ~/.profile.","demo-m01-04,startup,pattern,ubuntu"
 ```
 
 ---

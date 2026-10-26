@@ -287,7 +287,7 @@ layer to look at:
 
 | `wg show` evidence | Layer | Check next |
 |---|---|---|
-| Sent bytes grow, received is 0, no `latest handshake` | **Reachability / keys** | Is UDP 51820 allowed through every firewall (Demo M03-02/12a)? Is the endpoint right? Are the public keys the right way round? |
+| Sent bytes grow, received is 0, no `latest handshake` | **Reachability / keys** | Is UDP 51820 allowed through every firewall (Demo M03-02/M03-02)? Is the endpoint right? Are the public keys the right way round? |
 | Handshake is recent, but pings fail | **Routing / `AllowedIPs`** | `ip route get` for the destination, both sides' `AllowedIPs`, `ip_forward` on gateways, NAT if needed |
 | Handshake recent, small packets work, large ones hang | **MTU** | `ping -M do -s N`, interface MTU, fragment/ICMP handling on the path |
 
@@ -745,19 +745,19 @@ The operational basics (routing, firewall, MTU) are the same either way.
 #deck:Linux Mastery::Module 3 - Networking::Demo M03-07 - VPN Fundamentals
 #separator:Comma
 #columns:Front,Back,Tags
-"Name the three ordinary Linux components that together make up a VPN tunnel.","A virtual network interface (e.g. wg0), routes that send chosen destinations into it, and encapsulation/encryption of packets sent to the peer.","demo13c,vpn,fundamentals"
-"What is the difference between a full tunnel and a split tunnel?","Full tunnel sends all client traffic through the VPN (default route via the tunnel); split tunnel sends only specific destination networks through it. Both are expressed purely through routing.","demo13c,vpn,routing"
-"Why must the gateways in a site-to-site tunnel have net.ipv4.ip_forward=1?","Hosts behind each gateway send their traffic to the gateway, which must forward packets between its LAN and the tunnel interface rather than only processing packets addressed to itself.","demo13c,vpn,forwarding"
-"In WireGuard, who needs whose key, and how are public keys exchanged?","Each side needs its own private key and the other side's public key. There is no CA; public keys are copied between hosts out of band.","demo13c,wireguard,keys"
-"What file mode should /etc/wireguard/wg0.conf have, and why?","600, owned by root, because it contains the interface's private key, which is a credential and must not be readable or committed to version control.","demo13c,wireguard,security"
-"A WireGuard peer shows an old latest handshake but has had no traffic for an hour. Is that a fault?","No. WireGuard handshakes on demand and re-keys about every two minutes only while traffic flows, so an idle peer's stale handshake is normal.","demo13c,wireguard,troubleshooting"
-"Why does WireGuard connectivity fail silently when a firewall blocks UDP 51820?","WireGuard never answers unauthenticated or unreachable packets, so there is no refusal message; the client just sends handshake attempts forever. ss showing the port listening only proves the socket exists.","demo13c,wireguard,firewall"
-"What is the per-packet overhead of WireGuard over an IPv4 underlay, and how is it made up?","60 bytes: 20 (outer IPv4) + 8 (UDP) + 32 (WireGuard header and authentication tag). It is 80 bytes over IPv6.","demo13c,mtu,overhead"
-"What does ping -M do -s 1372 test, and what size is the packet on the wire?","It sends an ICMP echo with the Don't Fragment flag set; the on-wire packet is payload plus 28 bytes (20 IP + 8 ICMP), so 1400 bytes here.","demo13c,mtu,ping"
-"A gateway forwards traffic for clients you cannot reconfigure and the tunnel has a lower-than-default path MTU. What can you do at the gateway?","Clamp TCP MSS so handshakes advertise a segment size that fits, e.g. an nftables rule using tcp option maxseg size set rt mtu on SYN packets in the forward chain.","demo13c,mtu,mss"
-"Which of these protocols can OpenVPN use as transport that WireGuard cannot?","TCP (including TCP/443). WireGuard is UDP only.","demo13c,openvpn,comparison"
-"On an AllowedIPs = 0.0.0.0/0 config, what does wg-quick add so the tunnel's own UDP packets do not loop back into the tunnel?","Policy-routing rules using a firewall mark, so packets carrying the mark use the normal routing table. This is why multiple routing tables matter (Demo M03-04 section 1.2).","demo13c,wireguard,policy-routing"
-"How do you make a wg-quick tunnel start at boot?","sudo systemctl enable --now wg-quick@wg0, with the configuration in /etc/wireguard/wg0.conf.","demo13c,wireguard,systemd"
+"Name the three ordinary Linux components that together make up a VPN tunnel.","A virtual network interface (e.g. wg0), routes that send chosen destinations into it, and encapsulation/encryption of packets sent to the peer.","demo-m03-07,vpn,fundamentals"
+"What is the difference between a full tunnel and a split tunnel?","Full tunnel sends all client traffic through the VPN (default route via the tunnel); split tunnel sends only specific destination networks through it. Both are expressed purely through routing.","demo-m03-07,vpn,routing"
+"Why must the gateways in a site-to-site tunnel have net.ipv4.ip_forward=1?","Hosts behind each gateway send their traffic to the gateway, which must forward packets between its LAN and the tunnel interface rather than only processing packets addressed to itself.","demo-m03-07,vpn,forwarding"
+"In WireGuard, who needs whose key, and how are public keys exchanged?","Each side needs its own private key and the other side's public key. There is no CA; public keys are copied between hosts out of band.","demo-m03-07,wireguard,keys"
+"What file mode should /etc/wireguard/wg0.conf have, and why?","600, owned by root, because it contains the interface's private key, which is a credential and must not be readable or committed to version control.","demo-m03-07,wireguard,security"
+"A WireGuard peer shows an old latest handshake but has had no traffic for an hour. Is that a fault?","No. WireGuard handshakes on demand and re-keys about every two minutes only while traffic flows, so an idle peer's stale handshake is normal.","demo-m03-07,wireguard,troubleshooting"
+"Why does WireGuard connectivity fail silently when a firewall blocks UDP 51820?","WireGuard never answers unauthenticated or unreachable packets, so there is no refusal message; the client just sends handshake attempts forever. ss showing the port listening only proves the socket exists.","demo-m03-07,wireguard,firewall"
+"What is the per-packet overhead of WireGuard over an IPv4 underlay, and how is it made up?","60 bytes: 20 (outer IPv4) + 8 (UDP) + 32 (WireGuard header and authentication tag). It is 80 bytes over IPv6.","demo-m03-07,mtu,overhead"
+"What does ping -M do -s 1372 test, and what size is the packet on the wire?","It sends an ICMP echo with the Don't Fragment flag set; the on-wire packet is payload plus 28 bytes (20 IP + 8 ICMP), so 1400 bytes here.","demo-m03-07,mtu,ping"
+"A gateway forwards traffic for clients you cannot reconfigure and the tunnel has a lower-than-default path MTU. What can you do at the gateway?","Clamp TCP MSS so handshakes advertise a segment size that fits, e.g. an nftables rule using tcp option maxseg size set rt mtu on SYN packets in the forward chain.","demo-m03-07,mtu,mss"
+"Which of these protocols can OpenVPN use as transport that WireGuard cannot?","TCP (including TCP/443). WireGuard is UDP only.","demo-m03-07,openvpn,comparison"
+"On an AllowedIPs = 0.0.0.0/0 config, what does wg-quick add so the tunnel's own UDP packets do not loop back into the tunnel?","Policy-routing rules using a firewall mark, so packets carrying the mark use the normal routing table. This is why multiple routing tables matter (Demo M03-04 section 1.2).","demo-m03-07,wireguard,policy-routing"
+"How do you make a wg-quick tunnel start at boot?","sudo systemctl enable --now wg-quick@wg0, with the configuration in /etc/wireguard/wg0.conf.","demo-m03-07,wireguard,systemd"
 ```
 
 ---

@@ -987,39 +987,39 @@ tool sees it.
 #separator:Comma
 #columns:Front,Back,Tags
 
-"In bash, echo *.xyz matches no files. What is printed, and why does it matter?","The literal text *.xyz. Bash passes a non-matching pattern through unchanged. A command that receives a literal wildcard as an argument usually means nothing matched.","demo00a,globbing,nomatch"
+"In bash, echo *.xyz matches no files. What is printed, and why does it matter?","The literal text *.xyz. Bash passes a non-matching pattern through unchanged. A command that receives a literal wildcard as an argument usually means nothing matched.","demo-m01-01,globbing,nomatch"
 
-"Why does file?.txt match file1.txt but not file.txt, while file*.txt matches both?","? needs exactly one character; file.txt has none between 'file' and '.txt'. * allows zero or more characters, so it matches both.","demo00a,globbing,wildcards"
+"Why does file?.txt match file1.txt but not file.txt, while file*.txt matches both?","? needs exactly one character; file.txt has none between 'file' and '.txt'. * allows zero or more characters, so it matches both.","demo-m01-01,globbing,wildcards"
 
-"What does echo {a,b}{1,2} print, and how is it built?","a1 a2 b1 b2. Each item of the first group is paired with every item of the second group.","demo00a,brace,combinations"
+"What does echo {a,b}{1,2} print, and how is it built?","a1 a2 b1 b2. Each item of the first group is paired with every item of the second group.","demo-m01-01,brace,combinations"
 
-"What does cp app.conf{,.bak} expand to?","cp app.conf app.conf.bak. The first brace item is empty, so it gives app.conf, and the second adds .bak. A quick backup idiom.","demo00a,brace,backup"
+"What does cp app.conf{,.bak} expand to?","cp app.conf app.conf.bak. The first brace item is empty, so it gives app.conf, and the second adds .bak. A quick backup idiom.","demo-m01-01,brace,backup"
 
-"What is the key difference between brace expansion and globbing?","Brace expansion generates text and never checks the filesystem, so it works for files that don't exist. Globbing only expands to files that actually exist. Brace expansion runs first.","demo00a,brace,glob,order"
+"What is the key difference between brace expansion and globbing?","Brace expansion generates text and never checks the filesystem, so it works for files that don't exist. Globbing only expands to files that actually exist. Brace expansion runs first.","demo-m01-01,brace,glob,order"
 
-"What is word splitting?","After an unquoted variable is replaced by its value, bash cuts that value into separate words at spaces (IFS). name=""hello world"" used as $name becomes two arguments.","demo00a,wordsplitting"
+"What is word splitting?","After an unquoted variable is replaced by its value, bash cuts that value into separate words at spaces (IFS). name=""hello world"" used as $name becomes two arguments.","demo-m01-01,wordsplitting"
 
-"What does double-quoting a variable suppress, and what does it still allow?","It suppresses word splitting and globbing. $variable and $(command) still expand.","demo00a,quoting,doublequote"
+"What does double-quoting a variable suppress, and what does it still allow?","It suppresses word splitting and globbing. $variable and $(command) still expand.","demo-m01-01,quoting,doublequote"
 
-"What does single-quoting suppress that double-quoting does not?","Variable expansion and command substitution. Nothing inside single quotes is interpreted by the shell.","demo00a,quoting,singlequote"
+"What does single-quoting suppress that double-quoting does not?","Variable expansion and command substitution. Nothing inside single quotes is interpreted by the shell.","demo-m01-01,quoting,singlequote"
 
-"echo ""\*.txt"" prints \*.txt with the backslash. Why?","Inside double quotes, backslash only works before $, `, "", \ or a newline. * is not one of them, and wildcards are already literal inside double quotes.","demo00a,escaping,doublequote"
+"echo ""\*.txt"" prints \*.txt with the backslash. Why?","Inside double quotes, backslash only works before $, `, "", \ or a newline. * is not one of them, and wildcards are already literal inside double quotes.","demo-m01-01,escaping,doublequote"
 
-"A variable holds session_*.tmp and the script runs rm -v $tmpfile. What happens, and what is the fix?","The shell glob-expands the unquoted variable, so rm deletes every matching file with no error. Fix: rm -v ""$tmpfile"", which fails loudly instead. Also validate the value upstream.","demo00a,quoting,footgun,rm"
+"A variable holds session_*.tmp and the script runs rm -v $tmpfile. What happens, and what is the fix?","The shell glob-expands the unquoted variable, so rm deletes every matching file with no error. Fix: rm -v ""$tmpfile"", which fails loudly instead. Also validate the value upstream.","demo-m01-01,quoting,footgun,rm"
 
-"A variable is assigned tmpfile=session_*.tmp while matching files exist. Why isn't the wildcard expanded at assignment?","The right-hand side of an assignment gets variable expansion but no word splitting, globbing or brace expansion, so the text is stored as-is. Globbing happens later, when the variable is used unquoted as a command argument (rm $tmpfile).","demo00a,assignment,globbing,footgun"
+"A variable is assigned tmpfile=session_*.tmp while matching files exist. Why isn't the wildcard expanded at assignment?","The right-hand side of an assignment gets variable expansion but no word splitting, globbing or brace expansion, so the text is stored as-is. Globbing happens later, when the variable is used unquoted as a command argument (rm $tmpfile).","demo-m01-01,assignment,globbing,footgun"
 
-"What is the difference between file[1-3].txt and file{1..3}.txt, and what does file[1..5].txt match?","[1-3] is a glob range: one character from 1 to 3, matched only against existing files. {1..3} is a brace range: generates file1.txt file2.txt file3.txt with no filesystem check. [1..5] is not a range; it is a set of the characters 1, . and 5.","demo00a,globbing,brace,range"
+"What is the difference between file[1-3].txt and file{1..3}.txt, and what does file[1..5].txt match?","[1-3] is a glob range: one character from 1 to 3, matched only against existing files. {1..3} is a brace range: generates file1.txt file2.txt file3.txt with no filesystem check. [1..5] is not a range; it is a set of the characters 1, . and 5.","demo-m01-01,globbing,brace,range"
 
-"echo {a,b} prints a b. What do echo ""{a,b}"" and echo '{a,b}' print, and why?","Both print {a,b}. Quotes (double or single) switch brace expansion off, so the braces stay literal. Quotes protect only what is inside them: echo {a,b}-file gives a-file b-file, but echo ""{a,b}-file"" gives {a,b}-file.","demo00a,brace,quotes"
+"echo {a,b} prints a b. What do echo ""{a,b}"" and echo '{a,b}' print, and why?","Both print {a,b}. Quotes (double or single) switch brace expansion off, so the braces stay literal. Quotes protect only what is inside them: echo {a,b}-file gives a-file b-file, but echo ""{a,b}-file"" gives {a,b}-file.","demo-m01-01,brace,quotes"
 
-"What is quote removal, and when does it NOT apply?","The last expansion stage: bash removes the quote characters and backslashes you typed, so the command never sees them (printf '[%s]\n' ""hello"" prints [hello]). It only acts on text you typed: quotes that arrive inside a variable's value stay (x='""hi""'; echo $x prints ""hi"").","demo00a,quoting,quote-removal"
+"What is quote removal, and when does it NOT apply?","The last expansion stage: bash removes the quote characters and backslashes you typed, so the command never sees them (printf '[%s]\n' ""hello"" prints [hello]). It only acts on text you typed: quotes that arrive inside a variable's value stay (x='""hi""'; echo $x prints ""hi"").","demo-m01-01,quoting,quote-removal"
 
-"In what order does bash apply brace expansion, variable expansion, word splitting and globbing, and what is the proof that brace expansion runs before variable expansion?","1) brace expansion, 2) variable (and command) expansion, 3) word splitting, 4) globbing, then quote removal. Proof: x=""{1,2}""; echo $x prints {1,2}, because braces arriving inside a variable's value are never expanded (brace expansion already ran).","demo00a,expansion,order"
+"In what order does bash apply brace expansion, variable expansion, word splitting and globbing, and what is the proof that brace expansion runs before variable expansion?","1) brace expansion, 2) variable (and command) expansion, 3) word splitting, 4) globbing, then quote removal. Proof: x=""{1,2}""; echo $x prints {1,2}, because braces arriving inside a variable's value are never expanded (brace expansion already ran).","demo-m01-01,expansion,order"
 
-"A script starts with #!/bin/sh and uses {a,b}. On Ubuntu it doesn't expand. Why?","On Ubuntu/Debian /bin/sh is dash, which has no brace expansion. Use #!/bin/bash.","demo00a,shell,dash,portability"
+"A script starts with #!/bin/sh and uses {a,b}. On Ubuntu it doesn't expand. Why?","On Ubuntu/Debian /bin/sh is dash, which has no brace expansion. Use #!/bin/bash.","demo-m01-01,shell,dash,portability"
 
-"Why do several of this demo's commands give different results in zsh than in bash?","zsh errors on no-match patterns, treats ! as history expansion, and does not word-split or glob unquoted variables. Run the lab in bash.","demo00a,shell,zsh,portability"
+"Why do several of this demo's commands give different results in zsh than in bash?","zsh errors on no-match patterns, treats ! as history expansion, and does not word-split or glob unquoted variables. Run the lab in bash.","demo-m01-01,shell,zsh,portability"
 ```
 
 ---

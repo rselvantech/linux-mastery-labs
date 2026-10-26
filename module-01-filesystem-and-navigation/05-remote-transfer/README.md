@@ -726,31 +726,31 @@ sha256sum -c --quiet file.sha256 # print only failures
 #separator:Comma
 #columns:Front,Back,Tags
 
-"What happens when you run plain scp on a directory, and what is the fix?","scp prints an error saying it is not a regular file and exits non-zero. scp -r copies the whole directory tree, at any depth.","demo00e,scp,directories,recursive"
+"What happens when you run plain scp on a directory, and what is the fix?","scp prints an error saying it is not a regular file and exits non-zero. scp -r copies the whole directory tree, at any depth.","demo-m01-05,scp,directories,recursive"
 
-"scp -r localdir host:/tmp/copy is run twice. Why is the layout different the second time?","The first time /tmp/copy does not exist, so it becomes the copy. The second time it exists, so scp -r places localdir INSIDE it (/tmp/copy/localdir/...). Repeated syncs should use rsync.","demo00e,scp,nesting,gotcha"
+"scp -r localdir host:/tmp/copy is run twice. Why is the layout different the second time?","The first time /tmp/copy does not exist, so it becomes the copy. The second time it exists, so scp -r places localdir INSIDE it (/tmp/copy/localdir/...). Repeated syncs should use rsync.","demo-m01-05,scp,nesting,gotcha"
 
-"What are the port flags for ssh, scp and sftp?","ssh uses lowercase -p; scp and sftp use capital -P. In scp, lowercase -p means preserve times and modes, so scp -p 2222 file host: reads 2222 as a filename and fails.","demo00e,scp,ssh,port"
+"What are the port flags for ssh, scp and sftp?","ssh uses lowercase -p; scp and sftp use capital -P. In scp, lowercase -p means preserve times and modes, so scp -p 2222 file host: reads 2222 as a filename and fails.","demo-m01-05,scp,ssh,port"
 
-"What is the practical difference between scp and sftp, and when do you reach for rsync instead?","scp is a single scripted copy. sftp is a session (browse with ls/cd, move several files) or a scripted batch with -b. rsync (Demo M04-03) is for syncing folders and repeated transfers because it sends only what changed.","demo00e,scp,sftp,rsync"
+"What is the practical difference between scp and sftp, and when do you reach for rsync instead?","scp is a single scripted copy. sftp is a session (browse with ls/cd, move several files) or a scripted batch with -b. rsync (Demo M04-03) is for syncing folders and repeated transfers because it sends only what changed.","demo-m01-05,scp,sftp,rsync"
 
-"A failing command inside an sftp -b batch file (for example get of a missing file). What happens?","sftp stops and exits non-zero, so a script can detect the failure.","demo00e,sftp,batch,exitcode"
+"A failing command inside an sftp -b batch file (for example get of a missing file). What happens?","sftp stops and exits non-zero, so a script can detect the failure.","demo-m01-05,sftp,batch,exitcode"
 
-"curl -o file URL is run and the server returns 404. What is the exit code, and what is in the file?","Exit code 0, and the file contains the HTML error page. Without -f, curl treats any server response as a successful transfer.","demo00e,curl,404,exitcode"
+"curl -o file URL is run and the server returns 404. What is the exit code, and what is in the file?","Exit code 0, and the file contains the HTML error page. Without -f, curl treats any server response as a successful transfer.","demo-m01-05,curl,404,exitcode"
 
-"wget -O file URL is run and the server returns 404. What is the exit code and what is in the file?","Exit code 8 (server error response), and the file is empty (0 bytes).","demo00e,wget,404,exitcode"
+"wget -O file URL is run and the server returns 404. What is the exit code and what is in the file?","Exit code 8 (server error response), and the file is empty (0 bytes).","demo-m01-05,wget,404,exitcode"
 
-"What does curl -f do, and what flags make a safe script download?","-f (--fail) makes curl exit 22 on an HTTP error and save nothing. A safe download is curl -fsSL: fail on errors, silent progress, still show errors, follow redirects.","demo00e,curl,fail,safe"
+"What does curl -f do, and what flags make a safe script download?","-f (--fail) makes curl exit 22 on an HTTP error and save nothing. A safe download is curl -fsSL: fail on errors, silent progress, still show errors, follow redirects.","demo-m01-05,curl,fail,safe"
 
-"sha256sum -c file.sha256 is run against a modified file. What is printed and what is the exit code?","'file: FAILED' plus 'WARNING: 1 computed checksum did NOT match', and exit code 1. A match prints 'file: OK' and exits 0. A missing file prints 'FAILED open or read' and exits 1.","demo00e,sha256sum,verify,exitcode"
+"sha256sum -c file.sha256 is run against a modified file. What is printed and what is the exit code?","'file: FAILED' plus 'WARNING: 1 computed checksum did NOT match', and exit code 1. A match prints 'file: OK' and exits 0. A missing file prints 'FAILED open or read' and exits 1.","demo-m01-05,sha256sum,verify,exitcode"
 
-"Does a matching checksum prove the original file was correct?","No. It proves the bytes equal whatever the checksum was generated from. Generate the checksum from the known-good source, before transfer.","demo00e,checksum,limitations"
+"Does a matching checksum prove the original file was correct?","No. It proves the bytes equal whatever the checksum was generated from. Generate the checksum from the known-good source, before transfer.","demo-m01-05,checksum,limitations"
 
-"A checksum file downloaded from the same server as the artifact matches the artifact. Does that prove authenticity?","No. Whoever can replace the artifact can replace its checksum. It only catches accidental damage. For authenticity, verify a signature or get the checksum through a separate trusted channel.","demo00e,checksum,authenticity"
+"A checksum file downloaded from the same server as the artifact matches the artifact. Does that prove authenticity?","No. Whoever can replace the artifact can replace its checksum. It only catches accidental damage. For authenticity, verify a signature or get the checksum through a separate trusted channel.","demo-m01-05,checksum,authenticity"
 
-"What is the verified-transfer workflow, in order?","1) At the source, generate the checksum from the known-good file. 2) Transfer both the file and the checksum file. 3) At the destination run sha256sum -c and continue only if it exits 0.","demo00e,checksum,workflow"
+"What is the verified-transfer workflow, in order?","1) At the source, generate the checksum from the known-good file. 2) Transfer both the file and the checksum file. 3) At the destination run sha256sum -c and continue only if it exits 0.","demo-m01-05,checksum,workflow"
 
-"Why prefer sha256sum over md5sum, and what do checksums catch in practice if SSH already protects the wire?","md5 is broken against deliberate attackers (collisions can be manufactured), though fine for accidental corruption. SSH detects corruption in transit, so in practice checksums catch the wrong, partial or stale file, a different build than the one tested, or an error page saved as the file.","demo00e,checksum,md5,sha256"
+"Why prefer sha256sum over md5sum, and what do checksums catch in practice if SSH already protects the wire?","md5 is broken against deliberate attackers (collisions can be manufactured), though fine for accidental corruption. SSH detects corruption in transit, so in practice checksums catch the wrong, partial or stale file, a different build than the one tested, or an error page saved as the file.","demo-m01-05,checksum,md5,sha256"
 ```
 
 ---

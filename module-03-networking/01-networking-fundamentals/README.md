@@ -538,17 +538,17 @@ timedatectl status | grep "System clock synchronized"
 ### Task 6 — SSH key setup and the permissions trap
 
 ```bash
-ssh-keygen -t ed25519 -C "demo11-lab-key" -f ~/.ssh/demo11_key -N ""
+ssh-keygen -t ed25519 -C "demo-m03-01-lab-key" -f ~/.ssh/demo-m03-01_key -N ""
 chmod 700 ~/.ssh
-chmod 600 ~/.ssh/demo11_key
-chmod 644 ~/.ssh/demo11_key.pub
+chmod 600 ~/.ssh/demo-m03-01_key
+chmod 644 ~/.ssh/demo-m03-01_key.pub
 
 # Deliberately break it, then observe:
-chmod 644 ~/.ssh/demo11_key   # too permissive for a private key
-ssh -i ~/.ssh/demo11_key -o PasswordAuthentication=no wadmin@localhost
+chmod 644 ~/.ssh/demo-m03-01_key   # too permissive for a private key
+ssh -i ~/.ssh/demo-m03-01_key -o PasswordAuthentication=no wadmin@localhost
 # Expect a permissions-related refusal from ssh itself before it even
 # attempts the connection — the client enforces private key permissions too.
-chmod 600 ~/.ssh/demo11_key   # fix it
+chmod 600 ~/.ssh/demo-m03-01_key   # fix it
 ```
 
 ---
@@ -800,16 +800,16 @@ anyone connects the resulting symptoms back to the actual cause.
 #deck:Linux Mastery::Module 3 - Networking::Demo M03-01 - Networking Fundamentals
 #separator:Comma
 #columns:Front,Back,Tags
-"A name resolves correctly via dig, but a user's machine connects to the wrong server. What's the first thing to check?","/etc/hosts on that specific machine — nsswitch.conf's default hosts: files dns order means /etc/hosts is checked before DNS, so a stale local entry silently overrides a correct DNS answer that dig alone (which queries DNS directly) won't reveal.","demo11,hostname-resolution,troubleshooting"
-"Why does an address added with ip addr add disappear after a reboot?","ip operates on the kernel's live network state directly — it's an inspection/modification tool, not the persistence layer. Permanent changes must go into the distro's actual network configuration (Netplan on Ubuntu, NetworkManager on Rocky9).","demo11,ip-command,persistence"
-"An SSH key login fails with permission denied and falls back to a password prompt. What should you check before assuming the key is wrong?","Permissions on ~/.ssh (must be 700) and ~/.ssh/authorized_keys (must be 600) on the target server. sshd silently distrusts group/world-writable permissions on these and falls back to password auth without an explicit error.","demo11,ssh,troubleshooting"
-"What does dig @8.8.8.8 novatech.internal do differently from plain dig novatech.internal?","It queries the specified server (8.8.8.8) directly, bypassing /etc/resolv.conf entirely — useful for isolating whether a resolution problem is local resolver misconfiguration or an issue with the DNS server itself.","demo11,dns,dig"
-"What does CIDR notation like /24 actually represent?","The number of leading bits that define the network portion of the address — /24 means the first 24 bits are network, leaving 8 bits (256 addresses) for hosts. It replaces the older netmask notation (255.255.255.0), which expresses the same thing differently.","demo11,ipv4,cidr"
-"On an interface with IPv6 enabled, what is the fe80::/10 address used for, and is it routable off the local network?","It's the link-local address, used for on-link communication (similar in role to ARP for IPv4). It is never routed off the local network — global (routable, internet-facing) IPv6 addresses are a separate, additional assignment.","demo11,ipv6,link-local"
-"Why does clock drift on a server cause failures that don't obviously look like clock problems?","TLS certificate validation depends on current time being within the cert's validity window, log correlation across servers requires agreeing clocks, and timer/cron scheduling accuracy depends on the system clock — none of these failures look like 'the clock is wrong' on the surface.","demo11,time-sync,troubleshooting"
-"What's the default hostname resolution order set by /etc/nsswitch.conf's hosts: line on both Ubuntu and Rocky9?","files dns — /etc/hosts (files) is checked before DNS (dns).","demo11,hostname-resolution,basics"
-"Ubuntu defaults to systemd-timesyncd and Rocky9 defaults to chrony for time sync. What's the key functional difference?","systemd-timesyncd is lightweight and client-only (syncs to NTP servers but can't serve time to others). chrony is fuller-featured — it can also act as an NTP server itself and handles larger clock jumps more gracefully.","demo11,time-sync,chrony,timesyncd"
-"getent hosts NAME and dig NAME can return different answers for the same name. Why, and which one reflects what the machine will actually use?","getent respects the full nsswitch.conf resolution order (checking /etc/hosts before DNS); dig queries DNS directly, bypassing /etc/hosts. getent's answer is what the machine will actually resolve to in normal use.","demo11,hostname-resolution,dig,getent"
+"A name resolves correctly via dig, but a user's machine connects to the wrong server. What's the first thing to check?","/etc/hosts on that specific machine — nsswitch.conf's default hosts: files dns order means /etc/hosts is checked before DNS, so a stale local entry silently overrides a correct DNS answer that dig alone (which queries DNS directly) won't reveal.","demo-m03-01,hostname-resolution,troubleshooting"
+"Why does an address added with ip addr add disappear after a reboot?","ip operates on the kernel's live network state directly — it's an inspection/modification tool, not the persistence layer. Permanent changes must go into the distro's actual network configuration (Netplan on Ubuntu, NetworkManager on Rocky9).","demo-m03-01,ip-command,persistence"
+"An SSH key login fails with permission denied and falls back to a password prompt. What should you check before assuming the key is wrong?","Permissions on ~/.ssh (must be 700) and ~/.ssh/authorized_keys (must be 600) on the target server. sshd silently distrusts group/world-writable permissions on these and falls back to password auth without an explicit error.","demo-m03-01,ssh,troubleshooting"
+"What does dig @8.8.8.8 novatech.internal do differently from plain dig novatech.internal?","It queries the specified server (8.8.8.8) directly, bypassing /etc/resolv.conf entirely — useful for isolating whether a resolution problem is local resolver misconfiguration or an issue with the DNS server itself.","demo-m03-01,dns,dig"
+"What does CIDR notation like /24 actually represent?","The number of leading bits that define the network portion of the address — /24 means the first 24 bits are network, leaving 8 bits (256 addresses) for hosts. It replaces the older netmask notation (255.255.255.0), which expresses the same thing differently.","demo-m03-01,ipv4,cidr"
+"On an interface with IPv6 enabled, what is the fe80::/10 address used for, and is it routable off the local network?","It's the link-local address, used for on-link communication (similar in role to ARP for IPv4). It is never routed off the local network — global (routable, internet-facing) IPv6 addresses are a separate, additional assignment.","demo-m03-01,ipv6,link-local"
+"Why does clock drift on a server cause failures that don't obviously look like clock problems?","TLS certificate validation depends on current time being within the cert's validity window, log correlation across servers requires agreeing clocks, and timer/cron scheduling accuracy depends on the system clock — none of these failures look like 'the clock is wrong' on the surface.","demo-m03-01,time-sync,troubleshooting"
+"What's the default hostname resolution order set by /etc/nsswitch.conf's hosts: line on both Ubuntu and Rocky9?","files dns — /etc/hosts (files) is checked before DNS (dns).","demo-m03-01,hostname-resolution,basics"
+"Ubuntu defaults to systemd-timesyncd and Rocky9 defaults to chrony for time sync. What's the key functional difference?","systemd-timesyncd is lightweight and client-only (syncs to NTP servers but can't serve time to others). chrony is fuller-featured — it can also act as an NTP server itself and handles larger clock jumps more gracefully.","demo-m03-01,time-sync,chrony,timesyncd"
+"getent hosts NAME and dig NAME can return different answers for the same name. Why, and which one reflects what the machine will actually use?","getent respects the full nsswitch.conf resolution order (checking /etc/hosts before DNS); dig queries DNS directly, bypassing /etc/hosts. getent's answer is what the machine will actually resolve to in normal use.","demo-m03-01,hostname-resolution,dig,getent"
 ```
 
 ---

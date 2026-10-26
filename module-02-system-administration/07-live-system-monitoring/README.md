@@ -616,25 +616,25 @@ batch mode (`top -b -n`) with extra parsing.
 #separator:Comma
 #columns:Front,Back,Tags
 
-"A machine shows load average 6.82 on 4 cores, but top shows 92% idle CPU and wa: 4.3. What does this actually indicate?","An I/O bottleneck, not a CPU bottleneck. Linux counts processes in uninterruptible I/O wait toward load average, so high load with idle CPU and nonzero wa points at disk/network-bound processes, not CPU contention.","demo09,load-average,troubleshooting"
+"A machine shows load average 6.82 on 4 cores, but top shows 92% idle CPU and wa: 4.3. What does this actually indicate?","An I/O bottleneck, not a CPU bottleneck. Linux counts processes in uninterruptible I/O wait toward load average, so high load with idle CPU and nonzero wa points at disk/network-bound processes, not CPU contention.","demo-m02-07,load-average,troubleshooting"
 
-"free -h shows low free but high available. Is the machine low on memory?","No. Linux uses spare RAM for reclaimable page cache (buff/cache); available already accounts for how much of that cache could be reclaimed on demand. Available, not free, is the number that matters.","demo09,free,common-mistake"
+"free -h shows low free but high available. Is the machine low on memory?","No. Linux uses spare RAM for reclaimable page cache (buff/cache); available already accounts for how much of that cache could be reclaimed on demand. Available, not free, is the number that matters.","demo-m02-07,free,common-mistake"
 
-"What's the definitive vmstat signal that a machine is genuinely out of memory and swapping, as opposed to just using cache normally?","Non-zero, sustained si/so (swap in/swap out) columns. Normal cache usage shows high buff/cache with si/so near zero; real memory pressure shows active si/so.","demo09,vmstat,swap"
+"What's the definitive vmstat signal that a machine is genuinely out of memory and swapping, as opposed to just using cache normally?","Non-zero, sustained si/so (swap in/swap out) columns. Normal cache usage shows high buff/cache with si/so near zero; real memory pressure shows active si/so.","demo-m02-07,vmstat,swap"
 
-"In vmstat, what's the difference between the r and b columns?","r counts processes runnable and waiting for CPU (CPU contention signal); b counts processes blocked in uninterruptible sleep, almost always I/O (I/O contention signal).","demo09,vmstat,basics"
+"In vmstat, what's the difference between the r and b columns?","r counts processes runnable and waiting for CPU (CPU contention signal); b counts processes blocked in uninterruptible sleep, almost always I/O (I/O contention signal).","demo-m02-07,vmstat,basics"
 
-"Why should you always normalize load average against nproc before judging it?","A raw load average number is meaningless without core count context — 4.0 is trivial on 16 cores and a serious overload on 2 cores.","demo09,load-average,basics"
+"Why should you always normalize load average against nproc before judging it?","A raw load average number is meaningless without core count context — 4.0 is trivial on 16 cores and a serious overload on 2 cores.","demo-m02-07,load-average,basics"
 
-"What does a high count of zombie processes in top's Tasks line contribute to load average?","Effectively nothing ongoing — a zombie process isn't running or waiting for CPU/IO, it's a dead process waiting to be reaped by its parent. High zombie count is a process-reaping hygiene issue, not an explanation for elevated load average.","demo09,top,zombies"
+"What does a high count of zombie processes in top's Tasks line contribute to load average?","Effectively nothing ongoing — a zombie process isn't running or waiting for CPU/IO, it's a dead process waiting to be reaped by its parent. High zombie count is a process-reaping hygiene issue, not an explanation for elevated load average.","demo-m02-07,top,zombies"
 
-"Where does every number that top, vmstat, and free display ultimately come from?","/proc — the kernel's live virtual filesystem view of its own state, e.g. /proc/loadavg and /proc/meminfo.","demo09,proc,fundamentals"
+"Where does every number that top, vmstat, and free display ultimately come from?","/proc — the kernel's live virtual filesystem view of its own state, e.g. /proc/loadavg and /proc/meminfo.","demo-m02-07,proc,fundamentals"
 
-"What does watch -d add compared to plain watch -n 2 'cmd'?","-d highlights what changed between refreshes, making it easier to spot new entries (e.g. new connections in ss output) rather than re-reading the whole table each cycle.","demo09,watch,basics"
+"What does watch -d add compared to plain watch -n 2 'cmd'?","-d highlights what changed between refreshes, making it easier to spot new entries (e.g. new connections in ss output) rather than re-reading the whole table each cycle.","demo-m02-07,watch,basics"
 
-"Inside top, which key renices a process, and which kills one?","r renices (prompts for PID then new niceness value); k kills (prompts for PID then signal, default SIGTERM).","demo09,top,interactive-controls"
+"Inside top, which key renices a process, and which kills one?","r renices (prompts for PID then new niceness value); k kills (prompts for PID then signal, default SIGTERM).","demo-m02-07,top,interactive-controls"
 
-"A system has thin buff/cache (120Mi) alongside active vmstat si/so. Why does the thin cache make the swapping more concerning, not less?","Because the kernel prefers reclaiming cache over swapping whenever it can. A system that's already swapping while cache is thin has already exhausted what it could reclaim and still needs more memory than it has.","demo09,vmstat,free,troubleshooting"
+"A system has thin buff/cache (120Mi) alongside active vmstat si/so. Why does the thin cache make the swapping more concerning, not less?","Because the kernel prefers reclaiming cache over swapping whenever it can. A system that's already swapping while cache is thin has already exhausted what it could reclaim and still needs more memory than it has.","demo-m02-07,vmstat,free,troubleshooting"
 ```
 
 ---

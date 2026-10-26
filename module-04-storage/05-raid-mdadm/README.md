@@ -23,7 +23,7 @@
 A single disk is a single point of failure — RAID (Redundant Array of
 Independent Disks) combines multiple physical devices into one logical
 device that can survive some degree of disk failure, depending on the
-RAID level chosen. Demo M04-01/14a/14b covered a single volume's lifecycle;
+RAID level chosen. Demo M04-01/M04-02/M04-03 covered a single volume's lifecycle;
 this demo covers what happens when that volume is actually *several*
 disks acting as one, what happens when one of those disks fails, and the
 one risk — "split-brain," where two copies of the same mirrored data
@@ -111,7 +111,7 @@ did is a common, costly mistake:
   typically in the same physical machine.
 
 RAID is an *availability* tool (keep the system running through a disk
-failure), not a *data-protection* tool. Backups (Demo M04-02/14b) are the
+failure), not a *data-protection* tool. Backups (Demo M04-02/M04-03) are the
 data-protection tool. The two are complementary, and a common production
 mistake is treating a RAID array as if it were also a backup.
 
@@ -534,7 +534,7 @@ resolved the inconsistency correctly.
 
 ---
 
-1. **RAID protects against physical disk failure and nothing else — it is not a backup.** It faithfully mirrors accidental deletion, corruption, or ransomware across every member disk exactly as reliably as it mirrors legitimate writes. Backups (Demo M04-02/14b) are the complementary, distinct tool for those failure modes.
+1. **RAID protects against physical disk failure and nothing else — it is not a backup.** It faithfully mirrors accidental deletion, corruption, or ransomware across every member disk exactly as reliably as it mirrors legitimate writes. Backups (Demo M04-02/M04-03) are the complementary, distinct tool for those failure modes.
 2. **`[2/2] [UU]` in `/proc/mdstat` reads as configured/active member counts, then one letter per slot — `U` for up, `_` for missing.** The position of the underscore identifies which array *slot* is down, not necessarily which physical disk, since slot assignment happens at creation time.
 3. **A degraded RAID1 array (one failed member) keeps serving reads and writes normally — "degraded" is not "down."** This is the entire point of mirroring, but it also means a degraded array's real risk is invisible from the application's perspective: zero remaining redundancy, with a second failure at any point meaning total data loss.
 4. **`--fail` marks a member down without detaching it; `--remove` actually detaches it; `--add` attaches a replacement and triggers a full rebuild.** These are three deliberately separate operations, not one combined step, so a failing-but-not-dead disk can be investigated before being physically removed.
@@ -588,17 +588,17 @@ resolved the inconsistency correctly.
 #deck:Linux Mastery::Module 4 - Storage::Demo M04-05 - RAID with mdadm
 #separator:Comma
 #columns:Front,Back,Tags
-"Does RAID protect against accidental file deletion or ransomware encrypting your files?","No — RAID has no concept of correct vs incorrect data. It faithfully mirrors or stripes a deletion or a ransomware pass across every member disk just as reliably as legitimate writes. RAID protects against physical disk failure only; backups are the tool for accidental deletion or corruption.","demo15a,raid,fundamentals"
-"/proc/mdstat shows [2/1] [U_] for a RAID1 array. What does this mean?","2/1 means 2 configured members, 1 currently active. [U_] shows one letter per slot: U (up) for a working member, _ for missing/failed. This array is degraded — one member is down.","demo15a,raid,mdstat,fundamentals"
-"A RAID1 array has one failed disk (degraded state). Is the array currently down?","No — a degraded RAID1 array keeps serving reads and writes normally. Degraded is not down. What's lost is redundancy: a SECOND failure at this point would mean total data loss, since there's nothing left to fall back on.","demo15a,raid,degraded,fundamentals"
-"What's the difference between mdadm --fail and mdadm --remove?","--fail marks a member as failed without detaching it from the array. --remove actually detaches a failed member so a replacement can take its slot. They're separate deliberately, so a failing-but-not-dead disk can be investigated before physical removal.","demo15a,raid,mdadm,fundamentals"
-"What triggers a RAID rebuild, and what is the rebuild process actually doing?","Adding a new/replacement device with mdadm --add triggers an automatic rebuild. The array copies data from the surviving member(s) onto the new device until it's fully synchronized — visible in /proc/mdstat as a live recovery percentage.","demo15a,raid,rebuild,fundamentals"
-"What is RAID split-brain, in the context of a RAID1 mirror?","Two mirror members end up holding genuinely different data after being separated — the surviving member keeps accepting writes while the other is out, and if the returning member is reintegrated without verification, you have two disks each thinking they're the current authoritative copy.","demo15a,raid,split-brain,fundamentals"
-"How does mdadm detect and guard against split-brain / stale array members?","Every member disk's superblock carries an event count that increments on every significant array event. On reassembly, mdadm compares event counts — a member with a significantly lower count is treated as stale and never silently included in a live array without an explicit forced reassembly.","demo15a,raid,split-brain,mdadm,fundamentals"
-"A RAID1 array's first disk fails and stays unreplaced for three weeks before a second disk fails, taking down the array entirely. Is this RAID failing to do its job?","No — RAID1 is designed to survive exactly one failure, which it did for three weeks. The actual failure is operational: the degraded-state window existed specifically to be used for replacement and rebuild, and wasn't.","demo15a,raid,break-fix,operational"
-"Should a RAID member disk that was disconnected for several hours be trusted to rejoin the array automatically just because it's reconnected?","No — it should be treated as untrusted until mdadm's event-count check confirms it (or an explicit, monitored rebuild is performed). A disk missing that long has a stale view of the data, since the surviving member kept accepting writes the whole time.","demo15a,raid,split-brain,operational"
-"When would you choose RAID6 over RAID5?","When a second disk failure during a long rebuild is a real risk — larger arrays with slow rebuild times are exactly this case. RAID6 tolerates 2 simultaneous failures (two independent parity blocks) vs RAID5's 1, at the cost of more usable-capacity overhead.","demo15a,raid,levels,comparison"
-"Does RAID0 belong in a data-durability strategy?","No — RAID0 (striping with no redundancy) provides zero fault tolerance; ANY member disk failing loses the entire array's data. It exists purely for speed, making every member disk a single point of failure for the whole array.","demo15a,raid,raid0,fundamentals"
+"Does RAID protect against accidental file deletion or ransomware encrypting your files?","No — RAID has no concept of correct vs incorrect data. It faithfully mirrors or stripes a deletion or a ransomware pass across every member disk just as reliably as legitimate writes. RAID protects against physical disk failure only; backups are the tool for accidental deletion or corruption.","demo-m04-05,raid,fundamentals"
+"/proc/mdstat shows [2/1] [U_] for a RAID1 array. What does this mean?","2/1 means 2 configured members, 1 currently active. [U_] shows one letter per slot: U (up) for a working member, _ for missing/failed. This array is degraded — one member is down.","demo-m04-05,raid,mdstat,fundamentals"
+"A RAID1 array has one failed disk (degraded state). Is the array currently down?","No — a degraded RAID1 array keeps serving reads and writes normally. Degraded is not down. What's lost is redundancy: a SECOND failure at this point would mean total data loss, since there's nothing left to fall back on.","demo-m04-05,raid,degraded,fundamentals"
+"What's the difference between mdadm --fail and mdadm --remove?","--fail marks a member as failed without detaching it from the array. --remove actually detaches a failed member so a replacement can take its slot. They're separate deliberately, so a failing-but-not-dead disk can be investigated before physical removal.","demo-m04-05,raid,mdadm,fundamentals"
+"What triggers a RAID rebuild, and what is the rebuild process actually doing?","Adding a new/replacement device with mdadm --add triggers an automatic rebuild. The array copies data from the surviving member(s) onto the new device until it's fully synchronized — visible in /proc/mdstat as a live recovery percentage.","demo-m04-05,raid,rebuild,fundamentals"
+"What is RAID split-brain, in the context of a RAID1 mirror?","Two mirror members end up holding genuinely different data after being separated — the surviving member keeps accepting writes while the other is out, and if the returning member is reintegrated without verification, you have two disks each thinking they're the current authoritative copy.","demo-m04-05,raid,split-brain,fundamentals"
+"How does mdadm detect and guard against split-brain / stale array members?","Every member disk's superblock carries an event count that increments on every significant array event. On reassembly, mdadm compares event counts — a member with a significantly lower count is treated as stale and never silently included in a live array without an explicit forced reassembly.","demo-m04-05,raid,split-brain,mdadm,fundamentals"
+"A RAID1 array's first disk fails and stays unreplaced for three weeks before a second disk fails, taking down the array entirely. Is this RAID failing to do its job?","No — RAID1 is designed to survive exactly one failure, which it did for three weeks. The actual failure is operational: the degraded-state window existed specifically to be used for replacement and rebuild, and wasn't.","demo-m04-05,raid,break-fix,operational"
+"Should a RAID member disk that was disconnected for several hours be trusted to rejoin the array automatically just because it's reconnected?","No — it should be treated as untrusted until mdadm's event-count check confirms it (or an explicit, monitored rebuild is performed). A disk missing that long has a stale view of the data, since the surviving member kept accepting writes the whole time.","demo-m04-05,raid,split-brain,operational"
+"When would you choose RAID6 over RAID5?","When a second disk failure during a long rebuild is a real risk — larger arrays with slow rebuild times are exactly this case. RAID6 tolerates 2 simultaneous failures (two independent parity blocks) vs RAID5's 1, at the cost of more usable-capacity overhead.","demo-m04-05,raid,levels,comparison"
+"Does RAID0 belong in a data-durability strategy?","No — RAID0 (striping with no redundancy) provides zero fault tolerance; ANY member disk failing loses the entire array's data. It exists purely for speed, making every member disk a single point of failure for the whole array.","demo-m04-05,raid,raid0,fundamentals"
 ```
 
 ## Appendix B — Quiz

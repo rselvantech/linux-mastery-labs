@@ -2,7 +2,7 @@
 
 ## Overview
 
-Demo M05-01 taught regex syntax, 17a added PCRE, and 17b showed that the same
+Demo M05-01 taught regex syntax, M05-02 added PCRE, and M05-03 showed that the same
 pattern means different things in different tools. This demo is about the
 moment after that: the pattern is written, and it is wrong. Regex bugs are
 unusual because they almost never produce an error. A bad pattern matches
@@ -60,7 +60,7 @@ By the end of this demo you will be able to:
 
 ## Recall Check
 
-> Answer from memory before reading further. From Demos M05-01, 17a, and 17b.
+> Answer from memory before reading further. From Demos M05-01, M05-02, and M05-03.
 
 1. `sed -n '/user_id=[0-9]+/p' file` prints nothing, but `grep -E
    'user_id=[0-9]+' file` matches. Why, and what are two ways to fix the
@@ -803,18 +803,18 @@ engine never has to give characters back.
 #deck:Linux Mastery::Module 5 - Text Processing & Search Tools::Demo M05-04 - Practical Regex Debugging
 #separator:Comma
 #columns:Front,Back,Tags
-"Does grep -c count matches or lines? How do you count total matches?","Lines. A line with two matches counts once. Use grep -o PATTERN FILE | wc -l to count every match.","demo17c,grep,counting"
-"What sed trick shows exactly where a pattern's match begins and ends?","Wrap the match using &, which stands for the whole match: sed -nE 's/PATTERN/<<&>>/p'. A greedy overshoot becomes visible inside the markers.","demo17c,sed,debugging"
-"When should you use grep -F instead of a regex?","When searching for literal text, especially text from a shell variable. Nothing is interpreted as a metacharacter, so there is nothing to escape.","demo17c,grep,fixed-string"
-"What is the difference between \buser= and a plain user= pattern?","The plain pattern also matches inside longer words such as superuser=. \b (a GNU extension that works in grep -E and grep -P) requires a word boundary before it. grep -w does the same for whole words.","demo17c,anchoring,word-boundary"
-"Why is a negated class like [^""]* faster than a lazy .*? even in PCRE?","The engine never has to give characters back: the class can only match non-quote characters, so there is nothing to backtrack over.","demo17c,performance,negated-class"
-"What do grep exit statuses 0, 1, and 2 mean?","0: at least one match. 1: ran fine, no match. 2: an error (bad pattern, missing file, PCRE backtracking limit).","demo17c,grep,exit-codes"
-"You test a nested-quantifier pattern against aaaa...c and it returns instantly. Is the pattern safe?","Not necessarily. PCRE2 pre-checks for required literal characters; if the subject has no b for ^(a+)+b$, it fails immediately. Test with a subject that contains the required character but still fails, such as aaaa...b!.","demo17c,backtracking,testing"
-"What do possessive quantifiers and atomic groups do in PCRE?","They forbid backtracking into the quantified part once it has matched. a++ and (?>a+) cannot be re-divided, which removes the exponential case.","demo17c,pcre,backtracking"
-"Which grep mode is immune to catastrophic backtracking, and why?","grep -E (and plain grep): GNU grep uses a DFA-based matcher for these, which does not backtrack, so nested quantifiers have no exponential case.","demo17c,backtracking,engines"
-"Why must a regex be tested against lines that should NOT match?","A pattern tested only on matching lines can only show that it is not too strict. Negative samples are the only way to find out that it is too loose.","demo17c,workflow,testing"
-"Why is the ERE pattern 'msg="".*?""' in grep -E dangerous?","It runs without an error but ? does not make * lazy in ERE, so it returns the same greedy result as .*. Lazy quantifiers exist only in PCRE.","demo17c,erre,lazy-quantifier"
-"Why can a script using set -e still miss a grep -P engine error inside an if?","A failing command used as an if condition does not trigger set -e. Status 2 is simply non-zero, so the if takes the else branch exactly as it would for no match.","demo17c,scripting,exit-codes"
+"Does grep -c count matches or lines? How do you count total matches?","Lines. A line with two matches counts once. Use grep -o PATTERN FILE | wc -l to count every match.","demo-m05-04,grep,counting"
+"What sed trick shows exactly where a pattern's match begins and ends?","Wrap the match using &, which stands for the whole match: sed -nE 's/PATTERN/<<&>>/p'. A greedy overshoot becomes visible inside the markers.","demo-m05-04,sed,debugging"
+"When should you use grep -F instead of a regex?","When searching for literal text, especially text from a shell variable. Nothing is interpreted as a metacharacter, so there is nothing to escape.","demo-m05-04,grep,fixed-string"
+"What is the difference between \buser= and a plain user= pattern?","The plain pattern also matches inside longer words such as superuser=. \b (a GNU extension that works in grep -E and grep -P) requires a word boundary before it. grep -w does the same for whole words.","demo-m05-04,anchoring,word-boundary"
+"Why is a negated class like [^""]* faster than a lazy .*? even in PCRE?","The engine never has to give characters back: the class can only match non-quote characters, so there is nothing to backtrack over.","demo-m05-04,performance,negated-class"
+"What do grep exit statuses 0, 1, and 2 mean?","0: at least one match. 1: ran fine, no match. 2: an error (bad pattern, missing file, PCRE backtracking limit).","demo-m05-04,grep,exit-codes"
+"You test a nested-quantifier pattern against aaaa...c and it returns instantly. Is the pattern safe?","Not necessarily. PCRE2 pre-checks for required literal characters; if the subject has no b for ^(a+)+b$, it fails immediately. Test with a subject that contains the required character but still fails, such as aaaa...b!.","demo-m05-04,backtracking,testing"
+"What do possessive quantifiers and atomic groups do in PCRE?","They forbid backtracking into the quantified part once it has matched. a++ and (?>a+) cannot be re-divided, which removes the exponential case.","demo-m05-04,pcre,backtracking"
+"Which grep mode is immune to catastrophic backtracking, and why?","grep -E (and plain grep): GNU grep uses a DFA-based matcher for these, which does not backtrack, so nested quantifiers have no exponential case.","demo-m05-04,backtracking,engines"
+"Why must a regex be tested against lines that should NOT match?","A pattern tested only on matching lines can only show that it is not too strict. Negative samples are the only way to find out that it is too loose.","demo-m05-04,workflow,testing"
+"Why is the ERE pattern 'msg="".*?""' in grep -E dangerous?","It runs without an error but ? does not make * lazy in ERE, so it returns the same greedy result as .*. Lazy quantifiers exist only in PCRE.","demo-m05-04,erre,lazy-quantifier"
+"Why can a script using set -e still miss a grep -P engine error inside an if?","A failing command used as an if condition does not trigger set -e. Status 2 is simply non-zero, so the if takes the else branch exactly as it would for no match.","demo-m05-04,scripting,exit-codes"
 ```
 
 ---

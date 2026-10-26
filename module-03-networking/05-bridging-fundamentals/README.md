@@ -86,7 +86,7 @@ are kernel-level network state, not user-space configuration.
 
 ## Part 1 — Concepts
 
-### 13a.1 What a bridge actually is
+### 1.1 What a bridge actually is
 
 A Linux bridge is a virtual Layer 2 switch implemented in the
 kernel. Interfaces attached to it ("ports" on the bridge) can
@@ -102,7 +102,7 @@ ip link set br0 up
 A newly created bridge with nothing attached does nothing useful —
 it's an empty virtual switch until interfaces are added to it.
 
-### 13a.2 `veth` pairs — always two connected ends
+### 1.2 `veth` pairs — always two connected ends
 
 A `veth` (virtual ethernet) interface is created as a **pair** —
 anything sent into one end comes out the other, like a virtual
@@ -118,7 +118,7 @@ host (often attached to a bridge), the other end is moved into a
 network namespace or a container — this is exactly how Docker
 connects a container's network stack to the host's bridge.
 
-### 13a.3 Attaching an interface to a bridge
+### 1.3 Attaching an interface to a bridge
 
 ```bash
 ip link set veth-host master br0
@@ -138,7 +138,7 @@ bridge link show
 > forwarding` — the port is actively participating in the bridge's
 > switching, not just administratively attached.
 
-### 13a.4 Network namespaces — simulating a second host
+### 1.4 Network namespaces — simulating a second host
 
 A network namespace is an isolated network stack — its own
 interfaces, routing table, and IP addresses, separate from the
@@ -157,7 +157,7 @@ isolated network namespace — `ip addr add` inside it only affects
 that namespace's view of `veth-ns`, not the host's global network
 state.
 
-### 13a.5 Proving real connectivity, not just configuration
+### 1.5 Proving real connectivity, not just configuration
 
 ```bash
 ip addr add 192.168.50.1/24 dev br0
@@ -170,7 +170,7 @@ ip netns exec ns1 ping -c 2 192.168.50.1   # the reverse direction
 > forwarding through the bridge, not just interfaces existing in an
 > "up" state with no real traffic ever tested.
 
-### 13a.6 MAC learning — the core bridging mechanism, proven
+### 1.6 MAC learning — the core bridging mechanism, proven
 
 A bridge doesn't broadcast every packet to every port forever — it
 **learns** which MAC address is reachable through which port by
@@ -193,7 +193,7 @@ rather than a hub: traffic to a known MAC goes only to the port
 where the bridge last saw that MAC, not flooded to every attached
 port.
 
-### 13a.7 Why this matters beyond this demo
+### 1.7 Why this matters beyond this demo
 
 Docker's default bridge network, Kubernetes CNI plugins (many of
 which create bridges or bridge-like constructs per node), and
@@ -463,25 +463,25 @@ integrity for virtual setups).
 #separator:Comma
 #columns:Front,Back,Tags
 
-"What is a Linux bridge, conceptually?","A virtual Layer 2 switch implemented in the kernel. Interfaces attached to it (bridge ports) can exchange traffic directly, and the bridge learns which MAC address is reachable through which port, exactly like a physical network switch.","demo13a,bridge,concept"
+"What is a Linux bridge, conceptually?","A virtual Layer 2 switch implemented in the kernel. Interfaces attached to it (bridge ports) can exchange traffic directly, and the bridge learns which MAC address is reachable through which port, exactly like a physical network switch.","demo-m03-05,bridge,concept"
 
-"What is a veth pair, and why does it always come as two ends?","A veth (virtual ethernet) interface is created as a connected PAIR - anything sent into one end comes out the other, like a virtual patch cable. This is exactly the mechanism container runtimes use to connect an isolated network namespace's interface to the host's bridge.","demo13a,veth,pair"
+"What is a veth pair, and why does it always come as two ends?","A veth (virtual ethernet) interface is created as a connected PAIR - anything sent into one end comes out the other, like a virtual patch cable. This is exactly the mechanism container runtimes use to connect an isolated network namespace's interface to the host's bridge.","demo-m03-05,veth,pair"
 
-"ip link set veth-host master br0 is run. What does 'master' actually do, and how do you confirm it worked?","'master br0' attaches the interface to the bridge, making it an active port that participates in the bridge's switching. Confirm with 'bridge link show' - a correctly attached port shows 'state forwarding', not just administratively linked.","demo13a,bridge,attach,master"
+"ip link set veth-host master br0 is run. What does 'master' actually do, and how do you confirm it worked?","'master br0' attaches the interface to the bridge, making it an active port that participates in the bridge's switching. Confirm with 'bridge link show' - a correctly attached port shows 'state forwarding', not just administratively linked.","demo-m03-05,bridge,attach,master"
 
-"How do you PROVE a bridge is actually forwarding traffic, rather than just showing interfaces as administratively up?","Generate real traffic across it (e.g. a ping between two endpoints attached to the bridge), then check bridge fdb show - a dynamically learned MAC entry (no 'permanent' flag) is direct evidence the bridge processed and forwarded real packets, not just that link state shows up.","demo13a,bridge,verify,fdb"
+"How do you PROVE a bridge is actually forwarding traffic, rather than just showing interfaces as administratively up?","Generate real traffic across it (e.g. a ping between two endpoints attached to the bridge), then check bridge fdb show - a dynamically learned MAC entry (no 'permanent' flag) is direct evidence the bridge processed and forwarded real packets, not just that link state shows up.","demo-m03-05,bridge,verify,fdb"
 
-"What does 'bridge fdb show' actually display, and what does a non-permanent entry mean?","The bridge's forwarding database - which MAC addresses the bridge has learned are reachable through which port. A non-permanent (dynamically learned) entry means the bridge observed real traffic from that MAC and recorded which port it arrived on - proof of actual learning, not static configuration.","demo13a,bridge,fdb,mac-learning"
+"What does 'bridge fdb show' actually display, and what does a non-permanent entry mean?","The bridge's forwarding database - which MAC addresses the bridge has learned are reachable through which port. A non-permanent (dynamically learned) entry means the bridge observed real traffic from that MAC and recorded which port it arrived on - proof of actual learning, not static configuration.","demo-m03-05,bridge,fdb,mac-learning"
 
-"What is a network namespace, and what's it used for in this demo?","A fully isolated network stack - its own interfaces, routing table, and IP addresses, separate from the host's. Used here to simulate a second 'host' connected to the bridge via one end of a veth pair, without needing an actual separate machine.","demo13a,netns,namespace"
+"What is a network namespace, and what's it used for in this demo?","A fully isolated network stack - its own interfaces, routing table, and IP addresses, separate from the host's. Used here to simulate a second 'host' connected to the bridge via one end of a veth pair, without needing an actual separate machine.","demo-m03-05,netns,namespace"
 
-"Two containers on the same Docker bridge network can reach the internet but can't reach each other. What layer does this symptom point to?","Layer 2 (local link/switching), not Layer 3 routing - internet connectivity working confirms routing is fine for each container individually. Same-subnet-but-cant-reach-each-other is the classic Layer 2 symptom, pointing at the bridge itself (attachment, MAC learning) rather than routing configuration.","demo13a,bridge,layer2,troubleshooting"
+"Two containers on the same Docker bridge network can reach the internet but can't reach each other. What layer does this symptom point to?","Layer 2 (local link/switching), not Layer 3 routing - internet connectivity working confirms routing is fine for each container individually. Same-subnet-but-cant-reach-each-other is the classic Layer 2 symptom, pointing at the bridge itself (attachment, MAC learning) rather than routing configuration.","demo-m03-05,bridge,layer2,troubleshooting"
 
-"What's the Docker-networking equivalent of this demo's 'ip link show master br0' check?","ip link show master docker0 (or whatever the custom bridge is named) - confirms which veth interfaces are ACTUALLY attached to Docker's bridge, regardless of what Docker's own container metadata claims. The exact same kernel-level check applies since Docker bridges use this identical mechanism.","demo13a,bridge,docker,verify"
+"What's the Docker-networking equivalent of this demo's 'ip link show master br0' check?","ip link show master docker0 (or whatever the custom bridge is named) - confirms which veth interfaces are ACTUALLY attached to Docker's bridge, regardless of what Docker's own container metadata claims. The exact same kernel-level check applies since Docker bridges use this identical mechanism.","demo-m03-05,bridge,docker,verify"
 
-"Why does deleting a bridge with 'ip link delete br0' also remove the attached veth-host interface?","The veth-host end was attached (mastered) to br0; deleting the bridge tears down its attached ports as part of removing the bridge itself. The other end of the veth pair (inside a namespace, if not separately deleted) goes with whatever cleanup removes its associated namespace or the pair itself.","demo13a,bridge,cleanup,veth"
+"Why does deleting a bridge with 'ip link delete br0' also remove the attached veth-host interface?","The veth-host end was attached (mastered) to br0; deleting the bridge tears down its attached ports as part of removing the bridge itself. The other end of the veth pair (inside a namespace, if not separately deleted) goes with whatever cleanup removes its associated namespace or the pair itself.","demo-m03-05,bridge,cleanup,veth"
 
-"What underlying kernel mechanism do Docker's default bridge network, Kubernetes CNI plugins, and KVM/libvirt networking all share?","A kernel bridge, veth pairs connecting containers/VMs to it, and MAC learning handling actual forwarding - the exact same mechanism built by hand in this demo. Container/VM networking isn't a separate system; it's this mechanism with automation layered on top.","demo13a,bridge,docker,kubernetes,libvirt"
+"What underlying kernel mechanism do Docker's default bridge network, Kubernetes CNI plugins, and KVM/libvirt networking all share?","A kernel bridge, veth pairs connecting containers/VMs to it, and MAC learning handling actual forwarding - the exact same mechanism built by hand in this demo. Container/VM networking isn't a separate system; it's this mechanism with automation layered on top.","demo-m03-05,bridge,docker,kubernetes,libvirt"
 ```
 
 ---

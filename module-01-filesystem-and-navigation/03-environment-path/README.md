@@ -869,31 +869,31 @@ matches, and `unalias cmd` (or `unset -f cmd`) removes the shadow.
 #separator:Comma
 #columns:Front,Back,Tags
 
-"A plain variable myvar=x is set, then bash -c 'echo $myvar' runs. What does the child print, and why?","Nothing (empty). A plain variable exists only in the current shell. Child processes receive only variables that were exported with export.","demo00c,environment,export"
+"A plain variable myvar=x is set, then bash -c 'echo $myvar' runs. What does the child print, and why?","Nothing (empty). A plain variable exists only in the current shell. Child processes receive only variables that were exported with export.","demo-m01-03,environment,export"
 
-"What does 'FOO=bar command' do?","It gives command the variable FOO=bar for that single run only. The current shell does not get the variable.","demo00c,environment,one-shot"
+"What does 'FOO=bar command' do?","It gives command the variable FOO=bar for that single run only. The current shell does not get the variable.","demo-m01-03,environment,one-shot"
 
-"PATH=/new:$PATH vs PATH=$PATH:/new: what is the practical difference?","Prepending (/new first) gives it override priority over same-named tools later in PATH. Appending makes it only a fallback, used when nothing earlier matches.","demo00c,path,priority"
+"PATH=/new:$PATH vs PATH=$PATH:/new: what is the practical difference?","Prepending (/new first) gives it override priority over same-named tools later in PATH. Appending makes it only a fallback, used when nothing earlier matches.","demo-m01-03,path,priority"
 
-"alias greet='echo X' works in your terminal but not inside bash -c or a script. Why, and what is the fix?","Aliases are only expanded in interactive shells by default. In a script, use shopt -s expand_aliases (on its own line, before the alias is defined and used), or better, use a function.","demo00c,alias,scripts"
+"alias greet='echo X' works in your terminal but not inside bash -c or a script. Why, and what is the fix?","Aliases are only expanded in interactive shells by default. In a script, use shopt -s expand_aliases (on its own line, before the alias is defined and used), or better, use a function.","demo-m01-03,alias,scripts"
 
-"shopt -s expand_aliases; alias g='echo X'; g all on ONE line fails with 'command not found'. Why?","Bash reads a whole line before running it, so an alias defined on the same line is not active yet. The alias takes effect from the next line.","demo00c,alias,gotcha"
+"shopt -s expand_aliases; alias g='echo X'; g all on ONE line fails with 'command not found'. Why?","Bash reads a whole line before running it, so an alias defined on the same line is not active yet. The alias takes effect from the next line.","demo-m01-03,alias,gotcha"
 
-"An alias and a function with the same name both exist. Which runs, and how do you verify it?","The alias wins (alias, then function, then builtin, then hash/PATH). Verify with type -a name, which lists every match in precedence order.","demo00c,alias,function,type-a"
+"An alias and a function with the same name both exist. Which runs, and how do you verify it?","The alias wins (alias, then function, then builtin, then hash/PATH). Verify with type -a name, which lists every match in precedence order.","demo-m01-03,alias,function,type-a"
 
-"How do you run the real command when an alias or function is shadowing it?","\name skips the alias; command name skips the alias and the function. unalias name and unset -f name remove them.","demo00c,alias,bypass"
+"How do you run the real command when an alias or function is shadowing it?","\name skips the alias; command name skips the alias and the function. unalias name and unset -f name remove them.","demo-m01-03,alias,bypass"
 
-"Why define a function before an alias of the same name?","If the alias already exists, bash expands it inside the function definition and reports a syntax error near unexpected token '('.","demo00c,alias,function,syntax"
+"Why define a function before an alias of the same name?","If the alias already exists, bash expands it inside the function definition and reports a syntax error near unexpected token '('.","demo-m01-03,alias,function,syntax"
 
-"which and type give different answers when an alias exists. Which tells you what actually runs?","type (and command -v). The which program only searches PATH and cannot see aliases, functions or builtins, so it can name a file that is not what runs. In scripts prefer command -v.","demo00c,which,type,command-v"
+"which and type give different answers when an alias exists. Which tells you what actually runs?","type (and command -v). The which program only searches PATH and cannot see aliases, functions or builtins, so it can name a file that is not what runs. In scripts prefer command -v.","demo-m01-03,which,type,command-v"
 
-"command which shopt prints nothing and exits 1. Why?","shopt is a pure shell builtin with no file in PATH, so a PATH-only search finds nothing. type shopt reports 'shopt is a shell builtin'. (On Rocky, which cd does print /usr/bin/cd, but the builtin is still what runs.)","demo00c,which,builtin"
+"command which shopt prints nothing and exits 1. Why?","shopt is a pure shell builtin with no file in PATH, so a PATH-only search finds nothing. type shopt reports 'shopt is a shell builtin'. (On Rocky, which cd does print /usr/bin/cd, but the builtin is still what runs.)","demo-m01-03,which,builtin"
 
-"What is bash's command hash table, and what clears it?","A cache of full paths found by earlier PATH searches. Reassigning PATH clears it automatically; hash -r clears it by hand; a new shell starts empty.","demo00c,hash,cache"
+"What is bash's command hash table, and what clears it?","A cache of full paths found by earlier PATH searches. Reassigning PATH clears it automatically; hash -r clears it by hand; a new shell starts empty.","demo-m01-03,hash,cache"
 
-"A new copy of a tool is installed EARLIER in PATH, PATH is not reassigned, and the old copy still runs. Why and what fixes it?","Bash cached the old copy's path and does not re-search. hash -r (or a new shell) forces a fresh PATH search. which still shows the new copy because it searches fresh.","demo00c,hash,stale,hash-r"
+"A new copy of a tool is installed EARLIER in PATH, PATH is not reassigned, and the old copy still runs. Why and what fixes it?","Bash cached the old copy's path and does not re-search. hash -r (or a new shell) forces a fresh PATH search. which still shows the new copy because it searches fresh.","demo-m01-03,hash,stale,hash-r"
 
-"Does overwriting a hashed file at the SAME path leave a stale hash?","No. The cache stores the path, not the contents, so the new contents run. A hash goes stale only when a better copy appears at a different, earlier path, or the hashed file is moved or removed (then you see No such file or directory with the full path, exit 127).","demo00c,hash,same-path"
+"Does overwriting a hashed file at the SAME path leave a stale hash?","No. The cache stores the path, not the contents, so the new contents run. A hash goes stale only when a better copy appears at a different, earlier path, or the hashed file is moved or removed (then you see No such file or directory with the full path, exit 127).","demo-m01-03,hash,same-path"
 ```
 
 ---

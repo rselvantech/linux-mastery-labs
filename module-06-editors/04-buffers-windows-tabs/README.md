@@ -7,7 +7,7 @@ this series ever teaching what a "window" actually is in Vim, or how it
 differs from a buffer or a tab — that gap gets closed here. Demo M06-03's
 `:g` command edits patterns *within* one file; this demo extends the same
 idea *across* many files at once with `:argdo`/`:bufdo` — the natural
-multi-file follow-through 23b left open. Along the way this demo also
+multi-file follow-through M06-03 left open. Along the way this demo also
 covers one of the most common pieces of practical DevOps Vim knowledge
 this series hasn't mentioned yet: saving a file you opened without
 write permission, without closing and reopening it as root.
@@ -41,7 +41,7 @@ write permission, without closing and reopening it as root.
 |---|---|---|---|
 | All lab tasks | ✅ (`vim` preinstalled or `sudo apt install vim`) | ✅ (`vi`/`vim` preinstalled or `sudo dnf install vim`) | Not required |
 
-> **Verification note:** As with Demos M06-01/23a/23b, this sandbox has no
+> **Verification note:** As with Demos M06-01/M06-02/M06-03, this sandbox has no
 > network access to install Vim, so nothing here could be captured from a
 > live session. Window/buffer/tab mechanics and the sudo-tee write trick
 > are long-stable, widely-documented behavior. Two specifics are marked
@@ -619,15 +619,15 @@ no re-typing or copy-pasting.
 #deck:Linux Mastery::Module 6 - Editors::Demo M06-04 - Buffers, Windows & Tabs
 #separator:Comma
 #columns:Front,Back,Tags
-"What's the difference between a Vim buffer, a window, and a tab?","A buffer is a file loaded into memory, whether or not it's currently visible. A window is a viewport showing some buffer's content. A tab is a saved window layout, not a separate copy of any file — buffers are shared across the whole session.","demo23c,buffers,windows,tabs,fundamentals"
-"You have three files loaded via vim file1 file2 file3, but only one window open. How many buffers are loaded, and how do you see them all?","All three are loaded as buffers regardless of what's currently displayed. :ls (or :buffers) lists every loaded buffer, whether or not it's shown in any window right now.","demo23c,buffers,ls"
-"What's the difference between :bn/:bp and opening a new window?",":bn/:bp switch which buffer the CURRENT window displays, without changing your window layout at all. Opening a new window (:split/:vsplit) changes your layout, independent of which buffer ends up shown in it.","demo23c,buffers,windows,navigation"
-"What's the actual difference in scope between :argdo and :bufdo?",":argdo operates only on the explicit :args list (e.g. a glob you set deliberately). :bufdo operates on every currently loaded buffer, which can include files opened ad hoc mid-session via :e or :split that were never part of the argument list.","demo23c,argdo,bufdo,scope,common-mistake"
-"Why use :argdo %s/old/new/g | update instead of following the substitution with a blanket :w on every file?","update only writes a buffer if it was actually modified — a file with no matches for the substitution is left completely untouched, including its mtime. A blanket :w would rewrite every file's mtime regardless of whether its content changed.","demo23c,argdo,update,best-practice"
-"An engineer opened a file earlier in the session via :e just to check something, then forgot about it. Later they run :bufdo across an unrelated batch edit. What happens to that forgotten file?","It gets modified too — :bufdo scopes to every loaded buffer, and that forgotten file is still a loaded buffer even though it was never part of any :args list. :ls before a destructive :bufdo command would have surfaced it in time.","demo23c,bufdo,common-mistake,break-fix"
-"How do you save a file you opened in Vim without realizing it requires root permission to write, without losing your in-progress edit?",":w !sudo tee % > /dev/null — this pipes the buffer's current content to a sudo-elevated tee, writing the file directly with the exact edit intact, rather than quitting and reopening as root (which would lose the unsaved edit).","demo23c,sudo-write,permissions,fundamentals"
-"In :w !sudo tee % > /dev/null, what does % expand to, and whose syntax is it — Vim's or the shell's?","% is Vim's own filename expansion for 'the current file's name,' evaluated by Vim before the resulting command is ever handed to the shell — unrelated to any % syntax the shell itself might have.","demo23c,sudo-write,vim-expansion"
-"What does the tabs feature actually let you do that windows/splits alone don't?","Tabs hold entirely separate window layouts side by side — one tab could be split into several windows while another tab stays a single full-screen window — letting you switch between different 'desks' of layout without losing either arrangement.","demo23c,tabs,windows"
+"What's the difference between a Vim buffer, a window, and a tab?","A buffer is a file loaded into memory, whether or not it's currently visible. A window is a viewport showing some buffer's content. A tab is a saved window layout, not a separate copy of any file — buffers are shared across the whole session.","demo-m06-04,buffers,windows,tabs,fundamentals"
+"You have three files loaded via vim file1 file2 file3, but only one window open. How many buffers are loaded, and how do you see them all?","All three are loaded as buffers regardless of what's currently displayed. :ls (or :buffers) lists every loaded buffer, whether or not it's shown in any window right now.","demo-m06-04,buffers,ls"
+"What's the difference between :bn/:bp and opening a new window?",":bn/:bp switch which buffer the CURRENT window displays, without changing your window layout at all. Opening a new window (:split/:vsplit) changes your layout, independent of which buffer ends up shown in it.","demo-m06-04,buffers,windows,navigation"
+"What's the actual difference in scope between :argdo and :bufdo?",":argdo operates only on the explicit :args list (e.g. a glob you set deliberately). :bufdo operates on every currently loaded buffer, which can include files opened ad hoc mid-session via :e or :split that were never part of the argument list.","demo-m06-04,argdo,bufdo,scope,common-mistake"
+"Why use :argdo %s/old/new/g | update instead of following the substitution with a blanket :w on every file?","update only writes a buffer if it was actually modified — a file with no matches for the substitution is left completely untouched, including its mtime. A blanket :w would rewrite every file's mtime regardless of whether its content changed.","demo-m06-04,argdo,update,best-practice"
+"An engineer opened a file earlier in the session via :e just to check something, then forgot about it. Later they run :bufdo across an unrelated batch edit. What happens to that forgotten file?","It gets modified too — :bufdo scopes to every loaded buffer, and that forgotten file is still a loaded buffer even though it was never part of any :args list. :ls before a destructive :bufdo command would have surfaced it in time.","demo-m06-04,bufdo,common-mistake,break-fix"
+"How do you save a file you opened in Vim without realizing it requires root permission to write, without losing your in-progress edit?",":w !sudo tee % > /dev/null — this pipes the buffer's current content to a sudo-elevated tee, writing the file directly with the exact edit intact, rather than quitting and reopening as root (which would lose the unsaved edit).","demo-m06-04,sudo-write,permissions,fundamentals"
+"In :w !sudo tee % > /dev/null, what does % expand to, and whose syntax is it — Vim's or the shell's?","% is Vim's own filename expansion for 'the current file's name,' evaluated by Vim before the resulting command is ever handed to the shell — unrelated to any % syntax the shell itself might have.","demo-m06-04,sudo-write,vim-expansion"
+"What does the tabs feature actually let you do that windows/splits alone don't?","Tabs hold entirely separate window layouts side by side — one tab could be split into several windows while another tab stays a single full-screen window — letting you switch between different 'desks' of layout without losing either arrangement.","demo-m06-04,tabs,windows"
 ```
 
 ## Appendix B — Quiz

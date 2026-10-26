@@ -160,10 +160,10 @@ find restore2 -maxdepth 3
 **Absolute paths get stripped automatically, with a warning:**
 
 ```bash
-tar -cf abs-test.tar /home/claude/14a-lab/src/app/README.md
+tar -cf abs-test.tar /home/claude/m04-02-lab/src/app/README.md
 # tar: Removing leading `/' from member names
 tar -tvf abs-test.tar
-# -rw-r--r-- root/root        15 2026-09-17 21:28 home/claude/14a-lab/src/app/README.md
+# -rw-r--r-- root/root        15 2026-09-17 21:28 home/claude/m04-02-lab/src/app/README.md
 ```
 > **Observation:** `tar` refuses to store a member with a leading `/` — it strips it and warns, storing `home/claude/...` (relative) instead of `/home/claude/...` (absolute). This is a deliberate safety behavior: an archive that could write to `/etc/passwd` on extraction, just because that's where the source file happened to live, would be a serious security hazard. §7 in Part 2's Break-Fix section shows the related but distinct hazard this does *not* protect against.
 
@@ -306,14 +306,14 @@ Archive:  app.zip
 ### Task 1 — Archive without compressing
 
 ```bash
-mkdir -p ~/14a-lab/src && cd ~/14a-lab/src
+mkdir -p ~/m04-02-lab/src && cd ~/m04-02-lab/src
 mkdir -p app/config app/logs
 echo "server_name=novatech" > app/config/app.conf
 echo "port=8080" >> app/config/app.conf
 echo "readme content" > app/README.md
 # populate app/logs/access.log and app/logs/error.log with a few thousand
 # lines of sample text — real content matters for Task 4's ratio comparison
-cd ~/14a-lab
+cd ~/m04-02-lab
 du -sh src/app
 tar -cf app.tar -C src app
 ls -lh app.tar
@@ -380,9 +380,9 @@ tar -tzf app-nologs.tar.gz
 
 mkdir -p /tmp/mixed && cd /tmp/mixed
 touch "report one.txt" "report two.txt" normal.txt
-find /tmp/mixed -name '*.txt' -print0 | tar --null -czf ~/14a-lab/mixed.tar.gz --files-from=-
-tar -tzf ~/14a-lab/mixed.tar.gz
-cd ~/14a-lab
+find /tmp/mixed -name '*.txt' -print0 | tar --null -czf ~/m04-02-lab/mixed.tar.gz --files-from=-
+tar -tzf ~/m04-02-lab/mixed.tar.gz
+cd ~/m04-02-lab
 
 zip -r -q app.zip src/app
 unzip -l app.zip
@@ -521,18 +521,18 @@ Not entirely. `gzip -t` verifies the gzip stream's own internal checksum — it 
 #deck:Linux Mastery::Module 4 - Storage::Demo M04-02 - Archiving & Compression
 #separator:Comma
 #columns:Front,Back,Tags
-"You run tar -cf archive.tar dir and the resulting file is smaller than the source directory's total size shown by du. Did tar compress the data?","No — tar alone never compresses anything. The size difference comes from tar not preserving the filesystem's per-file block-rounding overhead, not from any compression. Compression requires an explicit flag (-z/-j/-J) or piping through a separate compressor.","demo14a,tar,compression,fundamentals"
-"tar -czf app.tar.gz -C src app and tar -cf - -C src app | gzip > app.tar.gz — are these equivalent?","Yes, byte-for-byte once decompressed. -czf is tar's combined-flag shorthand for exactly this pipe: -c creates the archive stream, and -z pipes it through gzip internally. Understanding this composition is what makes tar's flag combinations predictable.","demo14a,tar,gzip,fundamentals"
-"A command is written as tar -czf -C src app (archive filename omitted). What actually happens?","-f always consumes the very next token as the archive filename, regardless of whether it looks like another flag. Here it consumes '-C' literally, creating a real gzip file named -C, then fails trying to stat 'app' as a file in the current directory since -C never took effect as the change-directory flag.","demo14a,tar,break-fix,common-mistake"
-"An archive's tar -tzf output shows every member starting with ./ directly, with no common wrapping directory. What does this signature indicate, and what's the risk?","This is a tarbomb signature — the archive was created by archiving the contents of a directory (via cd + tar . ) rather than the directory itself. Extracting it scatters every file directly into whatever directory you're standing in, rather than into one clean subdirectory.","demo14a,tar,tarbomb,break-fix"
-"tar strips a leading / from member paths with a warning. Does this protect against a tarbomb?","No — that protection only applies to absolute paths (e.g. /etc/passwd). A tarbomb's paths are all relative (./readme.txt, ./lib/) with no common prefix, which is technically valid and not caught by absolute-path stripping. Always extract into a fresh subdirectory regardless of what -tzf shows.","demo14a,tar,tarbomb,security"
-"When would you choose xz over gzip for compressing a backup?","When compression ratio matters more than CPU time — a compliance archive written once and rarely read benefits from xz's smaller footprint despite its higher CPU cost at creation. gzip is the better default when the backup window itself is the constraint.","demo14a,compression,gzip,xz,tradeoffs"
-"gzip -t on a backup file returns exit code 0 (success). Does this guarantee the backup is fully restorable?","Not entirely. gzip -t only verifies the compressed stream's internal checksum — it doesn't confirm the tar contents inside are the expected files or that a real extraction produces correct data. A fuller check also runs tar -tzf (or a real test extraction) against the decompressed contents.","demo14a,integrity,verification,gzip"
-"A single byte is flipped inside a .tar.gz file. What does gzip -t report, and why isn't the damage localized to one file inside the archive?","gzip: invalid compressed data--crc error — compressed streams don't degrade gracefully; corruption anywhere in the stream can invalidate everything after that point, not just the one logical file whose bytes were altered.","demo14a,integrity,corruption,gzip"
-"How do you safely build a tar archive from a dynamically generated list of filenames that might contain spaces?","find DIR -print0 | tar --null -czf out.tar.gz --files-from=- — the same null-delimited pattern from Demo M05-06's find -print0 | xargs -0, applied to tar's --files-from instead of xargs.","demo14a,tar,find,cross-demo,safety"
-"--exclude='logs' is passed to tar during archive CREATION, not extraction. What's the practical implication?","The excluded content never enters the archive at all — it's not a filter applied when reading the archive back out. This matters because you can't recover excluded content from that archive later; the decision to exclude is permanent for that archive.","demo14a,tar,exclude,fundamentals"
-"Why might you choose zip over tar+gzip for a specific deliverable?","When the recipient's environment is unknown or non-Unix (Windows, macOS) — .zip is natively readable there without extra tooling, unlike .tar.gz. tar+compressor remains preferable for Linux-to-Linux transfer where preserving Unix permissions/ownership matters more.","demo14a,zip,tar,comparison"
-"What's the difference between tar -tvf and unzip -l?","They're the direct equivalent of each other for their respective formats — both list an archive's contents with details (size, date, name) without extracting anything. tar -tvf works on tar archives (any compression); unzip -l works on .zip files specifically.","demo14a,tar,zip,comparison"
+"You run tar -cf archive.tar dir and the resulting file is smaller than the source directory's total size shown by du. Did tar compress the data?","No — tar alone never compresses anything. The size difference comes from tar not preserving the filesystem's per-file block-rounding overhead, not from any compression. Compression requires an explicit flag (-z/-j/-J) or piping through a separate compressor.","demo-m04-02,tar,compression,fundamentals"
+"tar -czf app.tar.gz -C src app and tar -cf - -C src app | gzip > app.tar.gz — are these equivalent?","Yes, byte-for-byte once decompressed. -czf is tar's combined-flag shorthand for exactly this pipe: -c creates the archive stream, and -z pipes it through gzip internally. Understanding this composition is what makes tar's flag combinations predictable.","demo-m04-02,tar,gzip,fundamentals"
+"A command is written as tar -czf -C src app (archive filename omitted). What actually happens?","-f always consumes the very next token as the archive filename, regardless of whether it looks like another flag. Here it consumes '-C' literally, creating a real gzip file named -C, then fails trying to stat 'app' as a file in the current directory since -C never took effect as the change-directory flag.","demo-m04-02,tar,break-fix,common-mistake"
+"An archive's tar -tzf output shows every member starting with ./ directly, with no common wrapping directory. What does this signature indicate, and what's the risk?","This is a tarbomb signature — the archive was created by archiving the contents of a directory (via cd + tar . ) rather than the directory itself. Extracting it scatters every file directly into whatever directory you're standing in, rather than into one clean subdirectory.","demo-m04-02,tar,tarbomb,break-fix"
+"tar strips a leading / from member paths with a warning. Does this protect against a tarbomb?","No — that protection only applies to absolute paths (e.g. /etc/passwd). A tarbomb's paths are all relative (./readme.txt, ./lib/) with no common prefix, which is technically valid and not caught by absolute-path stripping. Always extract into a fresh subdirectory regardless of what -tzf shows.","demo-m04-02,tar,tarbomb,security"
+"When would you choose xz over gzip for compressing a backup?","When compression ratio matters more than CPU time — a compliance archive written once and rarely read benefits from xz's smaller footprint despite its higher CPU cost at creation. gzip is the better default when the backup window itself is the constraint.","demo-m04-02,compression,gzip,xz,tradeoffs"
+"gzip -t on a backup file returns exit code 0 (success). Does this guarantee the backup is fully restorable?","Not entirely. gzip -t only verifies the compressed stream's internal checksum — it doesn't confirm the tar contents inside are the expected files or that a real extraction produces correct data. A fuller check also runs tar -tzf (or a real test extraction) against the decompressed contents.","demo-m04-02,integrity,verification,gzip"
+"A single byte is flipped inside a .tar.gz file. What does gzip -t report, and why isn't the damage localized to one file inside the archive?","gzip: invalid compressed data--crc error — compressed streams don't degrade gracefully; corruption anywhere in the stream can invalidate everything after that point, not just the one logical file whose bytes were altered.","demo-m04-02,integrity,corruption,gzip"
+"How do you safely build a tar archive from a dynamically generated list of filenames that might contain spaces?","find DIR -print0 | tar --null -czf out.tar.gz --files-from=- — the same null-delimited pattern from Demo M05-06's find -print0 | xargs -0, applied to tar's --files-from instead of xargs.","demo-m04-02,tar,find,cross-demo,safety"
+"--exclude='logs' is passed to tar during archive CREATION, not extraction. What's the practical implication?","The excluded content never enters the archive at all — it's not a filter applied when reading the archive back out. This matters because you can't recover excluded content from that archive later; the decision to exclude is permanent for that archive.","demo-m04-02,tar,exclude,fundamentals"
+"Why might you choose zip over tar+gzip for a specific deliverable?","When the recipient's environment is unknown or non-Unix (Windows, macOS) — .zip is natively readable there without extra tooling, unlike .tar.gz. tar+compressor remains preferable for Linux-to-Linux transfer where preserving Unix permissions/ownership matters more.","demo-m04-02,zip,tar,comparison"
+"What's the difference between tar -tvf and unzip -l?","They're the direct equivalent of each other for their respective formats — both list an archive's contents with details (size, date, name) without extracting anything. tar -tvf works on tar archives (any compression); unzip -l works on .zip files specifically.","demo-m04-02,tar,zip,comparison"
 ```
 
 ## Appendix B — Quiz

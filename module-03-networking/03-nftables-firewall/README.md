@@ -90,7 +90,7 @@ nftables` / `dnf install nftables` if not already present.
 
 ## Part 1 — Concepts
 
-### 12a.1 The table/chain/rule structure
+### 1.1 The table/chain/rule structure
 
 `nftables` organizes rules in three layers:
 
@@ -112,7 +112,7 @@ A chain's `hook` (`input`, `output`, `forward`) is what actually wires it
 into the kernel's packet path — a table/chain with no hook is just an
 inert container until something references it.
 
-### 12a.2 Default-deny — build the base first, then add exceptions
+### 1.2 Default-deny — build the base first, then add exceptions
 
 The production pattern almost every real firewall follows: start by
 dropping everything, then explicitly allow only what's needed:
@@ -138,7 +138,7 @@ individually allowed by port — without it, every outbound connection's
 *response* traffic would also need an explicit inbound rule, which defeats
 the point of a stateful firewall.
 
-### 12a.3 Rule order — first match wins, not "most specific"
+### 1.3 Rule order — first match wins, not "most specific"
 
 ```bash
 nft add rule inet filter input tcp dport 8080 counter drop
@@ -157,7 +157,7 @@ position in the chain wins. `nft insert rule ... index 0` (or explicitly
 rebuilding the chain in the intended order) is how you fix a
 wrongly-ordered rule, not by adding another one after it.
 
-### 12a.4 Rate limiting
+### 1.4 Rate limiting
 
 ```bash
 nft add rule inet filter input tcp dport 22 limit rate 5/minute accept
@@ -174,7 +174,7 @@ allows a short burst above the steady rate before throttling kicks in —
 useful for legitimate traffic that's naturally bursty (an SSH client
 retrying a few times quickly) without allowing sustained abuse.
 
-### 12a.5 Logging before dropping — two separate actions in one rule
+### 1.5 Logging before dropping — two separate actions in one rule
 
 ```bash
 nft add rule inet filter input tcp dport 22 log prefix "SSH-ATTEMPT " counter drop
@@ -190,7 +190,7 @@ kernel log, visible via `dmesg` or `journalctl -k`) that happens in
 addition to whatever action follows it in the same rule. This is why you
 can log traffic you're about to drop without needing two separate rules.
 
-### 12a.6 Inspecting and safely resetting a ruleset
+### 1.6 Inspecting and safely resetting a ruleset
 
 ```bash
 nft list ruleset              # show everything currently active
@@ -463,25 +463,25 @@ rate.
 #separator:Comma
 #columns:Front,Back,Tags
 
-"An nftables chain has an accept rule for tcp dport 8080 listed BEFORE a drop rule for the identical match. Which one actually applies to matching traffic?","The accept rule - nftables evaluates rules top to bottom within a chain and stops at the first match. Position determines the outcome, not specificity - the drop rule below never gets evaluated for that traffic, confirmed directly by testing this exact ordering.","demo12a,nftables,rule-order,footgun"
+"An nftables chain has an accept rule for tcp dport 8080 listed BEFORE a drop rule for the identical match. Which one actually applies to matching traffic?","The accept rule - nftables evaluates rules top to bottom within a chain and stops at the first match. Position determines the outcome, not specificity - the drop rule below never gets evaluated for that traffic, confirmed directly by testing this exact ordering.","demo-m03-03,nftables,rule-order,footgun"
 
-"Why does a default-deny (policy drop) inbound chain need an explicit ct state established,related accept rule near the top?","Without it, response traffic for connections YOU initiated outbound would also need individual inbound rules by port - defeating the point of a stateful firewall. This rule lets return traffic for already-established connections flow back automatically, while new inbound connections still need explicit rules.","demo12a,nftables,established,stateful"
+"Why does a default-deny (policy drop) inbound chain need an explicit ct state established,related accept rule near the top?","Without it, response traffic for connections YOU initiated outbound would also need individual inbound rules by port - defeating the point of a stateful firewall. This rule lets return traffic for already-established connections flow back automatically, while new inbound connections still need explicit rules.","demo-m03-03,nftables,established,stateful"
 
-"What's the nftables table/chain/rule structure, and what does a chain's 'hook' actually do?","table = namespace/family container (e.g. inet covers both IPv4 and IPv6). chain = a named ordered list of rules. A chain's hook (input/output/forward) is what wires it into the kernel's actual packet-filtering path - a table/chain with no hook is just an inert container until referenced by something with a hook.","demo12a,nftables,structure,hook"
+"What's the nftables table/chain/rule structure, and what does a chain's 'hook' actually do?","table = namespace/family container (e.g. inet covers both IPv4 and IPv6). chain = a named ordered list of rules. A chain's hook (input/output/forward) is what wires it into the kernel's actual packet-filtering path - a table/chain with no hook is just an inert container until referenced by something with a hook.","demo-m03-03,nftables,structure,hook"
 
-"limit rate 5/minute accept is added to a rule. Does this guarantee never more than 5 matches in any given minute?","No - it caps the AVERAGE rate over time, not a hard per-minute ceiling. burst (defaulting to match the rate value if unspecified) allows a short spike above the steady rate before throttling kicks in, accommodating naturally bursty legitimate traffic.","demo12a,nftables,rate-limit,burst"
+"limit rate 5/minute accept is added to a rule. Does this guarantee never more than 5 matches in any given minute?","No - it caps the AVERAGE rate over time, not a hard per-minute ceiling. burst (defaulting to match the rate value if unspecified) allows a short spike above the steady rate before throttling kicks in, accommodating naturally bursty legitimate traffic.","demo-m03-03,nftables,rate-limit,burst"
 
-"A rule reads: tcp dport 22 log prefix \"SSH-ATTEMPT \" counter drop. Does log override drop, or do both happen?","Both happen, in sequence. log is a side effect (writes to the kernel log, visible via dmesg/journalctl -k) that occurs in addition to whatever action follows it in the same rule - it's not an alternative action, so a single rule can log AND drop the same packet.","demo12a,nftables,log,drop"
+"A rule reads: tcp dport 22 log prefix \"SSH-ATTEMPT \" counter drop. Does log override drop, or do both happen?","Both happen, in sequence. log is a side effect (writes to the kernel log, visible via dmesg/journalctl -k) that occurs in addition to whatever action follows it in the same rule - it's not an alternative action, so a single rule can log AND drop the same packet.","demo-m03-03,nftables,log,drop"
 
-"A firewall rule blocking a port is confirmed present via nft list ruleset, but traffic still gets through. What should you check FIRST, before assuming the rule is broken?","Rule ORDER, not just presence. Confirm the rule's exact position relative to any other rule matching the same traffic - an earlier accept rule for the identical match makes a correctly-written later drop rule completely unreachable. Read the full ordered chain listing, not just grep for the rule's existence.","demo12a,nftables,troubleshooting,order"
+"A firewall rule blocking a port is confirmed present via nft list ruleset, but traffic still gets through. What should you check FIRST, before assuming the rule is broken?","Rule ORDER, not just presence. Confirm the rule's exact position relative to any other rule matching the same traffic - an earlier accept rule for the identical match makes a correctly-written later drop rule completely unreachable. Read the full ordered chain listing, not just grep for the rule's existence.","demo-m03-03,nftables,troubleshooting,order"
 
-"How do you fix a firewall rule that's correctly written but positioned after a conflicting rule that matches the same traffic first?","Reorder it - don't just add another rule. Delete the misordered rule (nft delete rule ... handle N) and re-add it in the correct position, or use nft insert rule ... index 0 to place it before the conflicting rule. Adding yet another rule after the existing wrong order doesn't fix anything, since the already-first-matching rule still wins.","demo12a,nftables,fix,reorder"
+"How do you fix a firewall rule that's correctly written but positioned after a conflicting rule that matches the same traffic first?","Reorder it - don't just add another rule. Delete the misordered rule (nft delete rule ... handle N) and re-add it in the correct position, or use nft insert rule ... index 0 to place it before the conflicting rule. Adding yet another rule after the existing wrong order doesn't fix anything, since the already-first-matching rule still wins.","demo-m03-03,nftables,fix,reorder"
 
-"What's the practical difference between nft list ruleset and nft flush ruleset?","nft list ruleset shows every table/chain/rule currently active with no side effects. nft flush ruleset REMOVES every rule from every table immediately - on a live system this removes all current firewall protection instantly, so it should never be run on a remote system without a safety net in case new rules lock out the connection.","demo12a,nftables,list,flush,safety"
+"What's the practical difference between nft list ruleset and nft flush ruleset?","nft list ruleset shows every table/chain/rule currently active with no side effects. nft flush ruleset REMOVES every rule from every table immediately - on a live system this removes all current firewall protection instantly, so it should never be run on a remote system without a safety net in case new rules lock out the connection.","demo-m03-03,nftables,list,flush,safety"
 
-"Why does nftables use an inet table family instead of separate ip/ip6 tables like older iptables usage?","inet covers both IPv4 and IPv6 in ONE table/chain/rule set, rather than requiring separate, duplicated rule sets for each protocol family the way iptables traditionally required ip and ip6 to be managed as genuinely separate command invocations.","demo12a,nftables,inet,ipv4-ipv6"
+"Why does nftables use an inet table family instead of separate ip/ip6 tables like older iptables usage?","inet covers both IPv4 and IPv6 in ONE table/chain/rule set, rather than requiring separate, duplicated rule sets for each protocol family the way iptables traditionally required ip and ip6 to be managed as genuinely separate command invocations.","demo-m03-03,nftables,inet,ipv4-ipv6"
 
-"A rule is added with policy drop as the chain's default. What happens to traffic that doesn't match ANY rule in the chain?","It's dropped - the chain's policy is the fallback action applied when no individual rule matches. This is exactly why default-deny is the production pattern: anything not explicitly allowed is blocked automatically, rather than relying on remembering to write an explicit block rule for every unwanted case.","demo12a,nftables,policy,default-deny"
+"A rule is added with policy drop as the chain's default. What happens to traffic that doesn't match ANY rule in the chain?","It's dropped - the chain's policy is the fallback action applied when no individual rule matches. This is exactly why default-deny is the production pattern: anything not explicitly allowed is blocked automatically, rather than relying on remembering to write an explicit block rule for every unwanted case.","demo-m03-03,nftables,policy,default-deny"
 ```
 
 ---

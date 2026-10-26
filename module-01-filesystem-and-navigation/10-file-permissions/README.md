@@ -954,8 +954,8 @@ When you access a file the kernel checks in order:
 
 ```bash
 # Create test area
-mkdir -p ~/demo03
-cd ~/demo03
+mkdir -p ~/demo-m01-10
+cd ~/demo-m01-10
 
 # Create files to work with
 echo "config data" > app.conf
@@ -964,7 +964,7 @@ echo "log entry" > app.log
 mkdir -p shared-dir
 
 # View all permissions
-ls -la ~/demo03/
+ls -la ~/demo-m01-10/
 ```
 
 **What to look for in the output:**
@@ -995,7 +995,7 @@ ls -ld /tmp               # drwxrwxrwt — sticky bit in action
 **Run on Ubuntu, then Rocky9:**
 
 ```bash
-cd ~/demo03
+cd ~/demo-m01-10
 
 # View current permissions
 ls -la
@@ -1035,31 +1035,31 @@ about a command isn't the same as running it — this task closes
 that gap.
 
 ```bash
-cd ~/demo03
+cd ~/demo-m01-10
 
 # Create a throwaway group and file to practice on
-sudo groupadd demo03-team 2>/dev/null || true
+sudo groupadd demo-m01-10-team 2>/dev/null || true
 
 # Change owner only
 sudo chown nobody app.conf 2>/dev/null || sudo chown $(whoami) app.conf
 ls -l app.conf   # owner column changed
 
 # Change owner AND group together
-sudo chown $(whoami):demo03-team app.conf
+sudo chown $(whoami):demo-m01-10-team app.conf
 ls -l app.conf   # both columns changed
 
 # Change GROUP only — two equivalent ways
-sudo chown :demo03-team deploy.sh   # colon with no user = group only
-sudo chgrp demo03-team app.log      # chgrp — the older dedicated command
-ls -l deploy.sh app.log             # confirm both now show demo03-team
+sudo chown :demo-m01-10-team deploy.sh   # colon with no user = group only
+sudo chgrp demo-m01-10-team app.log      # chgrp — the older dedicated command
+ls -l deploy.sh app.log             # confirm both now show demo-m01-10-team
 
 # Recursive ownership change — the real DevOps pattern
-sudo mkdir -p ~/demo03/webroot/assets
-sudo chown -R $(whoami):demo03-team ~/demo03/webroot
-ls -lR ~/demo03/webroot   # every file and subdirectory changed, not just the top
+sudo mkdir -p ~/demo-m01-10/webroot/assets
+sudo chown -R $(whoami):demo-m01-10-team ~/demo-m01-10/webroot
+ls -lR ~/demo-m01-10/webroot   # every file and subdirectory changed, not just the top
 
 # Cleanup
-sudo groupdel demo03-team 2>/dev/null
+sudo groupdel demo-m01-10-team 2>/dev/null
 ```
 
 **Paste the three `ls -l`/`ls -lR` outputs showing owner-only,
@@ -1111,7 +1111,7 @@ grep -r "umask" /etc/profile /etc/bashrc /etc/profile.d/ 2>/dev/null
 **Run on Ubuntu, then Rocky9:**
 
 ```bash
-cd ~/demo03
+cd ~/demo-m01-10
 
 # --- Setuid ---
 # Find real setuid binaries on your system
@@ -1119,30 +1119,30 @@ find /usr/bin -perm -4000 -type f 2>/dev/null | head -5
 ls -l /usr/bin/passwd    # classic setuid example
 
 # Create a test script and set setuid (educational — no real effect on scripts)
-cp /bin/cat ~/demo03/mycat 2>/dev/null || cp /usr/bin/cat ~/demo03/mycat
-chmod 4755 ~/demo03/mycat
-ls -l ~/demo03/mycat     # should show -rwsr-xr-x
+cp /bin/cat ~/demo-m01-10/mycat 2>/dev/null || cp /usr/bin/cat ~/demo-m01-10/mycat
+chmod 4755 ~/demo-m01-10/mycat
+ls -l ~/demo-m01-10/mycat     # should show -rwsr-xr-x
 
 # --- Setgid on directory ---
-mkdir ~/demo03/team-project
-chmod 2775 ~/demo03/team-project
-ls -ld ~/demo03/team-project     # should show drwxrwsr-x
+mkdir ~/demo-m01-10/team-project
+chmod 2775 ~/demo-m01-10/team-project
+ls -ld ~/demo-m01-10/team-project     # should show drwxrwsr-x
 # Any file created here will inherit the directory's group
 
 # Prove it — don't just take the comment above on faith
-touch ~/demo03/team-project/newfile.txt
-ls -l ~/demo03/team-project/newfile.txt
+touch ~/demo-m01-10/team-project/newfile.txt
+ls -l ~/demo-m01-10/team-project/newfile.txt
 # Group column should show the SAME group as team-project's own
 # directory listing above — NOT your own primary group. Compare
 # against a file created outside this directory:
-touch ~/demo03/outside-file.txt
-ls -l ~/demo03/outside-file.txt
+touch ~/demo-m01-10/outside-file.txt
+ls -l ~/demo-m01-10/outside-file.txt
 # This one shows your primary group instead — the contrast IS the point
 
 # --- Sticky bit ---
-mkdir ~/demo03/shared-tmp
-chmod 1777 ~/demo03/shared-tmp
-ls -ld ~/demo03/shared-tmp       # should show drwxrwxrwt
+mkdir ~/demo-m01-10/shared-tmp
+chmod 1777 ~/demo-m01-10/shared-tmp
+ls -ld ~/demo-m01-10/shared-tmp       # should show drwxrwxrwt
 
 # --- Security audit: find all setuid files ---
 echo "=== Setuid files on this system ==="
@@ -1528,21 +1528,21 @@ find / -nouser -type f 2>/dev/null       # orphaned files (no owner)
 #separator:Comma
 #columns:Front,Back,Tags
 
-"ls -l shows -rwsr-xr-x on /usr/bin/passwd. What does the s mean and why is it needed?","The s in the owner execute position is the setuid bit. When any user runs passwd, the process temporarily runs with root's permissions (passwd is owned by root). This allows writing to /etc/shadow which only root can access. Without setuid, users could never change their own passwords.","demo03,setuid,permissions"
+"ls -l shows -rwsr-xr-x on /usr/bin/passwd. What does the s mean and why is it needed?","The s in the owner execute position is the setuid bit. When any user runs passwd, the process temporarily runs with root's permissions (passwd is owned by root). This allows writing to /etc/shadow which only root can access. Without setuid, users could never change their own passwords.","demo-m01-10,setuid,permissions"
 
-"You create a file in /var/www/project/. It shows your username as group instead of webteam. How do you fix this permanently for all future files?","Set the setgid bit on the directory: chmod g+s /var/www/project/ or chmod 2775 /var/www/project/. With setgid, all new files created inside inherit the directory's group (webteam) instead of the creator's primary group. Existing files are unaffected — only new files follow the rule.","demo03,setgid,permissions"
+"You create a file in /var/www/project/. It shows your username as group instead of webteam. How do you fix this permanently for all future files?","Set the setgid bit on the directory: chmod g+s /var/www/project/ or chmod 2775 /var/www/project/. With setgid, all new files created inside inherit the directory's group (webteam) instead of the creator's primary group. Existing files are unaffected — only new files follow the rule.","demo-m01-10,setgid,permissions"
 
-"What is umask 027? What permissions does it give to new files and directories?","umask 027 removes write from group and all permissions from others. New files: 640 (rw-r-----). New dirs: 750 (rwx r-x ---). Production use: service accounts should use umask 027 so they cannot accidentally create world-readable files. Set in systemd unit with UMask=0027.","demo03,umask,security"
+"What is umask 027? What permissions does it give to new files and directories?","umask 027 removes write from group and all permissions from others. New files: 640 (rw-r-----). New dirs: 750 (rwx r-x ---). Production use: service accounts should use umask 027 so they cannot accidentally create world-readable files. Set in systemd unit with UMask=0027.","demo-m01-10,umask,security"
 
-"A CI/CD pipeline gets Permission denied on deploy.sh. ls -l shows -rw-r--r--. What is wrong and what is the minimum fix?","No execute bit. The script has 644 — read/write for owner, read for group and others, no execute for anyone. Shell cannot execute a script without the execute bit. Fix: chmod 755 deploy.sh (or chmod +x deploy.sh). The x bit is required for any user to run the script as a program.","demo03,chmod,permissions,troubleshooting"
+"A CI/CD pipeline gets Permission denied on deploy.sh. ls -l shows -rw-r--r--. What is wrong and what is the minimum fix?","No execute bit. The script has 644 — read/write for owner, read for group and others, no execute for anyone. Shell cannot execute a script without the execute bit. Fix: chmod 755 deploy.sh (or chmod +x deploy.sh). The x bit is required for any user to run the script as a program.","demo-m01-10,chmod,permissions,troubleshooting"
 
-"What does the + at end of permissions mean in ls -l? Example: -rw-r--r--+","The + indicates an ACL (Access Control List) is set on this file beyond standard permissions. Standard ls -l cannot show the full picture. Use getfacl filename to see all ACL entries including per-user and per-group permissions.","demo03,acl,permissions"
+"What does the + at end of permissions mean in ls -l? Example: -rw-r--r--+","The + indicates an ACL (Access Control List) is set on this file beyond standard permissions. Standard ls -l cannot show the full picture. Use getfacl filename to see all ACL entries including per-user and per-group permissions.","demo-m01-10,acl,permissions"
 
-"You need to give user ci-runner read access to /etc/nginx/nginx.conf without making it world-readable and without adding ci-runner to the root group. What do you use?","ACL: setfacl -m u:ci-runner:r /etc/nginx/nginx.conf. Then verify: getfacl /etc/nginx/nginx.conf. This grants exactly read permission to one specific user without changing standard permissions, group membership, or world-readability. This is the primary use case for ACLs over standard permissions.","demo03,acl,setfacl,security"
+"You need to give user ci-runner read access to /etc/nginx/nginx.conf without making it world-readable and without adding ci-runner to the root group. What do you use?","ACL: setfacl -m u:ci-runner:r /etc/nginx/nginx.conf. Then verify: getfacl /etc/nginx/nginx.conf. This grants exactly read permission to one specific user without changing standard permissions, group membership, or world-readability. This is the primary use case for ACLs over standard permissions.","demo-m01-10,acl,setfacl,security"
 
-"What is wrong with chmod -R 755 /var/www/html/?","It applies execute permission to ALL files including regular HTML, CSS, JS files — not just directories. Regular files do not need the execute bit. The correct approach: find /var/www/html -type d -exec chmod 755 {} \\; && find /var/www/html -type f -exec chmod 644 {} \\;","demo03,chmod,recursive,security"
+"What is wrong with chmod -R 755 /var/www/html/?","It applies execute permission to ALL files including regular HTML, CSS, JS files — not just directories. Regular files do not need the execute bit. The correct approach: find /var/www/html -type d -exec chmod 755 {} \\; && find /var/www/html -type f -exec chmod 644 {} \\;","demo-m01-10,chmod,recursive,security"
 
-"A file has permissions rw-r--r-- and you run chmod o=. What are the new permissions?","rw-r----- (640). chmod o= sets other permissions to nothing (empty). Owner permissions (rw-) unchanged. Group permissions (r--) unchanged. Other permissions cleared to ---. Equivalent to: chmod 640 filename","demo03,chmod,symbolic"
+"A file has permissions rw-r--r-- and you run chmod o=. What are the new permissions?","rw-r----- (640). chmod o= sets other permissions to nothing (empty). Owner permissions (rw-) unchanged. Group permissions (r--) unchanged. Other permissions cleared to ---. Equivalent to: chmod 640 filename","demo-m01-10,chmod,symbolic"
 ```
 
 ---

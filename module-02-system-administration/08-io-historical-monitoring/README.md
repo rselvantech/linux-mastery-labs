@@ -514,25 +514,25 @@ packaged default.
 #separator:Comma
 #columns:Front,Back,Tags
 
-"iostat shows a device at 98% util with rising aqu-sz. What does iostat alone NOT tell you, and what tool fills that gap?","iostat reports per-device statistics, not per-process — it doesn't tell you which process is responsible for the load. iotop fills that gap by attributing I/O to individual processes.","demo10,iostat,iotop"
+"iostat shows a device at 98% util with rising aqu-sz. What does iostat alone NOT tell you, and what tool fills that gap?","iostat reports per-device statistics, not per-process — it doesn't tell you which process is responsible for the load. iotop fills that gap by attributing I/O to individual processes.","demo-m02-08,iostat,iotop"
 
-"What do the %util and aqu-sz columns in iostat -x together indicate when both are high?","Disk saturation with actual request queuing — %util shows the device is busy nearly all the time, and rising aqu-sz confirms requests are backing up rather than being serviced instantly, which is what causes application-visible latency.","demo10,iostat,troubleshooting"
+"What do the %util and aqu-sz columns in iostat -x together indicate when both are high?","Disk saturation with actual request queuing — %util shows the device is busy nearly all the time, and rising aqu-sz confirms requests are backing up rather than being serviced instantly, which is what causes application-visible latency.","demo-m02-08,iostat,troubleshooting"
 
-"Why does sar exist when top/vmstat/free already cover CPU, memory, and I/O?","Those tools only show the current instant with no history. sar, backed by sysstat's background collection (sa1/sa2), is the only tool covered so far that can answer a question about the past on demand.","demo10,sar,fundamentals"
+"Why does sar exist when top/vmstat/free already cover CPU, memory, and I/O?","Those tools only show the current instant with no history. sar, backed by sysstat's background collection (sa1/sa2), is the only tool covered so far that can answer a question about the past on demand.","demo-m02-08,sar,fundamentals"
 
-"What do sa1 and sa2 actually do, and how are they scheduled?","sa1 runs frequently (traditionally every 10 min) and appends a compact data sample; sa2 runs once daily and produces a summary report. They're scheduled via cron or a systemd timer depending on the distro — the same scheduling mechanisms covered in Demo M02-05, not a new one.","demo10,sar,sysstat,cross-demo"
+"What do sa1 and sa2 actually do, and how are they scheduled?","sa1 runs frequently (traditionally every 10 min) and appends a compact data sample; sa2 runs once daily and produces a summary report. They're scheduled via cron or a systemd timer depending on the distro — the same scheduling mechanisms covered in Demo M02-05, not a new one.","demo-m02-08,sar,sysstat,cross-demo"
 
-"A team's sysstat retention (HISTORY=) is left at the packaged default. What's the practical risk?","If an incident isn't investigated until after the retention window passes (common, since postmortems often happen days or weeks later), the historical data needed to investigate it will already be deleted, even though collection was running the whole time.","demo10,sysstat,retention,common-mistake"
+"A team's sysstat retention (HISTORY=) is left at the packaged default. What's the practical risk?","If an incident isn't investigated until after the retention window passes (common, since postmortems often happen days or weeks later), the historical data needed to investigate it will already be deleted, even though collection was running the whole time.","demo-m02-08,sysstat,retention,common-mistake"
 
-"How do you query sar data for a specific past day rather than today's live-collected data?","sar -f /var/log/sysstat/saXX, where XX is the day-of-month of the saved data file you want to read, e.g. sar -u -f /var/log/sysstat/sa07 for the 7th.","demo10,sar,historical-query"
+"How do you query sar data for a specific past day rather than today's live-collected data?","sar -f /var/log/sysstat/saXX, where XX is the day-of-month of the saved data file you want to read, e.g. sar -u -f /var/log/sysstat/sa07 for the 7th.","demo-m02-08,sar,historical-query"
 
-"What's the difference in purpose between iotop's accumulated mode (-a) and its default current-rate view?","Accumulated mode totals I/O since iotop started, better for identifying which process has done the most total I/O over an ongoing incident window; current-rate view shows only the instantaneous snapshot, which can catch a process mid-burst or mid-idle.","demo10,iotop,troubleshooting"
+"What's the difference in purpose between iotop's accumulated mode (-a) and its default current-rate view?","Accumulated mode totals I/O since iotop started, better for identifying which process has done the most total I/O over an ongoing incident window; current-rate view shows only the instantaneous snapshot, which can catch a process mid-burst or mid-idle.","demo-m02-08,iotop,troubleshooting"
 
-"What is sadf used for, and what does the -d flag do?","sadf exports sar's historical data outside the terminal — into a spreadsheet, chart, or external system. -d outputs it in a semicolon-delimited CSV-like format instead of sar's default human-readable text.","demo10,sadf,export"
+"What is sadf used for, and what does the -d flag do?","sadf exports sar's historical data outside the terminal — into a spreadsheet, chart, or external system. -d outputs it in a semicolon-delimited CSV-like format instead of sar's default human-readable text.","demo-m02-08,sadf,export"
 
-"Which sar flag queries historical memory usage, and which queries historical per-device I/O?","sar -r for memory, sar -d for per-device I/O (the historical counterpart to iostat). sar -u covers CPU, sar -n DEV covers network.","demo10,sar,basics"
+"Which sar flag queries historical memory usage, and which queries historical per-device I/O?","sar -r for memory, sar -d for per-device I/O (the historical counterpart to iostat). sar -u covers CPU, sar -n DEV covers network.","demo-m02-08,sar,basics"
 
-"iostat and top both show system activity — what's the key structural difference in what each one can report?","top (Demo M02-07) is a live-only, primarily process/CPU/memory-oriented view. iostat is specifically device-level I/O detail (per-disk throughput, utilization, queue depth) — the two are complementary, not overlapping, since top doesn't break down per-device I/O this way.","demo10,iostat,cross-demo"
+"iostat and top both show system activity — what's the key structural difference in what each one can report?","top (Demo M02-07) is a live-only, primarily process/CPU/memory-oriented view. iostat is specifically device-level I/O detail (per-disk throughput, utilization, queue depth) — the two are complementary, not overlapping, since top doesn't break down per-device I/O this way.","demo-m02-08,iostat,cross-demo"
 ```
 
 ---
