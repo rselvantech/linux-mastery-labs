@@ -5,3 +5,5 @@ src/
 logs/
 old*.md
 new*.md
+docs/
+tools/
